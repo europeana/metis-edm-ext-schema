@@ -1,0 +1,134 @@
+@prefix schema:  <http://www.europeana.eu/metis/edm/ext/> .
+@prefix cc:      <http://creativecommons.org/ns#> .
+@prefix dc:      <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix edm:     <http://www.europeana.eu/schemas/edm/> .
+@prefix ore:     <http://www.openarchives.org/ore/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh:      <http://www.w3.org/ns/shacl#> .
+@prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+
+# Property declarations
+schema:contributorProperty
+    sh:path     dc:contributor ;
+    sh:nodeKind sh:IRIOrLiteral ;
+    sh:message "This property must be a literal or a reference.".
+
+# This shape verifies that the various properties reference the right type of contextual classes.
+# The properties for typing contextual class references are constructed to avoid triggering
+# on literals, or on IRIs that are not resolvable in the record.
+schema:EdmClassWithCorrectReferencesShape
+    a              sh:NodeShape ;
+    sh:targetClass schema:EdmClass ;
+    sh:property    [ sh:path     dc:contributor ;
+                     sh:or       ( [ sh:class edm:Agent ]
+                                   [ sh:not [ sh:class schema:EdmClass ] ] ) ;
+                     sh:severity sh:Warning ;
+                     sh:message  "This property may not reference a contextual class other than edm:Agent." ] .
+
+# ProvidedCHO
+schema:ProvidedCHOShape
+    a              sh:NodeShape ;
+    sh:targetClass edm:ProvidedCHO ;
+    sh:property    schema:contributorProperty .
+
+# Aggregation
+schema:AggregationShape
+    a              sh:NodeShape ;
+    sh:targetClass ore:Aggregation .
+
+# WebResource
+schema:WebResourceShape
+    a              sh:NodeShape ;
+    sh:targetClass edm:WebResource .
+
+# Agent
+schema:AgentShape
+    a              sh:NodeShape ;
+    sh:targetClass edm:Agent .
+
+# Concept
+schema:ConceptShape
+    a              sh:NodeShape ;
+    sh:targetClass skos:Concept .
+
+# Place
+schema:PlaceShape
+    a              sh:NodeShape ;
+    sh:targetClass edm:Place .
+
+# TimeSpan
+schema:TimeSpanShape
+    a              sh:NodeShape ;
+    sh:targetClass edm:TimeSpan .
+
+# License
+schema:LicenseShape
+    a              sh:NodeShape ;
+    sh:targetClass cc:License .
+
+
+
+# LEGACY
+schema:hasLang
+    sh:or ( [ sh:not [ sh:path     edm:type ;
+                       sh:datatype xsd:string ;
+                       sh:pattern  "^TEXT" ] ] [ sh:path     dc:language ;
+                                                 sh:datatype xsd:string ;
+                                                 sh:minCount 1 ] ) .
+
+schema:ProvidedCHOShapeLegacy
+  a              sh:NodeShape ;
+  sh:targetClass edm:ProvidedCHO ;
+  sh:property    [ sh:path     edm:type ;
+                   sh:minCount 1 ;
+                   sh:in       ( "TEXT" "VIDEO" "SOUND" "IMAGE" "3D" ) ;
+                   sh:message  "Missing or invalid value for edm:type" ] ;
+  sh:property    [ sh:path      [ sh:alternativePath ( dc:title dc:description ) ] ;
+                   sh:minCount  1 ;
+                   sh:minLength 1 ; # no empty string allowed
+                   sh:message   "At least one the following properties should be present: dc:title or dc:description" ] ;
+  sh:property    [ sh:path     [ sh:alternativePath ( dc:subject dc:type dcterms:spatial dcterms:temporal ) ] ;
+                   sh:minCount 1 ;
+                   sh:message  "At least one the following properties should be present: dc:subject, dc:type, dcterms:spatial or dcterms:temporal" ] ;
+  sh:node        [ sh:node    schema:hasLang ;
+                   sh:message "Property dc:language is required with edm:type='TEXT'" ] .
+
+schema:AggregationShapeLegacy
+  a              sh:NodeShape ;
+  sh:targetClass ore:Aggregation ;
+  sh:property    [ sh:path     edm:aggregatedCHO ;
+                   sh:nodeKind sh:IRI ;
+                   sh:minCount 1 ;
+                   sh:maxCount 1 ;
+                   sh:message  "Missing or invalid value for edm:aggregatedCHO" ] ;
+  sh:property    [ sh:path     edm:provider ;
+                   sh:nodeKind sh:IRIOrLiteral ;
+                   sh:minCount 1 ;
+                   sh:maxCount 1 ;
+                   sh:message  "Missing or invalid value for edm:provider" ] ;
+  sh:property    [ sh:path     edm:dataProvider ;
+                   sh:nodeKind sh:IRIOrLiteral ;
+                   sh:minCount 1 ;
+                   sh:maxCount 1 ;
+                   sh:message  "Missing or invalid value for edm:dataProvider" ] ;
+  sh:property    [ sh:path     edm:rights ;
+                   sh:nodeKind sh:IRI ;
+                   sh:minCount 1 ;
+                   sh:message  "Missing or invalid value for edm:rights" ] ;
+  sh:property    [ sh:path     [ sh:alternativePath ( edm:isShownAt edm:isShownBy ) ] ;
+                   sh:nodeKind sh:IRI ;
+                   sh:minCount 1 ;
+                   sh:message  "At least one the following properties should be present: edm:isShownAt or edm:isShownBy and should have a valid URI" ] ;
+  sh:property    [ sh:path     edm:isShownAt ;
+                   sh:nodeKind sh:IRI ;
+                   sh:maxCount 1 ;
+                   sh:message  "Only one occurrence of edm:isShownAt is allowed" ] ;
+  sh:property    [ sh:path     edm:isShownBy ;
+                   sh:nodeKind sh:IRI ;
+                   sh:maxCount 1 ;
+                   sh:message  "Only one occurrence of edm:isShownBy is allowed" ] .
+

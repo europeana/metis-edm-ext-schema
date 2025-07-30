@@ -1,0 +1,23 @@
+@prefix schema:  <http://www.europeana.eu/metis/edm/ext/> .
+@prefix cc:      <http://creativecommons.org/ns#> .
+@prefix dc:      <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix edm:     <http://www.europeana.eu/schemas/edm/> .
+@prefix ore:     <http://www.openarchives.org/ore/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh:      <http://www.w3.org/ns/shacl#> .
+@prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+schema:EdmClass rdfs:subClassOf rdfs:Class .
+edm:ProvidedCHO rdfs:subClassOf schema:EdmClass .
+ore:Aggregation rdfs:subClassOf schema:EdmClass .
+cc:License rdfs:subClassOf schema:EdmClass .
+
+schema:ContextualClass rdfs:subClassOf schema:EdmClass .
+edm:Agent rdfs:subClassOf schema:ContextualClass .
+skos:Concept rdfs:subClassOf schema:ContextualClass .
+edm:Organisation rdfs:subClassOf schema:ContextualClass .
+edm:Place rdfs:subClassOf schema:ContextualClass .
+edm:TimeSpan rdfs:subClassOf schema:ContextualClass .

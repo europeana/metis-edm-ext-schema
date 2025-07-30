@@ -12,17 +12,21 @@ import org.apache.jena.shacl.lib.ShLib;
 
 public class EdmExternalValidator {
 
-  final Shapes SHAPES;
+  final Shapes shapes;
+  final Model modelHierarchy;
 
   public EdmExternalValidator() {
-    this.SHAPES = Shapes.parse(RDFDataMgr.loadGraph("schema/shacl_edm.ttl"));
+    this.shapes = Shapes.parse(RDFDataMgr.loadGraph("schema/edm_ext_shacl_shapes.ttl"));
+    this.modelHierarchy = ModelFactory.createDefaultModel().read(
+        "schema/edm_ext_class_hierarchy.ttl");
   }
 
   public void validate(String rdfXmlInput) {
     final Model model = ModelFactory.createDefaultModel();
     model.read(new StringReader(rdfXmlInput), "", Lang.RDFXML.getLabel());
+    model.add(this.modelHierarchy);
 
-    final ValidationReport report = ShaclValidator.get().validate(SHAPES, model.getGraph());
+    final ValidationReport report = ShaclValidator.get().validate(shapes, model.getGraph());
     ShLib.printReport(report);
     System.out.println();
     RDFDataMgr.write(System.out, report.getModel(), Lang.TTL);
