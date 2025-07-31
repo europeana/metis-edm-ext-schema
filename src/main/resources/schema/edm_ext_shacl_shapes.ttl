@@ -11,29 +11,169 @@
 @prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
 
 
-# Property declarations
-schema:contributorProperty
+### Property declarations ###
+schema:dcContributorProperty
     sh:path     dc:contributor ;
     sh:nodeKind sh:IRIOrLiteral ;
-    sh:message "This property must be a literal or a reference.".
+    sh:message  "dc:contributor must be a literal or a reference." .
+
+schema:dcCoverageProperty
+    sh:path     dc:coverage ;
+    sh:nodeKind sh:IRIOrLiteral ;
+    sh:message  "dc:coverage must be a literal or a reference." .
+
+schema:dcCreatorProperty
+    sh:path     dc:creator  ;
+    sh:nodeKind sh:IRIOrLiteral ;
+    sh:message  "cd:creator must be a literal or a reference." .
+
+schema:dcDateProperty
+    sh:path     dc:date ;
+    sh:nodeKind sh:IRIOrLiteral ;
+    sh:message  "dc:date must be a literal or a reference." .
+
+schema:dcDescriptionProperty
+    sh:path     dc:description  ;
+    sh:nodeKind sh:IRIOrLiteral ;
+    sh:pattern  "\\S" ; # Prevents invalid EDM after normalisation (removal of empty literals).
+    sh:message  "dc:description must be a non-whitespace literal or a reference." .
+
+schema:dcFormatProperty
+    sh:path     dc:format ;
+    sh:nodeKind sh:IRIOrLiteral ;
+    sh:message  "dc:format must be a literal or a reference." .
+
+schema:dcIdentifierProperty
+    sh:path     dc:identifier ;
+    sh:nodeKind sh:Literal ;
+    sh:message  "dc:identifier must be a literal." .
+
+schema:dcLanguageProperty
+    sh:path     dc:language ;
+    sh:nodeKind sh:Literal ;
+    sh:pattern  "\\S" ; # Prevents invalid EDM after normalisation (removal of empty literals).
+    sh:message  "dc:language must be a non-whitespace literal." .
+
+schema:dcPublisherProperty
+    sh:path     dc:publisher ;
+    sh:nodeKind sh:IRIOrLiteral ;
+    sh:message  "dc:publisher must be a literal or a reference." .
+
+schema:dcRelationProperty
+    sh:path     dc:relation ;
+    sh:nodeKind sh:IRIOrLiteral ;
+    sh:message  "dc:relation must be a literal or a reference." .
+
+schema:dcRightsProperty
+    sh:path     dc:rights ;
+    sh:nodeKind sh:IRIOrLiteral ;
+    sh:message  "dc:rights must be a literal or a reference." .
+
+schema:dcSourceProperty
+    sh:path     dc:source ;
+    sh:nodeKind sh:IRIOrLiteral ;
+    sh:message  "dc:source must be a literal or a reference." .
+
+schema:dcSubjectProperty
+    sh:path     dc:subject  ;
+    sh:nodeKind sh:IRIOrLiteral ;
+    sh:pattern  "\\S" ; # Prevents invalid EDM after normalisation (removal of empty literals).
+    sh:message  "dc:subject must be a non-whitespace literal or a reference." .
+
+schema:dcTitleProperty
+    sh:path     dc:title ;
+    sh:nodeKind sh:Literal ;
+    sh:pattern  "\\S" ; # Prevents invalid EDM after normalisation (removal of empty literals).
+    sh:message  "dc:title must be a non-whitespace literal." .
+
+schema:dcTypeProperty
+    sh:path     dc:type  ;
+    sh:nodeKind sh:IRIOrLiteral ;
+    sh:pattern  "\\S" ; # Prevents invalid EDM after normalisation (removal of empty literals).
+    sh:message  "dc:type must be a non-whitespace literal or a reference." .
+
+
+# TODO: dcterms:temporal and dcterms:spatial need to be non-whitespace!
+
+
+### Shape declarations ###
 
 # This shape verifies that the various properties reference the right type of contextual classes.
-# The properties for typing contextual class references are constructed to avoid triggering
-# on literals, or on IRIs that are not resolvable in the record.
-schema:EdmClassWithCorrectReferencesShape
+# The typing conditions for contextual class references are designed to avoid failing on literals,
+# or on IRIs that are not resolvable in the record.
+schema:EdmClassWithContextualReferencesShape
     a              sh:NodeShape ;
     sh:targetClass schema:EdmClass ;
-    sh:property    [ sh:path     dc:contributor ;
+    sh:property    [ sh:path     [ sh:alternativePath ( dc:contributor dc:creator dc:publisher ) ] ;
                      sh:or       ( [ sh:class edm:Agent ]
                                    [ sh:not [ sh:class schema:EdmClass ] ] ) ;
                      sh:severity sh:Warning ;
-                     sh:message  "This property may not reference a contextual class other than edm:Agent." ] .
+                     sh:message  "This property should not reference an EDM class other than edm:Agent." ] ;
+    sh:property    [ sh:path     [ sh:alternativePath ( dc:subject dc:type ) ] ;
+                     sh:or       ( [ sh:class skos:Concept ]
+                                   [ sh:not [ sh:class schema:EdmClass ] ] ) ;
+                     sh:severity sh:Warning ;
+                     sh:message  "This property should not reference an EDM class other than skos:Concept." ] ;
+    sh:property    [ sh:path     dc:date ;
+                     sh:or       ( [ sh:class edm:TimeSpan ]
+                                   [ sh:not [ sh:class schema:EdmClass ] ] ) ;
+                     sh:severity sh:Warning ;
+                     sh:message  "This property should not reference an EDM class other than edm:TimeSpan." ] ;
+    sh:property    [ sh:path     dc:coverage ;
+                     sh:or       ( [ sh:class edm:Place ]
+                                   [ sh:class edm:TimeSpan ]
+                                   [ sh:not [ sh:class schema:EdmClass ] ] ) ;
+                     sh:severity sh:Warning ;
+                     sh:message  "This property should not reference an EDM class other than edm:Place or edm:TimeSpan." ] ;
+    sh:property    [ sh:path     [ sh:alternativePath ( dc:description dc:format dc:rights dc:source ) ] ;
+                     sh:not      [ sh:class schema:EdmClass ] ;
+                     sh:severity sh:Warning ;
+                     sh:message  "This property should not reference an EDM class." ] .
+
 
 # ProvidedCHO
 schema:ProvidedCHOShape
     a              sh:NodeShape ;
     sh:targetClass edm:ProvidedCHO ;
-    sh:property    schema:contributorProperty .
+    sh:property    schema:dcContributorProperty ;
+    sh:property    schema:dcCoverageProperty ;
+    sh:property    schema:dcCreatorProperty ;
+    sh:property    schema:dcDateProperty ;
+    sh:property    schema:dcDescriptionProperty ;
+    sh:property    schema:dcFormatProperty ;
+    sh:property    schema:dcIdentifierProperty ;
+    sh:property    schema:dcLanguageProperty ;
+    sh:property    schema:dcPublisherProperty ;
+    sh:property    schema:dcRelationProperty ;
+    sh:property    schema:dcRightsProperty ;
+    sh:property    schema:dcSourceProperty ;
+    sh:property    schema:dcSubjectProperty ;
+    sh:property    schema:dcTitleProperty ;
+    sh:property    schema:dcTypeProperty ;
+
+    # There needs to be at least a description or title, and the description should be a literal.
+    sh:property    [ sh:path     dc:description ;
+                     sh:nodeKind sh:Literal ;
+                     sh:severity sh:Warning ;
+                     sh:message  "dc:description should be a literal, not a reference." ] ;
+    sh:property    [ sh:path     [ sh:alternativePath ( dc:title dc:description ) ] ;
+                     sh:minCount 1 ;
+                     sh:message  "At least one the following properties must be present: dc:title or dc:description" ]  ;
+
+    # There needs to be at least a dc:subject, dc:type, dcterms:spatial or dcterms:temporal.
+    sh:property    [ sh:path     [ sh:alternativePath ( dc:subject dc:type dcterms:spatial dcterms:temporal ) ] ;
+                     sh:minCount 1 ;
+                     sh:message  "At least one the following properties should be present: dc:subject, dc:type, dcterms:spatial or dcterms:temporal" ] .
+
+# ProvidedCHO: If this is a TEXT object, we require a language.
+schema:ProvidedCHOForTextTypeShape
+    a              sh:NodeShape ;
+    sh:targetClass edm:ProvidedCHO ;
+    sh:or          ( [ sh:path     dc:language ;
+                       sh:minCount 1 ]
+                     [ sh:not      [ sh:path    edm:type ;
+                                     sh:pattern "^TEXT" ] ] ) ;
+    sh:message     "At least one occurrence of the property dc:language is required if edm:type='TEXT'" .
 
 # Aggregation
 schema:AggregationShape
@@ -72,30 +212,14 @@ schema:LicenseShape
 
 
 
-# LEGACY
-schema:hasLang
-    sh:or ( [ sh:not [ sh:path     edm:type ;
-                       sh:datatype xsd:string ;
-                       sh:pattern  "^TEXT" ] ] [ sh:path     dc:language ;
-                                                 sh:datatype xsd:string ;
-                                                 sh:minCount 1 ] ) .
-
+### LEGACY ###
 schema:ProvidedCHOShapeLegacy
   a              sh:NodeShape ;
   sh:targetClass edm:ProvidedCHO ;
   sh:property    [ sh:path     edm:type ;
                    sh:minCount 1 ;
                    sh:in       ( "TEXT" "VIDEO" "SOUND" "IMAGE" "3D" ) ;
-                   sh:message  "Missing or invalid value for edm:type" ] ;
-  sh:property    [ sh:path      [ sh:alternativePath ( dc:title dc:description ) ] ;
-                   sh:minCount  1 ;
-                   sh:minLength 1 ; # no empty string allowed
-                   sh:message   "At least one the following properties should be present: dc:title or dc:description" ] ;
-  sh:property    [ sh:path     [ sh:alternativePath ( dc:subject dc:type dcterms:spatial dcterms:temporal ) ] ;
-                   sh:minCount 1 ;
-                   sh:message  "At least one the following properties should be present: dc:subject, dc:type, dcterms:spatial or dcterms:temporal" ] ;
-  sh:node        [ sh:node    schema:hasLang ;
-                   sh:message "Property dc:language is required with edm:type='TEXT'" ] .
+                   sh:message  "Missing or invalid value for edm:type" ] .
 
 schema:AggregationShapeLegacy
   a              sh:NodeShape ;

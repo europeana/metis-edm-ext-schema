@@ -11,13 +11,16 @@
 @prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
 
 schema:EdmClass rdfs:subClassOf rdfs:Class .
-edm:ProvidedCHO rdfs:subClassOf schema:EdmClass .
-ore:Aggregation rdfs:subClassOf schema:EdmClass .
-cc:License rdfs:subClassOf schema:EdmClass .
-
 schema:ContextualClass rdfs:subClassOf schema:EdmClass .
+schema:EdmCoreClass rdfs:subClassOf schema:EdmClass .
+
+edm:ProvidedCHO rdfs:subClassOf schema:EdmCoreClass .
+ore:Aggregation rdfs:subClassOf schema:EdmCoreClass .
+edm:WebResource rdfs:subClassOf schema:EdmCoreClass .
+
 edm:Agent rdfs:subClassOf schema:ContextualClass .
 skos:Concept rdfs:subClassOf schema:ContextualClass .
+cc:License rdfs:subClassOf schema:ContextualClass .
 edm:Organisation rdfs:subClassOf schema:ContextualClass .
 edm:Place rdfs:subClassOf schema:ContextualClass .
 edm:TimeSpan rdfs:subClassOf schema:ContextualClass .

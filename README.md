@@ -3,12 +3,18 @@
 Trial version with limited rules.
 
 Still lacking support:
-* Most EDM features
+* Most EDM features as documented
+* Closed objects
+
+Further additions needed (these may also require inclusion in the EDM documentation below):
+* Language restrictions
+* The various record API V3 requirements (as warnings) 
 * 3D profile
 * IIIF profile
 * OEmbed profile
 * PID profile
-* Others?
+* Technical metadata fields (profile)
+* Others? Also see https://pro.europeana.eu/page/edm-profiles.
 
 This project should replace the schema links on the EDM page of Europeana Pro 
 (https://pro.europeana.eu/page/edm-documentation)
