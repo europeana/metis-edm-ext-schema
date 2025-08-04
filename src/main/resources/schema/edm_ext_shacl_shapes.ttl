@@ -12,6 +12,11 @@
 
 
 ### Property declarations ###
+# Note: some properties are mandated to be non-empty (if they are literals). These properties are
+# involved in specific requirements for presence. If a property (or at least one of a group of
+# properties) is required to be present, then it should not be allowed to be empty. This is not
+# only out of data correctness, but also to prevent normalisation from invalidating the record.
+# During normalisation emtpy properties may be removed and the record could become invalid as a result.
 
 :dcContributorProperty
     sh:path     dc:contributor ;
@@ -24,7 +29,7 @@
     sh:message  "dc:coverage must be a literal or a reference." .
 
 :dcCreatorProperty
-    sh:path     dc:creator  ;
+    sh:path     dc:creator ;
     sh:nodeKind sh:IRIOrLiteral ;
     sh:message  "cd:creator must be a literal or a reference." .
 
@@ -34,7 +39,7 @@
     sh:message  "dc:date must be a literal or a reference." .
 
 :dcDescriptionProperty
-    sh:path     dc:description  ;
+    sh:path     dc:description ;
     sh:nodeKind sh:IRIOrLiteral ;
     sh:pattern  "\\S" ; # Prevents invalid EDM after normalisation (removal of empty literals).
     sh:message  "dc:description must be a non-whitespace literal or a reference." .
@@ -205,11 +210,27 @@
     sh:pattern  "\\S" ; # Prevents invalid EDM after normalisation (removal of empty literals).
     sh:message  "dcterms:temporal must be a non-whitespace literal or a reference." .
 
+:edmAggregatedCHOProperty
+    sh:path     edm:aggregatedCHO ;
+    sh:nodeKind sh:IRI ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:class    edm:ProvidedCHO ;
+    sh:message  "edm:aggregatedCHO must refer to a ProvidedCHO and must occur exactly once." .
+
 :edmCurrentLocationProperty
     sh:path     edm:currentLocation ;
     sh:nodeKind sh:IRIOrLiteral ;
     sh:maxCount 1 ;
     sh:message  "edm:currentLocation must be a literal or a reference and can only occur once." .
+
+:edmDataProviderProperty
+    sh:path     edm:dataProvider ;
+    sh:nodeKind sh:IRIOrLiteral ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:pattern  "\\S" ; # Prevents invalid EDM after normalisation (removal of empty literals).
+    sh:message  "edm:dataProvider must be a non-whitespace literal or a reference and must occur exactly once." .
 
 :edmHasMetProperty
     sh:path     edm:hasMet ;
@@ -221,10 +242,20 @@
     sh:nodeKind sh:IRIOrLiteral ;
     sh:message  "edm:hasType must be a literal or a reference." .
 
+:edmHasViewProperty
+    sh:path     edm:hasView ;
+    sh:nodeKind sh:IRI ;
+    sh:message  "edm:hasView must be a reference." .
+
 :edmIncorporatesProperty
     sh:path     edm:incorporates ;
     sh:nodeKind sh:IRI ;
     sh:message  "edm:incorporates must be a reference." .
+
+:edmIntermediateProviderProperty
+    sh:path     edm:intermediateProvider ;
+    sh:nodeKind sh:IRIOrLiteral ;
+    sh:message  "edm:intermediateProvider must be a literal or a reference." .
 
 :edmIsDerivativeOfProperty
     sh:path     edm:isDerivativeOf ;
@@ -247,6 +278,18 @@
     sh:maxCount 1 ;
     sh:message  "edm:isRepresentationOf must be a reference and can only occur once." .
 
+:edmIsShownAtProperty
+    sh:path     edm:isShownAt ;
+    sh:nodeKind sh:IRI ;
+    sh:maxCount 1 ;
+    sh:message  "edm:isShownAt must be a reference and can only occur once." .
+
+:edmIsShownByProperty
+    sh:path     edm:isShownBy ;
+    sh:nodeKind sh:IRI ;
+    sh:maxCount 1 ;
+    sh:message  "edm:isShownBy must be a reference and can only occur once." .
+
 :edmIsSimilarToProperty
     sh:path     edm:isSimilarTo ;
     sh:nodeKind sh:IRI ;
@@ -257,10 +300,30 @@
     sh:nodeKind sh:IRI ;
     sh:message  "edm:isSuccessorOf must be a reference." .
 
+:edmObjectProperty
+    sh:path     edm:object ;
+    sh:nodeKind sh:IRI ;
+    sh:maxCount 1 ;
+    sh:message  "edm:object must be a reference and can only occur once." .
+
+:edmProviderProperty
+    sh:path     edm:provider ;
+    sh:nodeKind sh:IRIOrLiteral ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:pattern  "\\S" ; # Prevents invalid EDM after normalisation (removal of empty literals).
+    sh:message  "edm:provider must be a non-whitespace literal or a reference and must occur exactly once." .
+
 :edmRealizesProperty
     sh:path     edm:realizes ;
     sh:nodeKind sh:IRI ;
     sh:message  "edm:realizes must be a reference." .
+
+:edmRightsProperty
+    sh:path     edm:rights ;
+    sh:nodeKind sh:IRI ;
+    sh:maxCount 1 ;
+    sh:message  "edm:rights must be a reference and may only occur once." .
 
 :edmTypeProperty
     sh:path     edm:type ;
@@ -269,6 +332,13 @@
     sh:maxCount 1 ;
     sh:in       ( "TEXT" "VIDEO" "SOUND" "IMAGE" "3D" ) ;
     sh:message  "edm:type must occur exactly once and must have one of the permitted values.".
+
+:edmUgcProperty
+    sh:path     edm:ugc ;
+    sh:nodeKind sh:Literal ;
+    sh:maxCount 1 ;
+    sh:pattern  "^true$" ;
+    sh:message  "edm:ugc must be a literal with value 'true' and can only occur once." .
 
 :owlSameAsProperty
     sh:path     owl:sameAs ;
@@ -292,6 +362,11 @@
 :EdmClassWithCorrectContextualReferencesShape
     a              sh:NodeShape ;
     sh:targetClass :EdmClass ;
+    sh:property    [ sh:path     [ sh:alternativePath ( edm:hasView edm:isShownAt edm:isShownBy edm:object ) ] ;
+                     sh:or       ( [ sh:class edm:WebResource ]
+                                   [ sh:not [ sh:class :EdmClass ] ] ) ;
+                     sh:severity sh:Warning ;
+                     sh:message  "This property should not reference an EDM class other than edm:WebResource." ] ;
     sh:property    [ sh:path     [ sh:alternativePath ( dc:contributor dc:creator dc:publisher ) ] ;
                      sh:or       ( [ sh:class edm:Agent ]
                                    [ sh:not [ sh:class :EdmClass ] ] ) ;
@@ -302,6 +377,11 @@
                                    [ sh:not [ sh:class :EdmClass ] ] ) ;
                      sh:severity sh:Warning ;
                      sh:message  "This property should not reference an EDM class other than skos:Concept." ] ;
+    sh:property    [ sh:path     [ sh:alternativePath ( edm:dataProvider edm:intermediateProvider edm:provider ) ] ;
+                     sh:or       ( [ sh:class edm:Organisation ]
+                                   [ sh:not [ sh:class :EdmClass ] ] ) ;
+                     sh:severity sh:Warning ;
+                     sh:message  "This property should not reference an EDM class other than edm:Organisation." ] ;
     sh:property    [ sh:path     [ sh:alternativePath ( dcterms:spatial edm:currentLocation ) ] ;
                      sh:or       ( [ sh:class edm:Place ]
                                    [ sh:not [ sh:class :EdmClass ] ] ) ;
@@ -330,67 +410,72 @@
                                                         dcterms:medium dcterms:provenance dcterms:references
                                                         dcterms:replaces dcterms:requires edm:incorporates
                                                         edm:isDerivativeOf edm:isNextInSequence edm:isRepresentationOf
-                                                        edm:isSimilarTo edm:isSuccessorOf edm:realizes owl:sameAs ) ] ;
+                                                        edm:isSimilarTo edm:isSuccessorOf edm:realizes edm:rights
+                                                        owl:sameAs ) ] ;
                      sh:not      [ sh:class :EdmClass ] ;
                      sh:severity sh:Warning ;
                      sh:message  "This property should not reference an EDM class." ] .
 
-# ProvidedCHO - TODO this is to be the sh:closed shape with an error message about unexpected properties
+# ProvidedCHO: The closed list of permitted properties.
 :ProvidedCHOShape
-    a              sh:NodeShape ;
-    sh:targetClass edm:ProvidedCHO ;
-    sh:property    :dcContributorProperty ;
-    sh:property    :dcCoverageProperty ;
-    sh:property    :dcCreatorProperty ;
-    sh:property    :dcDateProperty ;
-    sh:property    :dcDescriptionProperty ;
-    sh:property    :dcFormatProperty ;
-    sh:property    :dcIdentifierProperty ;
-    sh:property    :dcLanguageProperty ;
-    sh:property    :dcPublisherProperty ;
-    sh:property    :dcRelationProperty ;
-    sh:property    :dcRightsProperty ;
-    sh:property    :dcSourceProperty ;
-    sh:property    :dcSubjectProperty ;
-    sh:property    :dcTitleProperty ;
-    sh:property    :dcTypeProperty ;
-    sh:property    :dctermsAlternativeProperty ;
-    sh:property    :dctermsConformsToProperty ;
-    sh:property    :dctermsCreatedProperty ;
-    sh:property    :dctermsExtentProperty ;
-    sh:property    :dctermsHasFormatProperty ;
-    sh:property    :dctermsHasPartProperty ;
-    sh:property    :dctermsHasVersionProperty ;
-    sh:property    :dctermsIsFormatOfProperty ;
-    sh:property    :dctermsIsPartOfProperty ;
-    sh:property    :dctermsIsReferencedByProperty ;
-    sh:property    :dctermsIsReplacedByProperty ;
-    sh:property    :dctermsIsRepuiredByProperty ;
-    sh:property    :dctermsIssuedProperty ;
-    sh:property    :dctermsIsVersionOfProperty ;
-    sh:property    :dctermsMediumProperty ;
-    sh:property    :dctermsProvenanceProperty ;
-    sh:property    :dctermsReferencesProperty ;
-    sh:property    :dctermsReplacesProperty ;
-    sh:property    :dctermsRequiresProperty ;
-    sh:property    :dctermsSpatialProperty ;
-    sh:property    :dctermsTableOfContentsProperty ;
-    sh:property    :dctermsTemporalProperty ;
-    sh:property    :edmCurrentLocationProperty ;
-    sh:property    :edmHasMetProperty ;
-    sh:property    :edmHasTypeProperty ;
-    sh:property    :edmIncorporatesProperty ;
-    sh:property    :edmIsDerivativeOfProperty ;
-    sh:property    :edmIsNextInSequenceProperty ;
-    sh:property    :edmIsRelatedToProperty ;
-    sh:property    :edmIsRepresentationOfProperty ;
-    sh:property    :edmIsSimilarToProperty ;
-    sh:property    :edmIsSuccessorOfProperty ;
-    sh:property    :edmRealizesProperty ;
-    sh:property    :edmTypeProperty ;
-    sh:property    :owlSameAsProperty .
+    a                    sh:NodeShape ;
+    sh:targetClass       edm:ProvidedCHO ;
+    sh:closed            true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:message           "This edm:ProvidedCho object contains unexpected properties." ;
+    sh:property          :dcContributorProperty ;
+    sh:property          :dcCoverageProperty ;
+    sh:property          :dcCreatorProperty ;
+    sh:property          :dcDateProperty ;
+    sh:property          :dcDescriptionProperty ;
+    sh:property          :dcFormatProperty ;
+    sh:property          :dcIdentifierProperty ;
+    sh:property          :dcLanguageProperty ;
+    sh:property          :dcPublisherProperty ;
+    sh:property          :dcRelationProperty ;
+    sh:property          :dcRightsProperty ;
+    sh:property          :dcSourceProperty ;
+    sh:property          :dcSubjectProperty ;
+    sh:property          :dcTitleProperty ;
+    sh:property          :dcTypeProperty ;
+    sh:property          :dctermsAlternativeProperty ;
+    sh:property          :dctermsConformsToProperty ;
+    sh:property          :dctermsCreatedProperty ;
+    sh:property          :dctermsExtentProperty ;
+    sh:property          :dctermsHasFormatProperty ;
+    sh:property          :dctermsHasPartProperty ;
+    sh:property          :dctermsHasVersionProperty ;
+    sh:property          :dctermsIsFormatOfProperty ;
+    sh:property          :dctermsIsPartOfProperty ;
+    sh:property          :dctermsIsReferencedByProperty ;
+    sh:property          :dctermsIsReplacedByProperty ;
+    sh:property          :dctermsIsRepuiredByProperty ;
+    sh:property          :dctermsIssuedProperty ;
+    sh:property          :dctermsIsVersionOfProperty ;
+    sh:property          :dctermsMediumProperty ;
+    sh:property          :dctermsProvenanceProperty ;
+    sh:property          :dctermsReferencesProperty ;
+    sh:property          :dctermsReplacesProperty ;
+    sh:property          :dctermsRequiresProperty ;
+    sh:property          :dctermsSpatialProperty ;
+    sh:property          :dctermsTableOfContentsProperty ;
+    sh:property          :dctermsTemporalProperty ;
+    sh:property          :edmCurrentLocationProperty ;
+    sh:property          :edmHasMetProperty ;
+    sh:property          :edmHasTypeProperty ;
+    sh:property          :edmIncorporatesProperty ;
+    sh:property          :edmIsDerivativeOfProperty ;
+    sh:property          :edmIsNextInSequenceProperty ;
+    sh:property          :edmIsRelatedToProperty ;
+    sh:property          :edmIsRepresentationOfProperty ;
+    sh:property          :edmIsSimilarToProperty ;
+    sh:property          :edmIsSuccessorOfProperty ;
+    sh:property          :edmRealizesProperty ;
+    sh:property          :edmTypeProperty ;
+    sh:property          :owlSameAsProperty .
 
-# ProvidedCHO: There needs to be at least a description or title, and the description should be a literal.
+# ProvidedCHO: There needs to be at least a description or title, and the description should be a
+# literal. Also, there needs to be at least a dc:subject, dc:type, dcterms:spatial or dcterms:temporal.
 :ProvidedCHOWithRightPropertyCombinationsShape
     a              sh:NodeShape ;
     sh:targetClass edm:ProvidedCHO ;
@@ -400,12 +485,10 @@
                      sh:message  "dc:description should be a literal, not a reference." ] ;
     sh:property    [ sh:path     [ sh:alternativePath ( dc:title dc:description ) ] ;
                      sh:minCount 1 ;
-                     sh:message  "At least one the following properties must be present: dc:title or dc:description" ]  ;
-
-    # There needs to be at least a dc:subject, dc:type, dcterms:spatial or dcterms:temporal.
+                     sh:message  "At least one the following properties must be present: dc:title or dc:description." ]  ;
     sh:property    [ sh:path     [ sh:alternativePath ( dc:subject dc:type dcterms:spatial dcterms:temporal ) ] ;
                      sh:minCount 1 ;
-                     sh:message  "At least one the following properties should be present: dc:subject, dc:type, dcterms:spatial or dcterms:temporal" ] .
+                     sh:message  "At least one the following properties should be present: dc:subject, dc:type, dcterms:spatial or dcterms:temporal." ] .
 
 # ProvidedCHO: If this is a TEXT object, we require a language.
 :ProvidedCHOForTextWithLanguageShape
@@ -414,13 +497,49 @@
     sh:or          ( [ sh:path     dc:language ;
                        sh:minCount 1 ]
                      [ sh:not      [ sh:path    edm:type ;
-                                     sh:pattern "^TEXT" ] ] ) ;
-    sh:message     "At least one occurrence of the property dc:language is required if edm:type='TEXT'" .
+                                     sh:pattern "^TEXT$" ] ] ) ;
+    sh:message     "At least one occurrence of the property dc:language is required if edm:type='TEXT'." .
 
-# Aggregation
+# Aggregation: The closed list of permitted properties.
 :AggregationShape
+    a                    sh:NodeShape ;
+    sh:targetClass       ore:Aggregation ;
+    sh:closed            true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:message           "This ore:Aggregation object contains unexpected properties." ;
+    sh:property          :dcRightsProperty ;
+    sh:property          :edmAggregatedCHOProperty ;
+    sh:property          :edmDataProviderProperty ;
+    sh:property          :edmHasViewProperty ;
+    sh:property          :edmIntermediateProviderProperty ;
+    sh:property          :edmIsShownAtProperty ;
+    sh:property          :edmIsShownByProperty ;
+    sh:property          :edmObjectProperty ;
+    sh:property          :edmProviderProperty ;
+    sh:property          :edmRightsProperty ;
+    sh:property          :edmUgcProperty.
+
+# Aggregation: There needs to be at least a edm:isShownAt or edm:isShownBy.
+:AggregationWithRightPropertyCombinationsShape
     a              sh:NodeShape ;
-    sh:targetClass ore:Aggregation .
+    sh:targetClass ore:Aggregation ;
+    sh:property    [ sh:path     [ sh:alternativePath ( edm:isShownAt edm:isShownBy ) ] ;
+                     sh:minCount 1 ;
+                     sh:message  "At least one the following properties must be present: edm:isShownAt or edm:isShownBy." ] ;
+    sh:property    [ sh:path     edm:rights ;
+                     sh:minCount 1 ;
+                     sh:message  "edm:rights must be present." ] .
+
+# Aggregation: Warn if an IMAGE has no edm:isShownBy or edm:object.
+:AggregationForImageWithRightMediaLinksShape
+    a              sh:NodeShape ;
+    sh:targetClass ore:Aggregation ;
+    sh:or          ( [ sh:path     [ sh:alternativePath ( edm:isShownBy edm:object ) ];
+                       sh:minCount 1 ]
+                     [ sh:not      [ sh:path    ( edm:aggregatedCHO edm:type ) ;
+                                     sh:pattern "^IMAGE$" ] ] ) ;
+    sh:severity    sh:Warning ;
+    sh:message     "At least one of edm:isShownBy or edm:object is required for publication if edm:type='IMAGE'." .
 
 # WebResource
 :WebResourceShape
@@ -451,42 +570,3 @@
 :LicenseShape
     a              sh:NodeShape ;
     sh:targetClass cc:License .
-
-
-
-### LEGACY ### TODO integrate with the shapes above.
-:AggregationShapeLegacy
-  a              sh:NodeShape ;
-  sh:targetClass ore:Aggregation ;
-  sh:property    [ sh:path     edm:aggregatedCHO ;
-                   sh:nodeKind sh:IRI ;
-                   sh:minCount 1 ;
-                   sh:maxCount 1 ;
-                   sh:message  "Missing or invalid value for edm:aggregatedCHO" ] ;
-  sh:property    [ sh:path     edm:provider ;
-                   sh:nodeKind sh:IRIOrLiteral ;
-                   sh:minCount 1 ;
-                   sh:maxCount 1 ;
-                   sh:message  "Missing or invalid value for edm:provider" ] ;
-  sh:property    [ sh:path     edm:dataProvider ;
-                   sh:nodeKind sh:IRIOrLiteral ;
-                   sh:minCount 1 ;
-                   sh:maxCount 1 ;
-                   sh:message  "Missing or invalid value for edm:dataProvider" ] ;
-  sh:property    [ sh:path     edm:rights ;
-                   sh:nodeKind sh:IRI ;
-                   sh:minCount 1 ;
-                   sh:message  "Missing or invalid value for edm:rights" ] ;
-  sh:property    [ sh:path     [ sh:alternativePath ( edm:isShownAt edm:isShownBy ) ] ;
-                   sh:nodeKind sh:IRI ;
-                   sh:minCount 1 ;
-                   sh:message  "At least one the following properties should be present: edm:isShownAt or edm:isShownBy and should have a valid URI" ] ;
-  sh:property    [ sh:path     edm:isShownAt ;
-                   sh:nodeKind sh:IRI ;
-                   sh:maxCount 1 ;
-                   sh:message  "Only one occurrence of edm:isShownAt is allowed" ] ;
-  sh:property    [ sh:path     edm:isShownBy ;
-                   sh:nodeKind sh:IRI ;
-                   sh:maxCount 1 ;
-                   sh:message  "Only one occurrence of edm:isShownBy is allowed" ] .
-

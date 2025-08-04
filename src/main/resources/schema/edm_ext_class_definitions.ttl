@@ -1,10 +1,11 @@
-@prefix :        <http://www.europeana.eu/metis/edm/ext/> .
-@prefix cc:      <http://creativecommons.org/ns#> .
-@prefix edm:     <http://www.europeana.eu/schemas/edm/> .
-@prefix ore:     <http://www.openarchives.org/ore/terms/> .
-@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
+@prefix :     <http://www.europeana.eu/metis/edm/ext/> .
+@prefix cc:   <http://creativecommons.org/ns#> .
+@prefix edm:  <http://www.europeana.eu/schemas/edm/> .
+@prefix ore:  <http://www.openarchives.org/ore/terms/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 
+### Classes ###
 :EdmClass rdfs:subClassOf rdfs:Class .
 :ContextualClass rdfs:subClassOf :EdmClass .
 :EdmCoreClass rdfs:subClassOf :EdmClass .

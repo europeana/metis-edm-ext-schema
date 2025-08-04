@@ -18,7 +18,7 @@ public class EdmExternalValidator {
   public EdmExternalValidator() {
     this.shapes = Shapes.parse(RDFDataMgr.loadGraph("schema/edm_ext_shacl_shapes.ttl"));
     this.modelHierarchy = ModelFactory.createDefaultModel().read(
-        "schema/edm_ext_class_hierarchy.ttl");
+        "schema/edm_ext_class_definitions.ttl");
   }
 
   public void validate(String rdfXmlInput) {
