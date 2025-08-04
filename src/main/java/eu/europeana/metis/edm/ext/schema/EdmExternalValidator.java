@@ -26,6 +26,7 @@ public class EdmExternalValidator {
     model.read(new StringReader(rdfXmlInput), "", Lang.RDFXML.getLabel());
     model.add(this.modelHierarchy);
 
+    // TODO return report.
     final ValidationReport report = ShaclValidator.get().validate(shapes, model.getGraph());
     ShLib.printReport(report);
     System.out.println();
