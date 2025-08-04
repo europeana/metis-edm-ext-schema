@@ -235,7 +235,7 @@
 :edmHasMetProperty
     sh:path     edm:hasMet ;
     sh:nodeKind sh:IRI ;
-    sh:message  "edm:currentLocation must be a reference." .
+    sh:message  "edm:hasMet must be a reference." .
 
 :edmHasTypeProperty
     sh:path     edm:hasType ;
@@ -541,10 +541,30 @@
     sh:severity    sh:Warning ;
     sh:message     "At least one of edm:isShownBy or edm:object is required for publication if edm:type='IMAGE'." .
 
-# WebResource
+# WebResource: The closed list of permitted properties.
 :WebResourceShape
-    a              sh:NodeShape ;
-    sh:targetClass edm:WebResource .
+    a                    sh:NodeShape ;
+    sh:targetClass       edm:WebResource ;
+    sh:closed            true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:message           "This edm:WebResource object contains unexpected properties." ;
+    sh:property          :dcCreatorProperty ;
+    sh:property          :dcDescriptionProperty ;
+    sh:property          :dcFormatProperty ;
+    sh:property          :dcRightsProperty ;
+    sh:property          :dcSourceProperty ;
+    sh:property          :dcTypeProperty ;
+    sh:property          :dctermsConformsToProperty ;
+    sh:property          :dctermsCreatedProperty ;
+    sh:property          :dctermsExtentProperty ;
+    sh:property          :dctermsHasPartProperty ;
+    sh:property          :dctermsIsFormatOfProperty ;
+    sh:property          :dctermsIsPartOfProperty ;
+    sh:property          :dctermsIsReferencedByProperty ;
+    sh:property          :dctermsIssuedProperty ;
+    sh:property          :edmIsNextInSequenceProperty ;
+    sh:property          :edmRightsProperty ;
+    sh:property          :owlSameAsProperty .
 
 # Agent
 :AgentShape
