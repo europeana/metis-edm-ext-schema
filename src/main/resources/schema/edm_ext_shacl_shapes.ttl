@@ -40,8 +40,7 @@
 :dcDescriptionProperty
     sh:path     dc:description ;
     sh:nodeKind sh:IRIOrLiteral ;
-    sh:pattern  "\\S" ; # Prevents invalid EDM after normalisation (removal of empty literals).
-    sh:message  "dc:description must be a non-whitespace literal or a reference." .
+    sh:message  "dc:description must be a literal or a reference." .
 
 :dcFormatProperty
     sh:path     dc:format ;
@@ -56,8 +55,7 @@
 :dcLanguageProperty
     sh:path     dc:language ;
     sh:nodeKind sh:Literal ;
-    sh:pattern  "\\S" ; # Prevents invalid EDM after normalisation (removal of empty literals).
-    sh:message  "dc:language must be a non-whitespace literal." .
+    sh:message  "dc:language must be a literal." .
 
 :dcPublisherProperty
     sh:path     dc:publisher ;
@@ -82,20 +80,17 @@
 :dcSubjectProperty
     sh:path     dc:subject  ;
     sh:nodeKind sh:IRIOrLiteral ;
-    sh:pattern  "\\S" ; # Prevents invalid EDM after normalisation (removal of empty literals).
-    sh:message  "dc:subject must be a non-whitespace literal or a reference." .
+    sh:message  "dc:subject must be a literal or a reference." .
 
 :dcTitleProperty
     sh:path     dc:title ;
     sh:nodeKind sh:Literal ;
-    sh:pattern  "\\S" ; # Prevents invalid EDM after normalisation (removal of empty literals).
-    sh:message  "dc:title must be a non-whitespace literal." .
+    sh:message  "dc:title must be a literal." .
 
 :dcTypeProperty
     sh:path     dc:type  ;
     sh:nodeKind sh:IRIOrLiteral ;
-    sh:pattern  "\\S" ; # Prevents invalid EDM after normalisation (removal of empty literals).
-    sh:message  "dc:type must be a non-whitespace literal or a reference." .
+    sh:message  "dc:type must be a literal or a reference." .
 
 :dctermsAlternativeProperty
     sh:path     dcterms:alternative ;
@@ -195,8 +190,7 @@
 :dctermsSpatialProperty
     sh:path     dcterms:spatial ;
     sh:nodeKind sh:IRIOrLiteral ;
-    sh:pattern  "\\S" ; # Prevents invalid EDM after normalisation (removal of empty literals).
-    sh:message  "dcterms:spatial must be a non-whitespace literal or a reference." .
+    sh:message  "dcterms:spatial must be a literal or a reference." .
 
 :dctermsTableOfContentsProperty
     sh:path     dcterms:tableOfContents ;
@@ -206,8 +200,7 @@
 :dctermsTemporalProperty
     sh:path     dcterms:temporal ;
     sh:nodeKind sh:IRIOrLiteral ;
-    sh:pattern  "\\S" ; # Prevents invalid EDM after normalisation (removal of empty literals).
-    sh:message  "dcterms:temporal must be a non-whitespace literal or a reference." .
+    sh:message  "dcterms:temporal must be a literal or a reference." .
 
 :edmAggregatedCHOProperty
     sh:path     edm:aggregatedCHO ;
@@ -492,7 +485,7 @@
 
 # ProvidedCHO: There needs to be at least a description or title, and the description should be a
 # literal. Also, there needs to be at least a dc:subject, dc:type, dcterms:spatial or dcterms:temporal.
-# TODO use conditional property to check for empty literals, and then use conditional min count. Then remove check for emptiness in the properties.
+# The non-whitespace requirement prevents invalid EDM after normalisation (removal of empty literals).
 :ProvidedCHOWithRightPropertyCombinationsShape
     a              sh:NodeShape ;
     sh:targetClass edm:ProvidedCHO ;
@@ -500,23 +493,26 @@
                      sh:nodeKind sh:Literal ;
                      sh:severity sh:Warning ;
                      sh:message  "dc:description should be a literal, not a reference." ] ;
-    sh:property    [ sh:path     [ sh:alternativePath ( dc:title dc:description ) ] ;
-                     sh:minCount 1 ;
-                     sh:message  "At least one the following properties must be present: dc:title or dc:description." ]  ;
-    sh:property    [ sh:path     [ sh:alternativePath ( dc:subject dc:type dcterms:spatial dcterms:temporal ) ] ;
-                     sh:minCount 1 ;
-                     sh:message  "At least one the following properties should be present: dc:subject, dc:type, dcterms:spatial or dcterms:temporal." ] .
+    sh:property    [ sh:path                [ sh:alternativePath ( dc:title dc:description ) ] ;
+                     sh:qualifiedValueShape [ sh:pattern "\\S" ] ;
+                     sh:qualifiedMinCount   1 ;
+                     sh:message             "At least one the following properties must be present and non-whitespace: dc:title or dc:description." ] ;
+    sh:property    [ sh:path                [ sh:alternativePath ( dc:subject dc:type dcterms:spatial dcterms:temporal ) ] ;
+                     sh:qualifiedValueShape [ sh:pattern "\\S" ] ;
+                     sh:qualifiedMinCount   1 ;
+                     sh:message             "At least one the following properties should be present and non-empty: dc:subject, dc:type, dcterms:spatial or dcterms:temporal." ] .
 
 # ProvidedCHO: If this is a TEXT object, we require a language.
-# TODO use conditional property to check for empty literals, and then use conditional min count. Then remove check for emptiness in the properties.
+# The non-whitespace requirement prevents invalid EDM after normalisation (removal of empty literals).
 :ProvidedCHOForTextWithLanguageShape
     a              sh:NodeShape ;
     sh:targetClass edm:ProvidedCHO ;
-    sh:or          ( [ sh:path     dc:language ;
-                       sh:minCount 1 ]
-                     [ sh:not      [ sh:path    edm:type ;
-                                     sh:pattern "^TEXT$" ] ] ) ;
-    sh:message     "At least one occurrence of the property dc:language is required if edm:type='TEXT'." .
+    sh:or          ( [ sh:path                dc:language ;
+                       sh:qualifiedValueShape [ sh:pattern "\\S" ] ;
+                       sh:qualifiedMinCount   1 ]
+                     [ sh:not [ sh:path    edm:type ;
+                                sh:pattern "^TEXT$" ] ] ) ;
+    sh:message     "At least one non-whitespace occurrence of the property dc:language is required if edm:type='TEXT'." .
 
 # Aggregation: The closed list of permitted properties.
 :AggregationShape
@@ -537,9 +533,8 @@
     sh:property          :edmRightsProperty ;
     sh:property          :edmUgcProperty.
 
-# Aggregation: There needs to be at least a edm:isShownAt or edm:isShownBy. There needs to be
-# at least an occurrence of edm:rights.
-# TODO use conditional property to check for empty literals, and then use conditional min count. Then remove check for emptiness in the properties.
+# Aggregation: There needs to be at least a edm:isShownAt or edm:isShownBy. There needs to be at least
+# an occurrence of edm:rights. Note: all fields are IRIs, no need to enforce non-whitespace values.
 :AggregationWithRightPropertyCombinationsShape
     a              sh:NodeShape ;
     sh:targetClass ore:Aggregation ;
@@ -551,7 +546,7 @@
                      sh:message  "edm:rights must be present." ] .
 
 # Aggregation: Warn if an IMAGE has no edm:isShownBy or edm:object.
-# TODO use conditional property to check for empty literals, and then use conditional min count. Then remove check for emptiness in the properties.
+# Note: all fields are IRIs, no need to enforce non-whitespace values.
 :AggregationForImageWithRightMediaLinksShape
     a              sh:NodeShape ;
     sh:targetClass ore:Aggregation ;
