@@ -10,7 +10,6 @@
 @prefix sh:      <http://www.w3.org/ns/shacl#> .
 @prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
 
-
 ### Property declarations ###
 # Note: some properties are mandated to be non-empty (if they are literals). These properties are
 # involved in specific requirements for presence. If a property (or at least one of a group of
@@ -352,16 +351,39 @@
 # TODO check: dc:format is enriched as if it always has a Concept, but this is not clear from the docs.
 # TODO check: fields that are not enriched but could be according to the docs: dc:publisher, ...
 # TODO        edm:currentLocation, edm:hasType, edm:isRelatedTo
+# TODO check: The acceptable referenced classes/objects for each property.
 
 
 ### Shape declarations ###
 
-# This shape verifies that the various properties reference the right type of contextual classes.
+# This shape verifies that the various properties reference the right type of classes.
 # The typing conditions for contextual class references are designed to avoid failing on literals,
 # or on IRIs that are not resolvable in the record.
-:EdmClassWithCorrectContextualReferencesShape
+:EdmClassWithCorrectReferencesShape
     a              sh:NodeShape ;
     sh:targetClass :EdmClass ;
+    sh:property    [ sh:path     [ sh:alternativePath ( dc:relation dc:source dcterms:hasPart dcterms:hasVersion
+                                                        dcterms:isPartOf dcterms:isReferencedBy dcterms:isReplacedBy
+                                                        dcterms:isRequiredBy dcterms:isVersionOf dcterms:references
+                                                        dcterms:replaces dcterms:requires edm:incorporates edm:isDerivativeOf
+                                                        edm:isRepresentationOf edm:isSimilarTo edm:isSuccessorOf
+                                                        edm:realizes ) ] ;
+                     sh:or       ( [ sh:class edm:ProvidedCHO ]
+                                   [ sh:not [ sh:class :EdmClass ] ] ) ;
+                     sh:severity sh:Warning ;
+                     sh:message  "This property should not reference an EDM class other than edm:ProvidedCHO." ] ;
+    sh:property    [ sh:path     [ sh:alternativePath ( dcterms:hasFormat dcterms:isFormatOf edm:isNextInSequence ) ] ;
+                     sh:or       ( [ sh:class edm:ProvidedCHO ]
+                                   [ sh:class edm:WebResource ]
+                                   [ sh:not [ sh:class :EdmClass ] ] ) ;
+                     sh:severity sh:Warning ;
+                     sh:message  "This property should not reference an EDM class other than edm:ProvidedCHO or edm:WebResource." ] ;
+    sh:property    [ sh:path     edm:isRelatedTo ;
+                     sh:or       ( [ sh:class edm:ProvidedCHO ]
+                                   [ sh:class skos:Concept ]
+                                   [ sh:not [ sh:class :EdmClass ] ] ) ;
+                     sh:severity sh:Warning ;
+                     sh:message  "This property should not reference an EDM class other than edm:ProvidedCHO or skos:Concept." ] ;
     sh:property    [ sh:path     [ sh:alternativePath ( edm:hasView edm:isShownAt edm:isShownBy edm:object ) ] ;
                      sh:or       ( [ sh:class edm:WebResource ]
                                    [ sh:not [ sh:class :EdmClass ] ] ) ;
@@ -403,15 +425,9 @@
                                    [ sh:not [ sh:class :EdmClass ] ] ) ;
                      sh:severity sh:Warning ;
                      sh:message  "This property should not reference an EDM class other than a contextual class." ] ;
-    sh:property    [ sh:path     [ sh:alternativePath ( dc:description dc:format dc:rights dc:source dcterms:conformsTo
-                                                        dcterms:extent dcterms:hasFormat dcterms:hasPart dcterms:hasVersion
-                                                        dcterms:isFormatOf dcterms:isPartOf dcterms:isReferencedBy
-                                                        dcterms:isReplacedBy dcterms:isRequiredBy dcterms:isVersionOf
-                                                        dcterms:medium dcterms:provenance dcterms:references
-                                                        dcterms:replaces dcterms:requires edm:incorporates
-                                                        edm:isDerivativeOf edm:isNextInSequence edm:isRepresentationOf
-                                                        edm:isSimilarTo edm:isSuccessorOf edm:realizes edm:rights
-                                                        owl:sameAs ) ] ;
+    sh:property    [ sh:path     [ sh:alternativePath ( dc:description dc:format dc:rights dcterms:conformsTo
+                                                        dcterms:extent dcterms:medium dcterms:provenance
+                                                        edm:rights owl:sameAs ) ] ;
                      sh:not      [ sh:class :EdmClass ] ;
                      sh:severity sh:Warning ;
                      sh:message  "This property should not reference an EDM class." ] .
@@ -476,6 +492,7 @@
 
 # ProvidedCHO: There needs to be at least a description or title, and the description should be a
 # literal. Also, there needs to be at least a dc:subject, dc:type, dcterms:spatial or dcterms:temporal.
+# TODO use conditional property to check for empty literals, and then use conditional min count. Then remove check for emptiness in the properties.
 :ProvidedCHOWithRightPropertyCombinationsShape
     a              sh:NodeShape ;
     sh:targetClass edm:ProvidedCHO ;
@@ -491,6 +508,7 @@
                      sh:message  "At least one the following properties should be present: dc:subject, dc:type, dcterms:spatial or dcterms:temporal." ] .
 
 # ProvidedCHO: If this is a TEXT object, we require a language.
+# TODO use conditional property to check for empty literals, and then use conditional min count. Then remove check for emptiness in the properties.
 :ProvidedCHOForTextWithLanguageShape
     a              sh:NodeShape ;
     sh:targetClass edm:ProvidedCHO ;
@@ -519,7 +537,9 @@
     sh:property          :edmRightsProperty ;
     sh:property          :edmUgcProperty.
 
-# Aggregation: There needs to be at least a edm:isShownAt or edm:isShownBy.
+# Aggregation: There needs to be at least a edm:isShownAt or edm:isShownBy. There needs to be
+# at least an occurrence of edm:rights.
+# TODO use conditional property to check for empty literals, and then use conditional min count. Then remove check for emptiness in the properties.
 :AggregationWithRightPropertyCombinationsShape
     a              sh:NodeShape ;
     sh:targetClass ore:Aggregation ;
@@ -531,6 +551,7 @@
                      sh:message  "edm:rights must be present." ] .
 
 # Aggregation: Warn if an IMAGE has no edm:isShownBy or edm:object.
+# TODO use conditional property to check for empty literals, and then use conditional min count. Then remove check for emptiness in the properties.
 :AggregationForImageWithRightMediaLinksShape
     a              sh:NodeShape ;
     sh:targetClass ore:Aggregation ;
