@@ -17,6 +17,7 @@ Further additions needed (these may also require inclusion in the EDM documentat
 * PID profile
 * Technical metadata fields (profile)
 * Others? Also see https://pro.europeana.eu/page/edm-profiles.
+* Others? Also see (subpages of) https://europeana.atlassian.net/wiki/spaces/EF/pages/1141932262/Classes+from+EDM+Profiles
 * Any additional features in the existing schema?
 
 This project should replace the schema links on the EDM page of Europeana Pro 

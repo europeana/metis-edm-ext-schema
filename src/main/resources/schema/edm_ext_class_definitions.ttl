@@ -17,6 +17,5 @@ edm:WebResource rdfs:subClassOf :EdmCoreClass .
 edm:Agent rdfs:subClassOf :ContextualClass .
 skos:Concept rdfs:subClassOf :ContextualClass .
 cc:License rdfs:subClassOf :ContextualClass .
-edm:Organisation rdfs:subClassOf :ContextualClass .
 edm:Place rdfs:subClassOf :ContextualClass .
 edm:TimeSpan rdfs:subClassOf :ContextualClass .

@@ -352,6 +352,7 @@
 # This shape verifies that the various properties reference the right type of classes.
 # The typing conditions for contextual class references are designed to avoid failing on literals,
 # or on IRIs that are not resolvable in the record.
+# TODO nextInSequence reference depends: from a webresource it can reference only a webresource. From a ProvidedCHO only a ProvidedCHO.
 :EdmClassWithCorrectReferencesShape
     a              sh:NodeShape ;
     sh:targetClass :EdmClass ;
@@ -392,11 +393,6 @@
                                    [ sh:not [ sh:class :EdmClass ] ] ) ;
                      sh:severity sh:Warning ;
                      sh:message  "This property should not reference an EDM class other than skos:Concept." ] ;
-    sh:property    [ sh:path     [ sh:alternativePath ( edm:dataProvider edm:intermediateProvider edm:provider ) ] ;
-                     sh:or       ( [ sh:class edm:Organisation ]
-                                   [ sh:not [ sh:class :EdmClass ] ] ) ;
-                     sh:severity sh:Warning ;
-                     sh:message  "This property should not reference an EDM class other than edm:Organisation." ] ;
     sh:property    [ sh:path     [ sh:alternativePath ( dcterms:spatial edm:currentLocation ) ] ;
                      sh:or       ( [ sh:class edm:Place ]
                                    [ sh:not [ sh:class :EdmClass ] ] ) ;
@@ -420,7 +416,8 @@
                      sh:message  "This property should not reference an EDM class other than a contextual class." ] ;
     sh:property    [ sh:path     [ sh:alternativePath ( dc:description dc:format dc:rights dcterms:conformsTo
                                                         dcterms:extent dcterms:medium dcterms:provenance
-                                                        edm:rights owl:sameAs ) ] ;
+                                                        edm:rights edm:dataProvider edm:intermediateProvider
+                                                        edm:provider owl:sameAs ) ] ;
                      sh:not      [ sh:class :EdmClass ] ;
                      sh:severity sh:Warning ;
                      sh:message  "This property should not reference an EDM class." ] .
