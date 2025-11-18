@@ -3,13 +3,12 @@
 Trial version with limited rules.
 
 Still lacking support:
-* Most EDM features as documented
-* Closed objects
+* Some EDM features as documented
+* Detecting orphaned entities (probably requiring SPARQL)
 * TODOs in schema: To be investigated.
 * We could look into separating the shapes into a file that can be used without importing the hierarchy, and can be used easily by externals, and then a bit for which the hierarchy is necessary. 
 
 Further additions needed (these may also require inclusion in the EDM documentation below):
-* Language restrictions
 * The various record API V3 requirements (as warnings) 
 * 3D profile (see https://europeana.atlassian.net/browse/MET-6731)
 * IIIF profile
