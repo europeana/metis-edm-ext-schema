@@ -3,8 +3,10 @@
 @prefix dc:      <http://purl.org/dc/elements/1.1/> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix edm:     <http://www.europeana.eu/schemas/edm/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
 @prefix ore:     <http://www.openarchives.org/ore/terms/> .
 @prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdaGr2:  <http://rdvocab.info/ElementsGr2/> .
 @prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sh:      <http://www.w3.org/ns/shacl#> .
@@ -342,10 +344,60 @@
     sh:pattern  "^true$" ;
     sh:message  "edm:ugc must be a literal with value 'true' and can only occur once." .
 
+:foafNameProperty
+    sh:path     foaf:name ;
+    sh:nodeKind sh:Literal ;
+    sh:message  "foaf:name must be a literal." .
+
 :owlSameAsProperty
     sh:path     owl:sameAs ;
     sh:nodeKind sh:IRI ;
     sh:message  "owl:sameAs must be a reference." .
+
+:rdaGr2BiographicalInformation
+    sh:path     rdaGr2:biographicalInformation ;
+    sh:nodeKind sh:Literal ;
+    sh:message  "rdaGr2:biographicalInformation must be a literal." .
+
+:rdaGr2DateOfBirth
+    sh:path     rdaGr2:dateOfBirth ;
+    sh:nodeKind sh:Literal ;
+    sh:message  "rdaGr2:dateOfBirth must be a literal." .
+
+:rdaGr2DateOfDeath
+    sh:path     rdaGr2:dateOfDeath ;
+    sh:nodeKind sh:Literal ;
+    sh:message  "rdaGr2:dateOfDeath must be a literal." .
+
+:rdaGr2DateOfEstablishment
+    sh:path     rdaGr2:dateOfEstablishment ;
+    sh:nodeKind sh:Literal ;
+    sh:message  "rdaGr2:dateOfEstablishment must be a literal." .
+
+:rdaGr2DateOfTermination
+    sh:path     rdaGr2:dateOfTermination ;
+    sh:nodeKind sh:Literal ;
+    sh:message  "rdaGr2:dateOfTermination must be a literal." .
+
+:rdaGr2Gender
+    sh:path     rdaGr2:gender ;
+    sh:nodeKind sh:Literal ;
+    sh:message  "rdaGr2:gender must be a literal." .
+
+:rdaGr2PlaceOfBirth
+    sh:path     rdaGr2:placeOfBirth ;
+    sh:nodeKind sh:IRIOrLiteral ;
+    sh:message  "rdaGr2:placeOfBirth must be a literal or a reference." .
+
+:rdaGr2PlaceOfDeath
+    sh:path     rdaGr2:placeOfDeath ;
+    sh:nodeKind sh:IRIOrLiteral ;
+    sh:message  "rdaGr2:placeOfDeath must be a literal or a reference." .
+
+:rdaGr2ProfessionOrOccupation
+    sh:path     rdaGr2:professionOrOccupation ;
+    sh:nodeKind sh:IRIOrLiteral ;
+    sh:message  "rdaGr2:professionOrOccupation must be a literal or a reference." .
 
 :skosAltLabelProperty
     sh:path     skos:altLabel ;
@@ -411,12 +463,13 @@
                                    [ sh:not [ sh:class :EdmClass ] ] ) ;
                      sh:severity sh:Warning ;
                      sh:message  "This property should not reference an EDM class other than edm:Agent." ] ;
-    sh:property    [ sh:path     [ sh:alternativePath ( dc:subject dc:type edm:hasType ) ] ;
+    sh:property    [ sh:path     [ sh:alternativePath ( dc:subject dc:type edm:hasType rdaGr2:professionOrOccupation ) ] ;
                      sh:or       ( [ sh:class skos:Concept ]
                                    [ sh:not [ sh:class :EdmClass ] ] ) ;
                      sh:severity sh:Warning ;
                      sh:message  "This property should not reference an EDM class other than skos:Concept." ] ;
-    sh:property    [ sh:path     [ sh:alternativePath ( dcterms:spatial edm:currentLocation ) ] ;
+    sh:property    [ sh:path     [ sh:alternativePath ( dcterms:spatial edm:currentLocation
+                                                        rdaGr2:placeOfBirth rdaGr2:placeOfDeath ) ] ;
                      sh:or       ( [ sh:class edm:Place ]
                                    [ sh:not [ sh:class :EdmClass ] ] ) ;
                      sh:severity sh:Warning ;
@@ -455,7 +508,8 @@
 :ProvidedCHOWithCorrectReferencesShape
     a              sh:NodeShape ;
     sh:targetClass edm:ProvidedCHO ;
-    sh:property    [ sh:path     [ sh:alternativePath ( dcterms:hasPart dcterms:isPartOf edm:isNextInSequence owl:sameAs ) ] ;
+    sh:property    [ sh:path     [ sh:alternativePath ( dcterms:hasPart dcterms:isPartOf
+                                                        edm:isNextInSequence owl:sameAs ) ] ;
                      sh:or       ( [ sh:class edm:ProvidedCHO ]
                                    [ sh:not [ sh:class :EdmClass ] ] ) ;
                      sh:severity sh:Warning ;
@@ -470,8 +524,8 @@
 :WebResourceWithCorrectReferencesShape
     a              sh:NodeShape ;
     sh:targetClass edm:WebResource ;
-    sh:property    [ sh:path      [ sh:alternativePath ( edm:isNextInSequence dcterms:hasPart dcterms:isPartOf
-                                                         owl:sameAs ) ] ;
+    sh:property    [ sh:path      [ sh:alternativePath ( dcterms:hasPart dcterms:isPartOf
+                                                         edm:isNextInSequence owl:sameAs ) ] ;
                      sh:or       ( [ sh:class edm:WebResource ]
                                    [ sh:not [ sh:class :EdmClass ] ] ) ;
                      sh:severity sh:Warning ;
@@ -659,18 +713,28 @@
     sh:targetClass       edm:Agent ;
     sh:closed            true ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:property :dcDateProperty ;
-    sh:property :dcIdentifierProperty ;
-    sh:property :dctermsHasPartProperty ;
-    sh:property :dctermsIsPartOfProperty ;
-    sh:property :edmBeginProperty ;
-    sh:property :edmEndProperty ;
-    sh:property :edmHasMetProperty ;
-    sh:property :edmIsRelatedToProperty ;
-    sh:property :owlSameAsProperty ;
-    sh:property :skosAltLabelProperty ;
-    sh:property :skosNoteProperty ;
-    sh:property :skosPrefLabelProperty .
+    sh:property          :dcDateProperty ;
+    sh:property          :dcIdentifierProperty ;
+    sh:property          :dctermsHasPartProperty ;
+    sh:property          :dctermsIsPartOfProperty ;
+    sh:property          :edmBeginProperty ;
+    sh:property          :edmEndProperty ;
+    sh:property          :edmHasMetProperty ;
+    sh:property          :edmIsRelatedToProperty ;
+    sh:property          :foafNameProperty ;
+    sh:property          :owlSameAsProperty ;
+    sh:property          :rdaGr2BiographicalInformation ;
+    sh:property          :rdaGr2DateOfBirth ;
+    sh:property          :rdaGr2DateOfDeath ;
+    sh:property          :rdaGr2DateOfEstablishment ;
+    sh:property          :rdaGr2DateOfTermination ;
+    sh:property          :rdaGr2Gender ;
+    sh:property          :rdaGr2PlaceOfBirth ;
+    sh:property          :rdaGr2PlaceOfDeath ;
+    sh:property          :rdaGr2ProfessionOrOccupation ;
+    sh:property          :skosAltLabelProperty ;
+    sh:property          :skosNoteProperty ;
+    sh:property          :skosPrefLabelProperty .
 
 # Concept
 :ConceptShape
