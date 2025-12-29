@@ -404,6 +404,46 @@
     sh:nodeKind sh:Literal ;
     sh:message  "skos:altLabel must be a literal." .
 
+:skosBroaderProperty
+    sh:path     skos:broader ;
+    sh:nodeKind sh:IRI ;
+    sh:message  "skos:broader must be a reference." .
+
+:skosBroadMatchProperty
+    sh:path     skos:broadMatch ;
+    sh:nodeKind sh:IRI ;
+    sh:message  "skos:broadMatch must be a reference." .
+
+:skosCloseMatchProperty
+    sh:path     skos:closeMatch ;
+    sh:nodeKind sh:IRI ;
+    sh:message  "skos:closeMatch must be a reference." .
+
+:skosExactMatchProperty
+    sh:path     skos:exactMatch ;
+    sh:nodeKind sh:IRI ;
+    sh:message  "skos:exactMatch must be a reference." .
+
+:skosInSchemeProperty
+    sh:path     skos:inScheme ;
+    sh:nodeKind sh:IRI ;
+    sh:message  "skos:inScheme must be a reference." .
+
+:skosNarrowerProperty
+    sh:path     skos:narrower ;
+    sh:nodeKind sh:IRI ;
+    sh:message  "skos:narrower must be a reference." .
+
+:skosNarrowMatchProperty
+    sh:path     skos:narrowMatch ;
+    sh:nodeKind sh:IRI ;
+    sh:message  "skos:narrowMatch must be a reference." .
+
+:skosNotationProperty
+    sh:path     skos:notation ;
+    sh:nodeKind sh:Literal ;
+    sh:message  "skos:notation must be a literal." .
+
 :skosNoteProperty
     sh:path     skos:note ;
     sh:nodeKind sh:Literal ;
@@ -415,6 +455,19 @@
     sh:uniqueLang true ;
     sh:message    "skos:prefLabel must be a literal; only one value per language may be present." .
 
+:skosRelatedProperty
+    sh:path     skos:related ;
+    sh:nodeKind sh:IRI ;
+    sh:message  "skos:related must be a reference." .
+
+:skosRelatedMatchProperty
+    sh:path     skos:relatedMatch ;
+    sh:nodeKind sh:IRI ;
+    sh:message  "skos:relatedMatch must be a reference." .
+
+
+
+### Property target declarations ###
 
 
 # TODO in the following checks, this schema follows the documentation. But we should verify and adjust.
@@ -423,12 +476,11 @@
 # TODO        edm:currentLocation, edm:hasType, edm:isRelatedTo?, dc:relation?
 # TODO check: dcterms:medium and dc:format is enriched as if it always has a Concept, but this is
 # TODO        not clear from the docs. However, it is kind of implied in the EDM definition.
+# TODO check: Organization objects (and references to them) are not expected in EDM external?
 
 # TODO check: The acceptable referenced classes/objects for each property. Where the documentation
 # TODO        it says 'resource' it is assumed to be a resource on the web somewhere.
 
-
-### Shape declarations ###
 
 # These shapes verify that the various properties reference the right type of classes.
 # The typing conditions for contextual class references are designed to avoid failing on literals,
@@ -463,7 +515,10 @@
                                    [ sh:not [ sh:class :EdmClass ] ] ) ;
                      sh:severity sh:Warning ;
                      sh:message  "This property should not reference an EDM class other than edm:Agent." ] ;
-    sh:property    [ sh:path     [ sh:alternativePath ( dc:subject dc:type edm:hasType rdaGr2:professionOrOccupation ) ] ;
+    sh:property    [ sh:path     [ sh:alternativePath ( dc:subject dc:type edm:hasType rdaGr2:professionOrOccupation
+                                                        skos:broader skos:narrower skos:related
+                                                        skos:broadMatch skos:narrowMatch skos:relatedMatch
+                                                        skos:closeMatch skos:exactMatch ) ] ;
                      sh:or       ( [ sh:class skos:Concept ]
                                    [ sh:not [ sh:class :EdmClass ] ] ) ;
                      sh:severity sh:Warning ;
@@ -500,10 +555,11 @@
                      sh:not      [ sh:class :EdmClass ] ;
                      sh:severity sh:Warning ;
                      sh:message  "This property should not reference an EDM class." ] ;
-    sh:property    [ sh:path     [ sh:alternativePath ( edm:dataProvider edm:intermediateProvider edm:provider ) ] ;
+    sh:property    [ sh:path     [ sh:alternativePath ( edm:dataProvider edm:intermediateProvider edm:provider
+                                                        skos:inScheme ) ] ;
                      sh:not      [ sh:class :EdmClass ] ;
                      sh:severity sh:Warning ;
-                     sh:message  "This property relate to Organizations and should not reference an EDM external class." ] .
+                     sh:message  "This property relates to Organizations and should not reference an EDM external class." ] .
 
 :ProvidedCHOWithCorrectReferencesShape
     a              sh:NodeShape ;
@@ -544,6 +600,9 @@
                                    [ sh:not [ sh:class :EdmClass ] ] ) ;
                      sh:severity sh:Warning ;
                      sh:message  "This property in an Agent should not reference an EDM class other than a contextual entity." ] .
+
+
+### Shape declarations ###
 
 # ProvidedCHO: The closed list of permitted properties.
 :ProvidedCHOShape
@@ -741,7 +800,20 @@
     a                    sh:NodeShape ;
     sh:targetClass       skos:Concept ;
     sh:closed            true ;
-    sh:ignoredProperties ( rdf:type ) .
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property          :skosPrefLabelProperty ;
+    sh:property          :skosAltLabelProperty ;
+    sh:property          :skosBroaderProperty ;
+    sh:property          :skosNarrowerProperty ;
+    sh:property          :skosRelatedProperty ;
+    sh:property          :skosBroadMatchProperty ;
+    sh:property          :skosNarrowMatchProperty ;
+    sh:property          :skosRelatedMatchProperty ;
+    sh:property          :skosExactMatchProperty ;
+    sh:property          :skosCloseMatchProperty ;
+    sh:property          :skosNoteProperty ;
+    sh:property          :skosNotationProperty ;
+    sh:property          :skosInSchemeProperty .
 
 # Place
 :PlaceShape

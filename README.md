@@ -18,6 +18,7 @@ Further additions needed (these may also require inclusion in the EDM documentat
 * Others? Also see https://pro.europeana.eu/page/edm-profiles.
 * Others? Also see (subpages of) https://europeana.atlassian.net/wiki/spaces/EF/pages/1141932262/Classes+from+EDM+Profiles
 * Any additional features in the existing schema?
+* We could show info-level warnings for the absence of recommended properties.
 
 This project should replace the schema links on the EDM page of Europeana Pro 
 (https://pro.europeana.eu/page/edm-documentation)
