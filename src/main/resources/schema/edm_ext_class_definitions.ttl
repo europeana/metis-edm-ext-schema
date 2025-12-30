@@ -4,18 +4,21 @@
 @prefix ore:  <http://www.openarchives.org/ore/terms/> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix svcs: <http://rdfs.org/sioc/services#> .
 
 ### Classes ###
 :EdmClass rdfs:subClassOf rdfs:Class .
-:ContextualClass rdfs:subClassOf :EdmClass .
-:EdmCoreClass rdfs:subClassOf :EdmClass .
 
+:EdmCoreClass rdfs:subClassOf :EdmClass .
 edm:ProvidedCHO rdfs:subClassOf :EdmCoreClass .
 ore:Aggregation rdfs:subClassOf :EdmCoreClass .
 edm:WebResource rdfs:subClassOf :EdmCoreClass .
 
+:ContextualClass rdfs:subClassOf :EdmClass .
 edm:Agent rdfs:subClassOf :ContextualClass .
 skos:Concept rdfs:subClassOf :ContextualClass .
-cc:License rdfs:subClassOf :ContextualClass .
 edm:Place rdfs:subClassOf :ContextualClass .
 edm:TimeSpan rdfs:subClassOf :ContextualClass .
+
+cc:License rdfs:subClassOf :EdmClass .
+svcs:Service rdfs:subClassOf :EdmClass .
