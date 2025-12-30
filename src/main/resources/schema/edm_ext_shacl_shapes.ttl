@@ -15,12 +15,6 @@
 
 ### Property declarations ###
 
-# Note: some properties are mandated to be non-empty (if they are literals). These properties are
-# involved in specific requirements for presence. If a property (or at least one of a group of
-# properties) is required to be present, then it should not be allowed to be empty. This is not
-# only out of data correctness, but also to prevent normalisation from invalidating the record.
-# During normalisation emtpy properties may be removed and the record could become invalid as a result.
-
 :dcContributorProperty
     sh:path     dc:contributor ;
     sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
@@ -241,26 +235,19 @@
 :edmAggregatedCHOProperty
     sh:path     edm:aggregatedCHO ;
     sh:nodeKind sh:IRI ;
-    sh:minCount 1 ;
-    sh:maxCount 1 ;
-    sh:class    edm:ProvidedCHO ;
-    sh:message  "edm:aggregatedCHO must refer to a ProvidedCHO and must occur exactly once." .
+    sh:message  "edm:aggregatedCHO must be a reference." .
 
 :edmCurrentLocationProperty
     sh:path     edm:currentLocation ;
     sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
                  [ sh:nodeKind sh:IRI ] ) ;
-    sh:maxCount 1 ;
-    sh:message  "edm:currentLocation must be a string literal or a reference and can only occur once." .
+    sh:message  "edm:currentLocation must be a string literal." .
 
 :edmDataProviderProperty
     sh:path     edm:dataProvider ;
     sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
                  [ sh:nodeKind sh:IRI ] ) ;
-    sh:minCount 1 ;
-    sh:maxCount 1 ;
-    sh:pattern  "\\S" ; # Prevents invalid EDM after normalisation (removal of empty literals).
-    sh:message  "edm:dataProvider must be a non-whitespace string literal or a reference and must occur exactly once." .
+    sh:message  "edm:dataProvider must be a string literal or a reference." .
 
 :edmBeginProperty
     sh:path     edm:begin ;
@@ -318,20 +305,17 @@
 :edmIsRepresentationOfProperty
     sh:path     edm:isRepresentationOf ;
     sh:nodeKind sh:IRI ;
-    sh:maxCount 1 ;
-    sh:message  "edm:isRepresentationOf must be a reference and can only occur once." .
+    sh:message  "edm:isRepresentationOf must be a reference." .
 
 :edmIsShownAtProperty
     sh:path     edm:isShownAt ;
     sh:nodeKind sh:IRI ;
-    sh:maxCount 1 ;
-    sh:message  "edm:isShownAt must be a reference and can only occur once." .
+    sh:message  "edm:isShownAt must be a reference." .
 
 :edmIsShownByProperty
     sh:path     edm:isShownBy ;
     sh:nodeKind sh:IRI ;
-    sh:maxCount 1 ;
-    sh:message  "edm:isShownBy must be a reference and can only occur once." .
+    sh:message  "edm:isShownBy must be a reference." .
 
 :edmIsSimilarToProperty
     sh:path     edm:isSimilarTo ;
@@ -346,17 +330,13 @@
 :edmObjectProperty
     sh:path     edm:object ;
     sh:nodeKind sh:IRI ;
-    sh:maxCount 1 ;
-    sh:message  "edm:object must be a reference and can only occur once." .
+    sh:message  "edm:object must be a reference" .
 
 :edmProviderProperty
     sh:path     edm:provider ;
     sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
                  [ sh:nodeKind sh:IRI ] ) ;
-    sh:minCount 1 ;
-    sh:maxCount 1 ;
-    sh:pattern  "\\S" ; # Prevents invalid EDM after normalisation (removal of empty literals).
-    sh:message  "edm:provider must be a non-whitespace string literal or a reference and must occur exactly once." .
+    sh:message  "edm:provider must be a string literal or a reference." .
 
 :edmRealizesProperty
     sh:path     edm:realizes ;
@@ -366,16 +346,13 @@
 :edmRightsProperty
     sh:path     edm:rights ;
     sh:nodeKind sh:IRI ;
-    sh:maxCount 1 ;
-    sh:message  "edm:rights must be a reference and may only occur once." .
+    sh:message  "edm:rights must be a reference." .
 
 :edmTypeProperty
     sh:path     edm:type ;
-    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ] ) ;
-    sh:minCount 1 ;
-    sh:maxCount 1 ;
+    sh:or       ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ] ) ;
     sh:in       ( "TEXT" "VIDEO" "SOUND" "IMAGE" "3D" ) ;
-    sh:message  "edm:type must occur exactly once and must have one of the permitted values.".
+    sh:message  "edm:type must have one of the permitted literal values.".
 
 :edmUgcProperty
     sh:path     edm:ugc ;
@@ -532,6 +509,9 @@
 :EdmClassWithCorrectReferencesShape
     a              sh:NodeShape ;
     sh:targetClass :EdmClass ;
+    sh:property    [ sh:path    edm:aggregatedCHO ;
+                     sh:class   edm:ProvidedCHO ;
+                     sh:message "edm:aggregatedCHO must reference an edm:ProvidedCHO." ] ;
     sh:property    [ sh:path     [ sh:alternativePath ( dc:relation dc:source dcterms:hasVersion
                                                         dcterms:isReferencedBy dcterms:isReplacedBy
                                                         dcterms:isRequiredBy dcterms:isVersionOf dcterms:references
@@ -647,6 +627,13 @@
 
 ### Shape declarations ###
 
+# Note: some properties are mandated to be non-empty in the definitions below. These properties are
+# involved in specific requirements for presence. If a property (or at least one of a group of
+# properties) is required to be present, then it should not be allowed to be empty. This is not
+# only out of data correctness, but also to prevent normalisation from invalidating the record.
+# During normalisation emtpy properties may be removed and the record could become invalid as a result.
+# Note: this only applies when the property is allowed to be a literal.
+
 # ProvidedCHO: The closed list of permitted properties.
 :ProvidedCHOShape
     a                    sh:NodeShape ;
@@ -707,7 +694,6 @@
 
 # ProvidedCHO: There needs to be at least a description or title, and the description should be a
 # literal. Also, there needs to be at least a dc:subject, dc:type, dcterms:spatial or dcterms:temporal.
-# The non-whitespace requirement prevents invalid EDM after normalisation (removal of empty literals).
 # TODO hasView can only occur if isShownBy has already been used. According to Hugo:check with Nuno. Warning, not violation.
 :ProvidedCHOWithRightPropertyCombinationsShape
     a              sh:NodeShape ;
@@ -720,6 +706,16 @@
                      sh:or         ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ] ) ;
                      sh:severity   sh:Warning ;
                      sh:message    "dc:description should be a string literal, not a reference." ] ;
+    sh:property    [ sh:path       edm:currentLocation ;
+                     sh:maxCount   1 ;
+                     sh:message    "edm:currentLocation can only occur once." ] ;
+    sh:property    [ sh:path       edm:isRepresentationOf ;
+                     sh:maxCount   1 ;
+                     sh:message    "edm:isRepresentationOf can only occur once." ] ;
+    sh:property    [ sh:path       edm:type ;
+                     sh:minCount   1 ;
+                     sh:maxCount   1 ;
+                     sh:message    "edm:type must occur exactly once." ] ;
     sh:property    [ sh:path                [ sh:alternativePath ( dc:title dc:description ) ] ;
                      sh:qualifiedValueShape [ sh:pattern "\\S" ] ;
                      sh:qualifiedMinCount   1 ;
@@ -730,7 +726,6 @@
                      sh:message             "At least one the following properties should be present and non-empty: dc:subject, dc:type, dcterms:spatial or dcterms:temporal." ] .
 
 # ProvidedCHO: If this is a TEXT object, we require a language.
-# The non-whitespace requirement prevents invalid EDM after normalisation (removal of empty literals).
 :ProvidedCHOForTextWithLanguageShape
     a              sh:NodeShape ;
     sh:targetClass edm:ProvidedCHO ;
@@ -760,20 +755,42 @@
     sh:property          :edmRightsProperty ;
     sh:property          :edmUgcProperty.
 
-# Aggregation: There needs to be at least a edm:isShownAt or edm:isShownBy. There needs to be at least
-# an occurrence of edm:rights. Note: all fields are IRIs, no need to enforce non-whitespace values.
+# Aggregation: There needs to be at least a edm:isShownAt or edm:isShownBy.
 :AggregationWithRightPropertyCombinationsShape
     a              sh:NodeShape ;
     sh:targetClass ore:Aggregation ;
-    sh:property    [ sh:path     [ sh:alternativePath ( edm:isShownAt edm:isShownBy ) ] ;
+    sh:property    [ sh:path     edm:aggregatedCHO ;
                      sh:minCount 1 ;
-                     sh:message  "At least one the following properties must be present: edm:isShownAt or edm:isShownBy." ] ;
+                     sh:maxCount 1 ;
+                     sh:message  "edm:aggregatedCHO must be present exactly once." ] ;
+    sh:property    [ sh:path     edm:dataProvider ;
+                     sh:minCount 1 ;
+                     sh:maxCount 1 ;
+                     sh:pattern  "\\S" ;
+                     sh:message  "edm:dataProvider must occur exactly once and must be non-empty."] ;
+    sh:property    [ sh:path     edm:isShownAt ;
+                     sh:maxCount 1 ;
+                     sh:message  "edm:isShownAt can only occur once." ] ;
+    sh:property    [ sh:path     edm:isShownBy ;
+                     sh:maxCount 1 ;
+                     sh:message  "edm:isShownBy can only occur once." ] ;
+    sh:property    [ sh:path     edm:object ;
+                     sh:maxCount 1 ;
+                     sh:message  "edm:object can only occur once." ] ;
+    sh:property    [ sh:path     edm:provider ;
+                     sh:minCount 1 ;
+                     sh:maxCount 1 ;
+                     sh:pattern  "\\S" ;
+                     sh:message  "edm:provider must occur exactly once and must be non-empty." ] ;
     sh:property    [ sh:path     edm:rights ;
                      sh:minCount 1 ;
-                     sh:message  "edm:rights must be present." ] .
+                     sh:maxCount 1 ;
+                     sh:message  "edm:rights must occur exactly once." ] ;
+    sh:property    [ sh:path     [ sh:alternativePath ( edm:isShownAt edm:isShownBy ) ] ;
+                     sh:minCount 1 ;
+                     sh:message  "At least one the following properties must be present: edm:isShownAt or edm:isShownBy." ] .
 
 # Aggregation: Warn if an IMAGE has no edm:isShownBy or edm:object.
-# Note: all fields are IRIs, no need to enforce non-whitespace values.
 :AggregationForImageWithRightMediaLinksShape
     a              sh:NodeShape ;
     sh:targetClass ore:Aggregation ;
@@ -808,6 +825,13 @@
     sh:property          :edmIsNextInSequenceProperty ;
     sh:property          :edmRightsProperty ;
     sh:property          :owlSameAsProperty .
+
+:WebResourceWithRightPropertyCombinationsShape
+    a              sh:NodeShape ;
+    sh:targetClass edm:WebResource ;
+    sh:property    [ sh:path     edm:rights ;
+                     sh:maxCount 1 ;
+                     sh:message  "edm:rights may only occur once." ] .
 
 # Agent
 :AgentShape
