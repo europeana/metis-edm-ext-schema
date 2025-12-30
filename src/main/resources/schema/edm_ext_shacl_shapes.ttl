@@ -11,8 +11,10 @@
 @prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sh:      <http://www.w3.org/ns/shacl#> .
 @prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
 
 ### Property declarations ###
+
 # Note: some properties are mandated to be non-empty (if they are literals). These properties are
 # involved in specific requirements for presence. If a property (or at least one of a group of
 # properties) is required to be present, then it should not be allowed to be empty. This is not
@@ -21,188 +23,220 @@
 
 :dcContributorProperty
     sh:path     dc:contributor ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "dc:contributor must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "dc:contributor must be a string literal or a reference." .
 
 :dcCoverageProperty
     sh:path     dc:coverage ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "dc:coverage must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "dc:coverage must be a string literal or a reference." .
 
 :dcCreatorProperty
     sh:path     dc:creator ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "cd:creator must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "cd:creator must be a string literal or a reference." .
 
 :dcDateProperty
     sh:path     dc:date ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "dc:date must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "dc:date must be a string literal or a reference." .
 
 :dcDescriptionProperty
     sh:path     dc:description ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "dc:description must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "dc:description must be a string literal or a reference." .
 
 :dcFormatProperty
     sh:path     dc:format ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "dc:format must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "dc:format must be a string literal or a reference." .
 
 :dcIdentifierProperty
     sh:path     dc:identifier ;
-    sh:nodeKind sh:Literal ;
-    sh:message  "dc:identifier must be a literal." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ] ) ;
+    sh:message  "dc:identifier must be a string literal." .
 
 :dcLanguageProperty
     sh:path     dc:language ;
-    sh:nodeKind sh:Literal ;
-    sh:message  "dc:language must be a literal." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ] ) ;
+    sh:message  "dc:language must be a string literal." .
 
 :dcPublisherProperty
     sh:path     dc:publisher ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "dc:publisher must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "dc:publisher must be a string literal or a reference." .
 
 :dcRelationProperty
     sh:path     dc:relation ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "dc:relation must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "dc:relation must be a string literal or a reference." .
 
 :dcRightsProperty
     sh:path     dc:rights ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "dc:rights must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "dc:rights must be a string literal or a reference." .
 
 :dcSourceProperty
     sh:path     dc:source ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "dc:source must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "dc:source must be a string literal or a reference." .
 
 :dcSubjectProperty
-    sh:path     dc:subject  ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "dc:subject must be a literal or a reference." .
+    sh:path    dc:subject ;
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message "dc:subject must be a string literal or a reference." .
 
 :dcTitleProperty
-    sh:path     dc:title ;
-    sh:nodeKind sh:Literal ;
-    sh:message  "dc:title must be a literal." .
+    sh:path    dc:title ;
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ] ) ;
+    sh:message "dc:title must be a string literal." .
 
 :dcTypeProperty
     sh:path     dc:type  ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "dc:type must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "dc:type must be a string literal or a reference." .
 
 :dctermsAlternativeProperty
     sh:path     dcterms:alternative ;
-    sh:nodeKind sh:Literal ;
-    sh:message  "dcterms:alternative must be a literal." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ] ) ;
+    sh:message  "dcterms:alternative must be a string literal." .
 
 :dctermsConformsToProperty
     sh:path     dcterms:conformsTo ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "dcterms:conformsTo must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "dcterms:conformsTo must be a string literal or a reference." .
 
 :dctermsCreatedProperty
     sh:path     dcterms:created ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "dcterms:created must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "dcterms:created must be a string literal or a reference." .
 
 :dctermsExtentProperty
     sh:path     dcterms:extent ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "dcterms:extent must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "dcterms:extent must be a string literal or a reference." .
 
 :dctermsHasFormatProperty
     sh:path     dcterms:hasFormat ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "dcterms:hasFormat must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "dcterms:hasFormat must be a string literal or a reference." .
 
 :dctermsHasPartProperty
     sh:path     dcterms:hasPart ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "dcterms:hasPart must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "dcterms:hasPart must be a string literal or a reference." .
 
 :dctermsHasVersionProperty
     sh:path     dcterms:hasVersion ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "dcterms:hasVersion must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "dcterms:hasVersion must be a string literal or a reference." .
 
 :dctermsIsFormatOfProperty
     sh:path     dcterms:isFormatOf ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "dcterms:isFormatOf must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "dcterms:isFormatOf must be a string literal or a reference." .
 
 :dctermsIsPartOfProperty
     sh:path     dcterms:isPartOf ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "dcterms:isPartOf must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "dcterms:isPartOf must be a string literal or a reference." .
 
 :dctermsIsReferencedByProperty
     sh:path     dcterms:isReferencedBy ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "dcterms:isReferencedBy must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "dcterms:isReferencedBy must be a string literal or a reference." .
 
 :dctermsIsReplacedByProperty
     sh:path     dcterms:isReplacedBy ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "dcterms:isReplacedBy must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "dcterms:isReplacedBy must be a string literal or a reference." .
 
 :dctermsIsRepuiredByProperty
     sh:path     dcterms:isRequiredBy ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "dcterms:isRequiredBy must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "dcterms:isRequiredBy must be a string literal or a reference." .
 
 :dctermsIssuedProperty
     sh:path     dcterms:issued ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "dcterms:issued must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "dcterms:issued must be a string literal or a reference." .
 
 :dctermsIsVersionOfProperty
     sh:path     dcterms:isVersionOf ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "dcterms:isVersionOf must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "dcterms:isVersionOf must be a string literal or a reference." .
 
 :dctermsMediumProperty
     sh:path     dcterms:medium ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "dcterms:medium must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "dcterms:medium must be a string literal or a reference." .
 
 :dctermsProvenanceProperty
     sh:path     dcterms:provenance ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "dcterms:provenance must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "dcterms:provenance must be a string literal or a reference." .
 
 :dctermsReferencesProperty
     sh:path     dcterms:references ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "dcterms:references must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "dcterms:references must be a string literal or a reference." .
 
 :dctermsReplacesProperty
     sh:path     dcterms:replaces ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "dcterms:replaces must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "dcterms:replaces must be a string literal or a reference." .
 
 :dctermsRequiresProperty
     sh:path     dcterms:requires ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "dcterms:requires must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "dcterms:requires must be a string literal or a reference." .
 
 :dctermsSpatialProperty
     sh:path     dcterms:spatial ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "dcterms:spatial must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "dcterms:spatial must be a string literal or a reference." .
 
 :dctermsTableOfContentsProperty
     sh:path     dcterms:tableOfContents ;
-    sh:nodeKind sh:Literal ;
-    sh:message  "dcterms:tableOfContents must be a literal." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ] ) ;
+    sh:message  "dcterms:tableOfContents must be a string literal." .
 
 :dctermsTemporalProperty
     sh:path     dcterms:temporal ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "dcterms:temporal must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "dcterms:temporal must be a string literal or a reference." .
 
 :edmAggregatedCHOProperty
     sh:path     edm:aggregatedCHO ;
@@ -214,27 +248,29 @@
 
 :edmCurrentLocationProperty
     sh:path     edm:currentLocation ;
-    sh:nodeKind sh:IRIOrLiteral ;
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
     sh:maxCount 1 ;
-    sh:message  "edm:currentLocation must be a literal or a reference and can only occur once." .
+    sh:message  "edm:currentLocation must be a string literal or a reference and can only occur once." .
 
 :edmDataProviderProperty
     sh:path     edm:dataProvider ;
-    sh:nodeKind sh:IRIOrLiteral ;
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
     sh:minCount 1 ;
     sh:maxCount 1 ;
     sh:pattern  "\\S" ; # Prevents invalid EDM after normalisation (removal of empty literals).
-    sh:message  "edm:dataProvider must be a non-whitespace literal or a reference and must occur exactly once." .
+    sh:message  "edm:dataProvider must be a non-whitespace string literal or a reference and must occur exactly once." .
 
 :edmBeginProperty
     sh:path     edm:begin ;
-    sh:nodeKind sh:Literal ;
-    sh:message  "edm:begin must be a literal." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ] ) ;
+    sh:message  "edm:begin must be a string literal." .
 
 :edmEndProperty
     sh:path     edm:end ;
-    sh:nodeKind sh:Literal ;
-    sh:message  "edm:end must be a literal." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ] ) ;
+    sh:message  "edm:end must be a string literal." .
 
 :edmHasMetProperty
     sh:path     edm:hasMet ;
@@ -243,8 +279,9 @@
 
 :edmHasTypeProperty
     sh:path     edm:hasType ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "edm:hasType must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "edm:hasType must be a string literal or a reference." .
 
 :edmHasViewProperty
     sh:path     edm:hasView ;
@@ -258,8 +295,9 @@
 
 :edmIntermediateProviderProperty
     sh:path     edm:intermediateProvider ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "edm:intermediateProvider must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "edm:intermediateProvider must be a string literal or a reference." .
 
 :edmIsDerivativeOfProperty
     sh:path     edm:isDerivativeOf ;
@@ -273,8 +311,9 @@
 
 :edmIsRelatedToProperty
     sh:path     edm:isRelatedTo ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "edm:isRelatedTo must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "edm:isRelatedTo must be a string literal or a reference." .
 
 :edmIsRepresentationOfProperty
     sh:path     edm:isRepresentationOf ;
@@ -312,11 +351,12 @@
 
 :edmProviderProperty
     sh:path     edm:provider ;
-    sh:nodeKind sh:IRIOrLiteral ;
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
     sh:minCount 1 ;
     sh:maxCount 1 ;
     sh:pattern  "\\S" ; # Prevents invalid EDM after normalisation (removal of empty literals).
-    sh:message  "edm:provider must be a non-whitespace literal or a reference and must occur exactly once." .
+    sh:message  "edm:provider must be a non-whitespace string literal or a reference and must occur exactly once." .
 
 :edmRealizesProperty
     sh:path     edm:realizes ;
@@ -331,7 +371,7 @@
 
 :edmTypeProperty
     sh:path     edm:type ;
-    sh:nodeKind sh:Literal ;
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ] ) ;
     sh:minCount 1 ;
     sh:maxCount 1 ;
     sh:in       ( "TEXT" "VIDEO" "SOUND" "IMAGE" "3D" ) ;
@@ -339,15 +379,15 @@
 
 :edmUgcProperty
     sh:path     edm:ugc ;
-    sh:nodeKind sh:Literal ;
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ] ) ;
     sh:maxCount 1 ;
     sh:pattern  "^true$" ;
-    sh:message  "edm:ugc must be a literal with value 'true' and can only occur once." .
+    sh:message  "edm:ugc must be a string literal with value 'true' and can only occur once." .
 
 :foafNameProperty
     sh:path     foaf:name ;
-    sh:nodeKind sh:Literal ;
-    sh:message  "foaf:name must be a literal." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ] ) ;
+    sh:message  "foaf:name must be a string literal." .
 
 :owlSameAsProperty
     sh:path     owl:sameAs ;
@@ -356,53 +396,56 @@
 
 :rdaGr2BiographicalInformation
     sh:path     rdaGr2:biographicalInformation ;
-    sh:nodeKind sh:Literal ;
-    sh:message  "rdaGr2:biographicalInformation must be a literal." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ] ) ;
+    sh:message  "rdaGr2:biographicalInformation must be a string literal." .
 
 :rdaGr2DateOfBirth
     sh:path     rdaGr2:dateOfBirth ;
-    sh:nodeKind sh:Literal ;
-    sh:message  "rdaGr2:dateOfBirth must be a literal." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ] ) ;
+    sh:message  "rdaGr2:dateOfBirth must be a string literal." .
 
 :rdaGr2DateOfDeath
     sh:path     rdaGr2:dateOfDeath ;
-    sh:nodeKind sh:Literal ;
-    sh:message  "rdaGr2:dateOfDeath must be a literal." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ] ) ;
+    sh:message  "rdaGr2:dateOfDeath must be a string literal." .
 
 :rdaGr2DateOfEstablishment
     sh:path     rdaGr2:dateOfEstablishment ;
-    sh:nodeKind sh:Literal ;
-    sh:message  "rdaGr2:dateOfEstablishment must be a literal." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ] ) ;
+    sh:message  "rdaGr2:dateOfEstablishment must be a string literal." .
 
 :rdaGr2DateOfTermination
     sh:path     rdaGr2:dateOfTermination ;
-    sh:nodeKind sh:Literal ;
-    sh:message  "rdaGr2:dateOfTermination must be a literal." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ] ) ;
+    sh:message  "rdaGr2:dateOfTermination must be a string literal." .
 
 :rdaGr2Gender
     sh:path     rdaGr2:gender ;
-    sh:nodeKind sh:Literal ;
-    sh:message  "rdaGr2:gender must be a literal." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ] ) ;
+    sh:message  "rdaGr2:gender must be a string literal." .
 
 :rdaGr2PlaceOfBirth
     sh:path     rdaGr2:placeOfBirth ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "rdaGr2:placeOfBirth must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "rdaGr2:placeOfBirth must be a string literal or a reference." .
 
 :rdaGr2PlaceOfDeath
     sh:path     rdaGr2:placeOfDeath ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "rdaGr2:placeOfDeath must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "rdaGr2:placeOfDeath must be a string literal or a reference." .
 
 :rdaGr2ProfessionOrOccupation
     sh:path     rdaGr2:professionOrOccupation ;
-    sh:nodeKind sh:IRIOrLiteral ;
-    sh:message  "rdaGr2:professionOrOccupation must be a literal or a reference." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ]
+                 [ sh:nodeKind sh:IRI ] ) ;
+    sh:message  "rdaGr2:professionOrOccupation must be a string literal or a reference." .
 
 :skosAltLabelProperty
     sh:path     skos:altLabel ;
-    sh:nodeKind sh:Literal ;
-    sh:message  "skos:altLabel must be a literal." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ] ) ;
+    sh:message  "skos:altLabel must be a string literal." .
 
 :skosBroaderProperty
     sh:path     skos:broader ;
@@ -442,18 +485,18 @@
 :skosNotationProperty
     sh:path     skos:notation ;
     sh:nodeKind sh:Literal ;
-    sh:message  "skos:notation must be a literal." .
+    sh:message  "skos:notation must be a literal of any type." .
 
 :skosNoteProperty
     sh:path     skos:note ;
-    sh:nodeKind sh:Literal ;
-    sh:message  "skos:note must be a literal." .
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ] ) ;
+    sh:message  "skos:note must be a string literal." .
 
 :skosPrefLabelProperty
     sh:path       skos:prefLabel ;
-    sh:nodeKind   sh:Literal ;
+    sh:or      ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ] ) ;
     sh:uniqueLang true ;
-    sh:message    "skos:prefLabel must be a literal; only one value per language may be present." .
+    sh:message    "skos:prefLabel must be a string literal; only one value per language may be present." .
 
 :skosRelatedProperty
     sh:path     skos:related ;
@@ -674,9 +717,9 @@
                      sh:severity   sh:Warning ;
                      sh:message    "There should be only one title per language. " ] ;
     sh:property    [ sh:path       dc:description ;
-                     sh:nodeKind   sh:Literal ;
+                     sh:or         ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ] ) ;
                      sh:severity   sh:Warning ;
-                     sh:message    "dc:description should be a literal, not a reference." ] ;
+                     sh:message    "dc:description should be a string literal, not a reference." ] ;
     sh:property    [ sh:path                [ sh:alternativePath ( dc:title dc:description ) ] ;
                      sh:qualifiedValueShape [ sh:pattern "\\S" ] ;
                      sh:qualifiedMinCount   1 ;
