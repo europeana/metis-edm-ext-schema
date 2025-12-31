@@ -1,17 +1,18 @@
-@prefix :        <http://www.europeana.eu/metis/edm/ext/> .
-@prefix cc:      <http://creativecommons.org/ns#> .
-@prefix dc:      <http://purl.org/dc/elements/1.1/> .
-@prefix dcterms: <http://purl.org/dc/terms/> .
-@prefix edm:     <http://www.europeana.eu/schemas/edm/> .
-@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
-@prefix ore:     <http://www.openarchives.org/ore/terms/> .
-@prefix owl:     <http://www.w3.org/2002/07/owl#> .
-@prefix rdaGr2:  <http://rdvocab.info/ElementsGr2/> .
-@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix sh:      <http://www.w3.org/ns/shacl#> .
-@prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
-@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix :          <http://www.europeana.eu/metis/edm/ext/> .
+@prefix cc:        <http://creativecommons.org/ns#> .
+@prefix dc:        <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms:   <http://purl.org/dc/terms/> .
+@prefix edm:       <http://www.europeana.eu/schemas/edm/> .
+@prefix foaf:      <http://xmlns.com/foaf/0.1/> .
+@prefix ore:       <http://www.openarchives.org/ore/terms/> .
+@prefix owl:       <http://www.w3.org/2002/07/owl#> .
+@prefix rdaGr2:    <http://rdvocab.info/ElementsGr2/> .
+@prefix rdf:       <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:      <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh:        <http://www.w3.org/ns/shacl#> .
+@prefix skos:      <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:       <http://www.w3.org/2001/XMLSchema#> .
+@prefix wgs84_pos: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
 
 ### Property declarations ###
 :StringLiteralOrIRIProperty
@@ -19,6 +20,10 @@
 
 :StringLiteralProperty
     sh:or ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ] ) .
+
+# TODO These properties should be encouraged to be decimal - but does our pipeline support it?
+:StringOrDecimalLiteralProperty
+    sh:or ( [ sh:datatype xsd:string ] [ sh:datatype xsd:decimal ] ) .
 
 :dcContributorProperty
     sh:path    dc:contributor ;
@@ -324,9 +329,8 @@
 :edmUgcProperty
     sh:path     edm:ugc ;
     sh:node     :StringLiteralProperty ;
-    sh:maxCount 1 ;
     sh:pattern  "^true$" ;
-    sh:message  "edm:ugc must be a string literal with value 'true' and can only occur once." .
+    sh:message  "edm:ugc must be a string literal with value 'true'." .
 
 :foafNameProperty
     sh:path    foaf:name ;
@@ -448,9 +452,22 @@
     sh:nodeKind sh:IRI ;
     sh:message  "This property must be a reference." .
 
+:wgs84PosLatProperty
+    sh:path     wgs84_pos:lat ;
+    sh:node     :StringOrDecimalLiteralProperty;
+    sh:message  "This property must be a floating point (decimal)." .
 
+:wgs84PosLongProperty
+    sh:path     wgs84_pos:long ;
+    sh:node     :StringOrDecimalLiteralProperty;
+    sh:message  "This property must be a floating point (decimal)." .
 
-### Property target declarations ###
+:wgs84PosAltProperty
+    sh:path     wgs84_pos:alt ;
+    sh:node     :StringOrDecimalLiteralProperty;
+    sh:message  "This property must be a floating point (decimal)." .
+
+### IRI target declarations (reference ranges) ###
 
 
 # TODO in the following checks, this schema follows the documentation. But we should verify and adjust.
@@ -586,6 +603,27 @@
                                    [ sh:not [ sh:class :EdmClass ] ] ) ;
                      sh:severity sh:Warning ;
                      sh:message  "This property in an Agent should not reference an EDM class other than a contextual entity." ] .
+
+:PlaceWithCorrectReferencesShape
+    a              sh:NodeShape ;
+    sh:targetClass edm:Place ;
+    sh:property    [ sh:path      [ sh:alternativePath ( dcterms:hasPart dcterms:isPartOf
+                                                         edm:isNextInSequence owl:sameAs ) ] ;
+                     sh:or       ( [ sh:class edm:Place ]
+                                   [ sh:not [ sh:class :EdmClass ] ] ) ;
+                     sh:severity sh:Warning ;
+                     sh:message  "This property in a Place should not reference an EDM class other than edm:Place." ] .
+
+:TimeSpanWithCorrectReferencesShape
+    a              sh:NodeShape ;
+    sh:targetClass edm:TimeSpan ;
+    sh:property    [ sh:path      [ sh:alternativePath ( dcterms:hasPart dcterms:isPartOf
+                                                         edm:isNextInSequence owl:sameAs ) ] ;
+                     sh:or       ( [ sh:class edm:TimeSpan ]
+                                   [ sh:not [ sh:class :EdmClass ] ] ) ;
+                     sh:severity sh:Warning ;
+                     sh:message  "This property in a TimeSpan should not reference an EDM class other than edm:TimeSpan." ] .
+
 
 
 ### Shape declarations ###
@@ -895,14 +933,60 @@
     a                    sh:NodeShape ;
     sh:targetClass       edm:Place ;
     sh:closed            true ;
-    sh:ignoredProperties ( rdf:type ) .
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property          :wgs84PosLatProperty ;
+    sh:property          :wgs84PosLongProperty ;
+    sh:property          :wgs84PosAltProperty ;
+    sh:property          :skosPrefLabelProperty ;
+    sh:property          :skosAltLabelProperty ;
+    sh:property          :skosNoteProperty ;
+    sh:property          :dctermsHasPartProperty ;
+    sh:property          :dctermsIsPartOfProperty ;
+    sh:property          :edmIsNextInSequenceProperty ;
+    sh:property          :owlSameAsProperty .
+
+:PlaceCardinalitiesShape
+    a              sh:NodeShape ;
+    sh:targetClass edm:Place ;
+    sh:property    [ sh:path     wgs84_pos:lat ;
+                     sh:maxCount 1 ;
+                     sh:message  "wgs84_pos:lat can only occur once." ] ;
+    sh:property    [ sh:path     wgs84_pos:long ;
+                     sh:maxCount 1 ;
+                     sh:message  "wgs84_pos:long can only occur once." ] ;
+    sh:property    [ sh:path     wgs84_pos:alt ;
+                     sh:maxCount 1 ;
+                     sh:message  "wgs84_pos:alt can only occur once." ] .
 
 # TimeSpan
 :TimeSpanShape
     a                    sh:NodeShape ;
     sh:targetClass       edm:TimeSpan ;
     sh:closed            true ;
-    sh:ignoredProperties ( rdf:type ) .
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property          :skosPrefLabelProperty ;
+    sh:property          :skosAltLabelProperty ;
+    sh:property          :skosNoteProperty ;
+    sh:property          :dctermsHasPartProperty ;
+    sh:property          :dctermsIsPartOfProperty ;
+    sh:property          :edmBeginProperty ;
+    sh:property          :edmEndProperty ;
+    sh:property          :edmIsNextInSequenceProperty ;
+    sh:property          :skosNotationProperty ;
+    sh:property          :owlSameAsProperty .
+
+:TimeSpanCardinalitiesShape
+    a              sh:NodeShape ;
+    sh:targetClass edm:TimeSpan ;
+    sh:property    [ sh:path     edm:begin ;
+                     sh:maxCount 1 ;
+                     sh:message  "edm:begin can only occur once." ] ;
+    sh:property    [ sh:path     edm:end ;
+                     sh:maxCount 1 ;
+                     sh:message  "edm:end can only occur once." ] ;
+    sh:property    [ sh:path     skos:notation ;
+                     sh:maxCount 1 ;
+                     sh:message  "skos:notation can only occur once." ] .
 
 # License
 :LicenseShape
