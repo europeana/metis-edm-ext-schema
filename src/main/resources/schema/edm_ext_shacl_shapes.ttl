@@ -4,6 +4,7 @@
 @prefix dcterms:   <http://purl.org/dc/terms/> .
 @prefix edm:       <http://www.europeana.eu/schemas/edm/> .
 @prefix foaf:      <http://xmlns.com/foaf/0.1/> .
+@prefix odrl:      <http://www.w3.org/ns/odrl/2/> .
 @prefix ore:       <http://www.openarchives.org/ore/terms/> .
 @prefix owl:       <http://www.w3.org/2002/07/owl#> .
 @prefix rdaGr2:    <http://rdvocab.info/ElementsGr2/> .
@@ -24,6 +25,11 @@
 # TODO These properties should be encouraged to be decimal - but does our pipeline support it?
 :StringOrDecimalLiteralProperty
     sh:or ( [ sh:datatype xsd:string ] [ sh:datatype xsd:decimal ] ) .
+
+:ccDeprecatedOnProperty
+    sh:path     cc:deprecatedOn ;
+    sh:datatype xsd:date ;
+    sh:message  "This property must be a literal of type 'date'." .
 
 :dcContributorProperty
     sh:path    dc:contributor ;
@@ -337,6 +343,12 @@
     sh:node    :StringLiteralProperty ;
     sh:message "This property must be a string literal." .
 
+# TODO Europeana has a controlled list for permissible values.
+:odrlInheritFromProperty
+    sh:path     odrl:inheritFrom ;
+    sh:nodeKind sh:IRI ;
+    sh:message  "This property must be a reference." .
+
 :owlSameAsProperty
     sh:path     owl:sameAs ;
     sh:nodeKind sh:IRI ;
@@ -554,12 +566,12 @@
                      sh:severity sh:Warning ;
                      sh:message  "This property should not reference an EDM class other than a contextual entity." ] ;
     sh:property    [ sh:path     [ sh:alternativePath ( dc:description dc:format dc:rights dcterms:conformsTo
-                                                        dcterms:extent dcterms:medium dcterms:provenance ) ] ;
+                                                        dcterms:extent dcterms:medium dcterms:provenance
+                                                        odrl:inheritFrom skos:inScheme ) ] ;
                      sh:not      [ sh:class :EdmClass ] ;
                      sh:severity sh:Warning ;
                      sh:message  "This property should not reference an EDM class." ] ;
-    sh:property    [ sh:path     [ sh:alternativePath ( edm:dataProvider edm:intermediateProvider edm:provider
-                                                        skos:inScheme ) ] ;
+    sh:property    [ sh:path     [ sh:alternativePath ( edm:dataProvider edm:intermediateProvider edm:provider ) ] ;
                      sh:not      [ sh:class :EdmClass ] ;
                      sh:severity sh:Warning ;
                      sh:message  "This property relates to Organizations and should not reference an EDM external class." ] .
@@ -993,4 +1005,17 @@
     a                    sh:NodeShape ;
     sh:targetClass       cc:License ;
     sh:closed            true ;
-    sh:ignoredProperties ( rdf:type ) .
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property          :odrlInheritFromProperty ;
+    sh:property          :ccDeprecatedOnProperty .
+
+:LicenseCardinalitiesShape
+    a              sh:NodeShape ;
+    sh:targetClass cc:License ;
+    sh:property    [ sh:path     odrl:inheritFrom ;
+                     sh:minCount 1 ;
+                     sh:maxCount 1 ;
+                     sh:message  "odrl:inheritFrom must occur exactly once." ] ;
+    sh:property    [ sh:path     cc:deprecatedOn ;
+                     sh:maxCount 1 ;
+                     sh:message  "cc:deprecatedOn can only occur once." ] .
