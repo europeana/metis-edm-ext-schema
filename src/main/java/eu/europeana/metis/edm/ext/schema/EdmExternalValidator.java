@@ -3,6 +3,7 @@ package eu.europeana.metis.edm.ext.schema;
 import java.io.StringReader;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.reasoner.ReasonerRegistry;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.shacl.ShaclValidator;
@@ -16,7 +17,9 @@ public class EdmExternalValidator {
   final Model modelHierarchy;
 
   public EdmExternalValidator() {
-    this.shapes = Shapes.parse(RDFDataMgr.loadGraph("schema/edm_ext_shacl_shapes.ttl"));
+    final Model enhancedShapeModel = ModelFactory.createInfModel(ReasonerRegistry.getOWLReasoner(),
+        ModelFactory.createDefaultModel().read("schema/edm_ext_shacl_shapes.ttl"));
+    this.shapes = Shapes.parse(enhancedShapeModel);
     this.modelHierarchy = ModelFactory.createDefaultModel().read(
         "schema/edm_ext_class_definitions.ttl");
   }

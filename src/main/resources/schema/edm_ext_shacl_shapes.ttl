@@ -16,15 +16,47 @@
 @prefix wgs84_pos: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
 
 ### Property declarations ###
+
+# Set the message and conditions for a string literal or IRI property instance.
 :StringLiteralOrIRIProperty
-    sh:or ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ] [ sh:nodeKind sh:IRI ] ) .
+    rdfs:subClassOf [ a              owl:Restriction ;
+                      owl:onProperty sh:message ;
+                      owl:hasValue   "This property must be a string literal or a reference." ] ;
+    rdfs:subClassOf [ a              owl:Restriction ;
+                      owl:onProperty sh:node ;
+                      owl:hasValue   [ sh:or ( [ sh:datatype xsd:string ]
+                                               [ sh:datatype rdf:langString ]
+                                               [ sh:nodeKind sh:IRI ] ) ] ] .
 
+# Set the message and conditions for a string literal property instance.
 :StringLiteralProperty
-    sh:or ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ] ) .
+    rdfs:subClassOf [ a              owl:Restriction ;
+                      owl:onProperty sh:message ;
+                      owl:hasValue   "This property must be a string literal." ] ;
+    rdfs:subClassOf [ a              owl:Restriction ;
+                      owl:onProperty sh:node ;
+                      owl:hasValue   [ sh:or ( [ sh:datatype xsd:string ]
+                                               [ sh:datatype rdf:langString ] ) ] ] .
 
+# Set the message and conditions for an IRI property instance.
+:IRIProperty
+    rdfs:subClassOf [ a              owl:Restriction ;
+                      owl:onProperty sh:message ;
+                      owl:hasValue   "This property must be a reference." ] ;
+    rdfs:subClassOf [ a              owl:Restriction ;
+                      owl:onProperty sh:node ;
+                      owl:hasValue   [ sh:nodeKind sh:IRI ] ] .
+
+# Set the message and conditions for a string literal or decimal property instance.
 # TODO These properties should be encouraged to be decimal - but does our pipeline support it?
 :StringOrDecimalLiteralProperty
-    sh:or ( [ sh:datatype xsd:string ] [ sh:datatype xsd:decimal ] ) .
+    rdfs:subClassOf [ a              owl:Restriction ;
+                      owl:onProperty sh:message ;
+                      owl:hasValue   "This property must be a floating point (decimal)." ] ;
+    rdfs:subClassOf [ a              owl:Restriction ;
+                      owl:onProperty sh:node ;
+                      owl:hasValue   [ sh:or ( [ sh:datatype xsd:string ]
+                                               [ sh:datatype xsd:decimal ] ) ] ] .
 
 :ccDeprecatedOnProperty
     sh:path     cc:deprecatedOn ;
@@ -32,412 +64,333 @@
     sh:message  "This property must be a literal of type 'date'." .
 
 :dcContributorProperty
-    sh:path    dc:contributor ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dc:contributor ;
+    a       :StringLiteralOrIRIProperty .
 
 :dcCoverageProperty
-    sh:path    dc:coverage ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dc:coverage ;
+    a       :StringLiteralOrIRIProperty .
 
 :dcCreatorProperty
-    sh:path    dc:creator ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dc:creator ;
+    a       :StringLiteralOrIRIProperty .
 
 :dcDateProperty
-    sh:path    dc:date ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dc:date ;
+    a       :StringLiteralOrIRIProperty .
 
 :dcDescriptionProperty
-    sh:path    dc:description ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dc:description ;
+    a       :StringLiteralOrIRIProperty .
 
 :dcFormatProperty
-    sh:path    dc:format ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dc:format ;
+    a       :StringLiteralOrIRIProperty .
 
 :dcIdentifierProperty
-    sh:path    dc:identifier ;
-    sh:node    :StringLiteralProperty ;
-    sh:message "This property must be a string literal." .
+    sh:path dc:identifier ;
+    a       :StringLiteralProperty .
 
 :dcLanguageProperty
-    sh:path    dc:language ;
-    sh:node    :StringLiteralProperty ;
-    sh:message "This property must be a string literal." .
+    sh:path dc:language ;
+    a       :StringLiteralProperty .
 
 :dcPublisherProperty
-    sh:path    dc:publisher ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dc:publisher ;
+    a       :StringLiteralOrIRIProperty .
 
 :dcRelationProperty
-    sh:path    dc:relation ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dc:relation ;
+    a       :StringLiteralOrIRIProperty .
 
 :dcRightsProperty
-    sh:path    dc:rights ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dc:rights ;
+    a       :StringLiteralOrIRIProperty .
 
 :dcSourceProperty
-    sh:path    dc:source ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dc:source ;
+    a       :StringLiteralOrIRIProperty .
 
 :dcSubjectProperty
-    sh:path    dc:subject ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dc:subject ;
+    a       :StringLiteralOrIRIProperty .
 
 :dcTitleProperty
-    sh:path    dc:title ;
-    sh:node    :StringLiteralProperty ;
-    sh:message "This property must be a string literal." .
+    sh:path dc:title ;
+    a       :StringLiteralProperty .
 
 :dcTypeProperty
-    sh:path    dc:type ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dc:type ;
+    a       :StringLiteralOrIRIProperty .
 
 :dctermsAlternativeProperty
-    sh:path    dcterms:alternative ;
-    sh:node    :StringLiteralProperty ;
-    sh:message "This property must be a string literal." .
+    sh:path dcterms:alternative ;
+    a       :StringLiteralProperty .
 
 :dctermsConformsToProperty
-    sh:path    dcterms:conformsTo ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dcterms:conformsTo ;
+    a       :StringLiteralOrIRIProperty .
 
 :dctermsCreatedProperty
-    sh:path    dcterms:created ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dcterms:created ;
+    a       :StringLiteralOrIRIProperty .
 
 :dctermsExtentProperty
-    sh:path    dcterms:extent ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dcterms:extent ;
+    a       :StringLiteralOrIRIProperty .
 
 :dctermsHasFormatProperty
-    sh:path    dcterms:hasFormat ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dcterms:hasFormat ;
+    a       :StringLiteralOrIRIProperty .
 
 :dctermsHasPartProperty
-    sh:path    dcterms:hasPart ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dcterms:hasPart ;
+    a       :StringLiteralOrIRIProperty .
 
 :dctermsHasVersionProperty
-    sh:path    dcterms:hasVersion ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dcterms:hasVersion ;
+    a       :StringLiteralOrIRIProperty .
 
 :dctermsIsFormatOfProperty
-    sh:path    dcterms:isFormatOf ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dcterms:isFormatOf ;
+    a       :StringLiteralOrIRIProperty .
 
 :dctermsIsPartOfProperty
-    sh:path    dcterms:isPartOf ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dcterms:isPartOf ;
+    a       :StringLiteralOrIRIProperty .
 
 :dctermsIsReferencedByProperty
-    sh:path    dcterms:isReferencedBy ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dcterms:isReferencedBy ;
+    a       :StringLiteralOrIRIProperty .
 
 :dctermsIsReplacedByProperty
-    sh:path    dcterms:isReplacedBy ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dcterms:isReplacedBy ;
+    a       :StringLiteralOrIRIProperty .
 
 :dctermsIsRepuiredByProperty
-    sh:path    dcterms:isRequiredBy ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dcterms:isRequiredBy ;
+    a       :StringLiteralOrIRIProperty .
 
 :dctermsIssuedProperty
-    sh:path    dcterms:issued ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dcterms:issued ;
+    a       :StringLiteralOrIRIProperty .
 
 :dctermsIsVersionOfProperty
-    sh:path    dcterms:isVersionOf ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dcterms:isVersionOf ;
+    a       :StringLiteralOrIRIProperty .
 
 :dctermsMediumProperty
-    sh:path    dcterms:medium ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dcterms:medium ;
+    a       :StringLiteralOrIRIProperty .
 
 :dctermsProvenanceProperty
-    sh:path    dcterms:provenance ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dcterms:provenance ;
+    a       :StringLiteralOrIRIProperty .
 
 :dctermsReferencesProperty
-    sh:path    dcterms:references ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dcterms:references ;
+    a       :StringLiteralOrIRIProperty .
 
 :dctermsReplacesProperty
-    sh:path    dcterms:replaces ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dcterms:replaces ;
+    a       :StringLiteralOrIRIProperty .
 
 :dctermsRequiresProperty
-    sh:path    dcterms:requires ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dcterms:requires ;
+    a       :StringLiteralOrIRIProperty .
 
 :dctermsSpatialProperty
-    sh:path    dcterms:spatial ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dcterms:spatial ;
+    a       :StringLiteralOrIRIProperty .
 
 :dctermsTableOfContentsProperty
-    sh:path    dcterms:tableOfContents ;
-    sh:node    :StringLiteralProperty ;
-    sh:message "This property must be a string literal." .
+    sh:path dcterms:tableOfContents ;
+    a       :StringLiteralProperty .
 
 :dctermsTemporalProperty
-    sh:path    dcterms:temporal ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path dcterms:temporal ;
+    a       :StringLiteralOrIRIProperty .
 
 :edmAggregatedCHOProperty
-    sh:path     edm:aggregatedCHO ;
-    sh:nodeKind sh:IRI ;
-    sh:message  "This property must be a reference." .
+    sh:path edm:aggregatedCHO ;
+    a       :IRIProperty .
 
 :edmCurrentLocationProperty
-    sh:path    edm:currentLocation ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path edm:currentLocation ;
+    a       :StringLiteralOrIRIProperty .
 
 :edmDataProviderProperty
-    sh:path    edm:dataProvider ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path edm:dataProvider ;
+    a       :StringLiteralOrIRIProperty .
 
 :edmBeginProperty
-    sh:path    edm:begin ;
-    sh:node    :StringLiteralProperty ;
-    sh:message "This property must be a string literal." .
+    sh:path edm:begin ;
+    a       :StringLiteralProperty .
 
 :edmEndProperty
-    sh:path    edm:end ;
-    sh:node    :StringLiteralProperty ;
-    sh:message "This property must be a string literal." .
+    sh:path edm:end ;
+    a       :StringLiteralProperty .
 
 :edmHasMetProperty
-    sh:path     edm:hasMet ;
-    sh:nodeKind sh:IRI ;
-    sh:message  "This property must be a reference." .
+    sh:path edm:hasMet ;
+    a       :IRIProperty .
 
 :edmHasTypeProperty
-    sh:path    edm:hasType ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path edm:hasType ;
+    a       :StringLiteralOrIRIProperty .
 
 :edmHasViewProperty
-    sh:path     edm:hasView ;
-    sh:nodeKind sh:IRI ;
-    sh:message  "This property must be a reference." .
+    sh:path edm:hasView ;
+    a       :IRIProperty .
 
 :edmIncorporatesProperty
-    sh:path     edm:incorporates ;
-    sh:nodeKind sh:IRI ;
-    sh:message  "This property must be a reference." .
+    sh:path edm:incorporates ;
+    a       :IRIProperty .
 
 :edmIntermediateProviderProperty
-    sh:path    edm:intermediateProvider ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path edm:intermediateProvider ;
+    a       :StringLiteralOrIRIProperty .
 
 :edmIsDerivativeOfProperty
-    sh:path     edm:isDerivativeOf ;
-    sh:nodeKind sh:IRI ;
-    sh:message  "This property must be a reference." .
+    sh:path edm:isDerivativeOf ;
+    a       :IRIProperty .
 
 :edmIsNextInSequenceProperty
-    sh:path     edm:isNextInSequence ;
-    sh:nodeKind sh:IRI ;
-    sh:message  "This property must be a reference." .
+    sh:path edm:isNextInSequence ;
+    a       :IRIProperty .
 
 :edmIsRelatedToProperty
-    sh:path    edm:isRelatedTo ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path edm:isRelatedTo ;
+    a       :StringLiteralOrIRIProperty .
 
 :edmIsRepresentationOfProperty
-    sh:path     edm:isRepresentationOf ;
-    sh:nodeKind sh:IRI ;
-    sh:message  "This property must be a reference." .
+    sh:path edm:isRepresentationOf ;
+    a       :IRIProperty .
 
 :edmIsShownAtProperty
-    sh:path     edm:isShownAt ;
-    sh:nodeKind sh:IRI ;
-    sh:message  "This property must be a reference." .
+    sh:path edm:isShownAt ;
+    a       :IRIProperty .
 
 :edmIsShownByProperty
-    sh:path     edm:isShownBy ;
-    sh:nodeKind sh:IRI ;
-    sh:message  "This property must be a reference." .
+    sh:path edm:isShownBy ;
+    a       :IRIProperty .
 
 :edmIsSimilarToProperty
-    sh:path     edm:isSimilarTo ;
-    sh:nodeKind sh:IRI ;
-    sh:message  "This property must be a reference." .
+    sh:path edm:isSimilarTo ;
+    a       :IRIProperty .
 
 :edmIsSuccessorOfProperty
-    sh:path     edm:isSuccessorOf ;
-    sh:nodeKind sh:IRI ;
-    sh:message  "This property must be a reference." .
+    sh:path edm:isSuccessorOf ;
+    a       :IRIProperty .
 
 :edmObjectProperty
-    sh:path     edm:object ;
-    sh:nodeKind sh:IRI ;
-    sh:message  "This property must be a reference." .
+    sh:path edm:object ;
+    a       :IRIProperty .
 
 :edmProviderProperty
-    sh:path    edm:provider ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path edm:provider ;
+    a       :StringLiteralOrIRIProperty .
 
 :edmRealizesProperty
-    sh:path     edm:realizes ;
-    sh:nodeKind sh:IRI ;
-    sh:message  "This property must be a reference." .
+    sh:path edm:realizes ;
+    a       :IRIProperty .
 
 :edmRightsProperty
-    sh:path     edm:rights ;
-    sh:nodeKind sh:IRI ;
-    sh:message  "This property must be a reference." .
+    sh:path edm:rights ;
+    a       :IRIProperty .
 
 :edmTypeProperty
-    sh:path    edm:type ;
-    sh:node    :StringLiteralProperty ;
-    sh:in      ( "TEXT" "VIDEO" "SOUND" "IMAGE" "3D" ) ;
-    sh:message "edm:type must have one of the permitted literal values." .
+    sh:path     edm:type ;
+    sh:datatype xsd:string ;
+    sh:in       ( "TEXT" "VIDEO" "SOUND" "IMAGE" "3D" ) ;
+    sh:message  "edm:type must have one of the permitted literal values." .
 
 :edmUgcProperty
     sh:path     edm:ugc ;
-    sh:node     :StringLiteralProperty ;
+    sh:datatype xsd:string ;
     sh:pattern  "^true$" ;
     sh:message  "edm:ugc must be a string literal with value 'true'." .
 
 :foafNameProperty
-    sh:path    foaf:name ;
-    sh:node    :StringLiteralProperty ;
-    sh:message "This property must be a string literal." .
+    sh:path foaf:name ;
+    a       :StringLiteralProperty .
 
 # TODO Europeana has a controlled list for permissible values.
 :odrlInheritFromProperty
-    sh:path     odrl:inheritFrom ;
-    sh:nodeKind sh:IRI ;
-    sh:message  "This property must be a reference." .
+    sh:path odrl:inheritFrom ;
+    a       :IRIProperty .
 
 :owlSameAsProperty
-    sh:path     owl:sameAs ;
-    sh:nodeKind sh:IRI ;
-    sh:message  "This property must be a reference." .
+    sh:path owl:sameAs ;
+    a       :IRIProperty .
 
 :rdaGr2BiographicalInformation
-    sh:path    rdaGr2:biographicalInformation ;
-    sh:node    :StringLiteralProperty ;
-    sh:message "This property must be a string literal." .
+    sh:path rdaGr2:biographicalInformation ;
+    a       :StringLiteralProperty .
 
 :rdaGr2DateOfBirth
-    sh:path    rdaGr2:dateOfBirth ;
-    sh:node    :StringLiteralProperty ;
-    sh:message "This property must be a string literal." .
+    sh:path rdaGr2:dateOfBirth ;
+    a       :StringLiteralProperty .
 
 :rdaGr2DateOfDeath
-    sh:path    rdaGr2:dateOfDeath ;
-    sh:node    :StringLiteralProperty ;
-    sh:message "This property must be a string literal." .
+    sh:path rdaGr2:dateOfDeath ;
+    a       :StringLiteralProperty .
 
 :rdaGr2DateOfEstablishment
-    sh:path    rdaGr2:dateOfEstablishment ;
-    sh:node    :StringLiteralProperty ;
-    sh:message "This property must be a string literal." .
+    sh:path rdaGr2:dateOfEstablishment ;
+    a       :StringLiteralProperty .
 
 :rdaGr2DateOfTermination
-    sh:path    rdaGr2:dateOfTermination ;
-    sh:node    :StringLiteralProperty ;
-    sh:message "This property must be a string literal." .
+    sh:path rdaGr2:dateOfTermination ;
+    a       :StringLiteralProperty .
 
 :rdaGr2Gender
-    sh:path    rdaGr2:gender ;
-    sh:node    :StringLiteralProperty ;
-    sh:message "This property must be a string literal." .
+    sh:path rdaGr2:gender ;
+    a       :StringLiteralProperty .
 
 :rdaGr2PlaceOfBirth
-    sh:path    rdaGr2:placeOfBirth ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path rdaGr2:placeOfBirth ;
+    a       :StringLiteralOrIRIProperty .
 
 :rdaGr2PlaceOfDeath
-    sh:path    rdaGr2:placeOfDeath ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path rdaGr2:placeOfDeath ;
+    a       :StringLiteralOrIRIProperty .
 
 :rdaGr2ProfessionOrOccupation
-    sh:path    rdaGr2:professionOrOccupation ;
-    sh:node    :StringLiteralOrIRIProperty ;
-    sh:message "This property must be a string literal or a reference." .
+    sh:path rdaGr2:professionOrOccupation ;
+    a       :StringLiteralOrIRIProperty .
 
 :skosAltLabelProperty
-    sh:path    skos:altLabel ;
-    sh:node    :StringLiteralProperty ;
-    sh:message "This property must be a string literal." .
+    sh:path skos:altLabel ;
+    a       :StringLiteralProperty .
 
 :skosBroaderProperty
-    sh:path     skos:broader ;
-    sh:nodeKind sh:IRI ;
-    sh:message  "This property must be a reference." .
+    sh:path skos:broader ;
+    a       :IRIProperty .
 
 :skosBroadMatchProperty
-    sh:path     skos:broadMatch ;
-    sh:nodeKind sh:IRI ;
-    sh:message  "This property must be a reference." .
+    sh:path skos:broadMatch ;
+    a       :IRIProperty .
 
 :skosCloseMatchProperty
-    sh:path     skos:closeMatch ;
-    sh:nodeKind sh:IRI ;
-    sh:message  "This property must be a reference." .
+    sh:path skos:closeMatch ;
+    a       :IRIProperty .
 
 :skosExactMatchProperty
-    sh:path     skos:exactMatch ;
-    sh:nodeKind sh:IRI ;
-    sh:message  "This property must be a reference." .
+    sh:path skos:exactMatch ;
+    a       :IRIProperty .
 
 :skosInSchemeProperty
-    sh:path     skos:inScheme ;
-    sh:nodeKind sh:IRI ;
-    sh:message  "This property must be a reference." .
+    sh:path skos:inScheme ;
+    a       :IRIProperty .
 
 :skosNarrowerProperty
-    sh:path     skos:narrower ;
-    sh:nodeKind sh:IRI ;
-    sh:message  "This property must be a reference." .
+    sh:path skos:narrower ;
+    a       :IRIProperty .
 
 :skosNarrowMatchProperty
-    sh:path     skos:narrowMatch ;
-    sh:nodeKind sh:IRI ;
-    sh:message  "This property must be a reference." .
+    sh:path skos:narrowMatch ;
+    a       :IRIProperty .
 
 :skosNotationProperty
     sh:path     skos:notation ;
@@ -445,39 +398,32 @@
     sh:message  "skos:notation must be a literal of any type." .
 
 :skosNoteProperty
-    sh:path    skos:note ;
-    sh:node    :StringLiteralProperty ;
-    sh:message "This property must be a string literal." .
+    sh:path skos:note ;
+    a       :StringLiteralProperty .
 
 :skosPrefLabelProperty
-    sh:path    skos:prefLabel ;
-    sh:node    :StringLiteralProperty ;
-    sh:message "This property must be a string literal." .
+    sh:path skos:prefLabel ;
+    a       :StringLiteralProperty .
 
 :skosRelatedProperty
-    sh:path     skos:related ;
-    sh:nodeKind sh:IRI ;
-    sh:message  "This property must be a reference." .
+    sh:path skos:related ;
+    a       :IRIProperty .
 
 :skosRelatedMatchProperty
-    sh:path     skos:relatedMatch ;
-    sh:nodeKind sh:IRI ;
-    sh:message  "This property must be a reference." .
+    sh:path skos:relatedMatch ;
+    a       :IRIProperty .
 
 :wgs84PosLatProperty
-    sh:path     wgs84_pos:lat ;
-    sh:node     :StringOrDecimalLiteralProperty;
-    sh:message  "This property must be a floating point (decimal)." .
+    sh:path wgs84_pos:lat ;
+    a       :StringOrDecimalLiteralProperty .
 
 :wgs84PosLongProperty
-    sh:path     wgs84_pos:long ;
-    sh:node     :StringOrDecimalLiteralProperty;
-    sh:message  "This property must be a floating point (decimal)." .
+    sh:path wgs84_pos:long ;
+    a       :StringOrDecimalLiteralProperty .
 
 :wgs84PosAltProperty
-    sh:path     wgs84_pos:alt ;
-    sh:node     :StringOrDecimalLiteralProperty;
-    sh:message  "This property must be a floating point (decimal)." .
+    sh:path wgs84_pos:alt ;
+    a       :StringOrDecimalLiteralProperty .
 
 ### IRI target declarations (reference ranges) ###
 
