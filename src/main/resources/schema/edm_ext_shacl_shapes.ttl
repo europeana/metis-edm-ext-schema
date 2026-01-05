@@ -15,7 +15,13 @@
 @prefix xsd:       <http://www.w3.org/2001/XMLSchema#> .
 @prefix wgs84_pos: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
 
-### Property declarations ###
+
+############################
+### Property definitions ###
+############################
+
+# These shapes define the properties including their value type and any literal value restrictions.
+# Note: by themselves these don't do anything. They need to be used in node shapes for resources.
 
 # Set the message and conditions for a string literal or IRI property instance.
 :StringLiteralOrIRIProperty
@@ -425,8 +431,233 @@
     sh:path wgs84_pos:alt ;
     a       :StringOrDecimalLiteralProperty .
 
-### IRI target declarations (reference ranges) ###
 
+############################
+### Resource definitions ###
+############################
+
+# These are the closed lists of supported and permitted properties for each resource type.
+
+:ProvidedCHOShape
+    a                    sh:NodeShape ;
+    sh:targetClass       edm:ProvidedCHO ;
+    sh:closed            true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:message           "This edm:ProvidedCho object contains unexpected properties." ;
+    sh:property          :dcContributorProperty ;
+    sh:property          :dcCoverageProperty ;
+    sh:property          :dcCreatorProperty ;
+    sh:property          :dcDateProperty ;
+    sh:property          :dcDescriptionProperty ;
+    sh:property          :dcFormatProperty ;
+    sh:property          :dcIdentifierProperty ;
+    sh:property          :dcLanguageProperty ;
+    sh:property          :dcPublisherProperty ;
+    sh:property          :dcRelationProperty ;
+    sh:property          :dcRightsProperty ;
+    sh:property          :dcSourceProperty ;
+    sh:property          :dcSubjectProperty ;
+    sh:property          :dcTitleProperty ;
+    sh:property          :dcTypeProperty ;
+    sh:property          :dctermsAlternativeProperty ;
+    sh:property          :dctermsConformsToProperty ;
+    sh:property          :dctermsCreatedProperty ;
+    sh:property          :dctermsExtentProperty ;
+    sh:property          :dctermsHasFormatProperty ;
+    sh:property          :dctermsHasPartProperty ;
+    sh:property          :dctermsHasVersionProperty ;
+    sh:property          :dctermsIsFormatOfProperty ;
+    sh:property          :dctermsIsPartOfProperty ;
+    sh:property          :dctermsIsReferencedByProperty ;
+    sh:property          :dctermsIsReplacedByProperty ;
+    sh:property          :dctermsIsRepuiredByProperty ;
+    sh:property          :dctermsIssuedProperty ;
+    sh:property          :dctermsIsVersionOfProperty ;
+    sh:property          :dctermsMediumProperty ;
+    sh:property          :dctermsProvenanceProperty ;
+    sh:property          :dctermsReferencesProperty ;
+    sh:property          :dctermsReplacesProperty ;
+    sh:property          :dctermsRequiresProperty ;
+    sh:property          :dctermsSpatialProperty ;
+    sh:property          :dctermsTableOfContentsProperty ;
+    sh:property          :dctermsTemporalProperty ;
+    sh:property          :edmCurrentLocationProperty ;
+    sh:property          :edmHasMetProperty ;
+    sh:property          :edmHasTypeProperty ;
+    sh:property          :edmIncorporatesProperty ;
+    sh:property          :edmIsDerivativeOfProperty ;
+    sh:property          :edmIsNextInSequenceProperty ;
+    sh:property          :edmIsRelatedToProperty ;
+    sh:property          :edmIsRepresentationOfProperty ;
+    sh:property          :edmIsSimilarToProperty ;
+    sh:property          :edmIsSuccessorOfProperty ;
+    sh:property          :edmRealizesProperty ;
+    sh:property          :edmTypeProperty ;
+    sh:property          :owlSameAsProperty .
+
+:AggregationShape
+    a                    sh:NodeShape ;
+    sh:targetClass       ore:Aggregation ;
+    sh:closed            true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:message           "This ore:Aggregation object contains unexpected properties." ;
+    sh:property          :dcRightsProperty ;
+    sh:property          :edmAggregatedCHOProperty ;
+    sh:property          :edmDataProviderProperty ;
+    sh:property          :edmHasViewProperty ;
+    sh:property          :edmIntermediateProviderProperty ;
+    sh:property          :edmIsShownAtProperty ;
+    sh:property          :edmIsShownByProperty ;
+    sh:property          :edmObjectProperty ;
+    sh:property          :edmProviderProperty ;
+    sh:property          :edmRightsProperty ;
+    sh:property          :edmUgcProperty.
+
+:WebResourceShape
+    a                    sh:NodeShape ;
+    sh:targetClass       edm:WebResource ;
+    sh:closed            true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:message           "This edm:WebResource object contains unexpected properties." ;
+    sh:property          :dcCreatorProperty ;
+    sh:property          :dcDescriptionProperty ;
+    sh:property          :dcFormatProperty ;
+    sh:property          :dcRightsProperty ;
+    sh:property          :dcSourceProperty ;
+    sh:property          :dcTypeProperty ;
+    sh:property          :dctermsConformsToProperty ;
+    sh:property          :dctermsCreatedProperty ;
+    sh:property          :dctermsExtentProperty ;
+    sh:property          :dctermsHasPartProperty ;
+    sh:property          :dctermsIsFormatOfProperty ;
+    sh:property          :dctermsIsPartOfProperty ;
+    sh:property          :dctermsIsReferencedByProperty ;
+    sh:property          :dctermsIssuedProperty ;
+    sh:property          :edmIsNextInSequenceProperty ;
+    sh:property          :edmRightsProperty ;
+    sh:property          :owlSameAsProperty .
+
+:AgentShape
+    a                    sh:NodeShape ;
+    sh:targetClass       edm:Agent ;
+    sh:closed            true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property          :dcDateProperty ;
+    sh:property          :dcIdentifierProperty ;
+    sh:property          :dctermsHasPartProperty ;
+    sh:property          :dctermsIsPartOfProperty ;
+    sh:property          :edmBeginProperty ;
+    sh:property          :edmEndProperty ;
+    sh:property          :edmHasMetProperty ;
+    sh:property          :edmIsRelatedToProperty ;
+    sh:property          :foafNameProperty ;
+    sh:property          :owlSameAsProperty ;
+    sh:property          :rdaGr2BiographicalInformation ;
+    sh:property          :rdaGr2DateOfBirth ;
+    sh:property          :rdaGr2DateOfDeath ;
+    sh:property          :rdaGr2DateOfEstablishment ;
+    sh:property          :rdaGr2DateOfTermination ;
+    sh:property          :rdaGr2Gender ;
+    sh:property          :rdaGr2PlaceOfBirth ;
+    sh:property          :rdaGr2PlaceOfDeath ;
+    sh:property          :rdaGr2ProfessionOrOccupation ;
+    sh:property          :skosAltLabelProperty ;
+    sh:property          :skosNoteProperty ;
+    sh:property          :skosPrefLabelProperty .
+
+:ConceptShape
+    a                    sh:NodeShape ;
+    sh:targetClass       skos:Concept ;
+    sh:closed            true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property          :skosPrefLabelProperty ;
+    sh:property          :skosAltLabelProperty ;
+    sh:property          :skosBroaderProperty ;
+    sh:property          :skosNarrowerProperty ;
+    sh:property          :skosRelatedProperty ;
+    sh:property          :skosBroadMatchProperty ;
+    sh:property          :skosNarrowMatchProperty ;
+    sh:property          :skosRelatedMatchProperty ;
+    sh:property          :skosExactMatchProperty ;
+    sh:property          :skosCloseMatchProperty ;
+    sh:property          :skosNoteProperty ;
+    sh:property          :skosNotationProperty ;
+    sh:property          :skosInSchemeProperty .
+
+:PlaceShape
+    a                    sh:NodeShape ;
+    sh:targetClass       edm:Place ;
+    sh:closed            true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property          :wgs84PosLatProperty ;
+    sh:property          :wgs84PosLongProperty ;
+    sh:property          :wgs84PosAltProperty ;
+    sh:property          :skosPrefLabelProperty ;
+    sh:property          :skosAltLabelProperty ;
+    sh:property          :skosNoteProperty ;
+    sh:property          :dctermsHasPartProperty ;
+    sh:property          :dctermsIsPartOfProperty ;
+    sh:property          :edmIsNextInSequenceProperty ;
+    sh:property          :owlSameAsProperty .
+
+:TimeSpanShape
+    a                    sh:NodeShape ;
+    sh:targetClass       edm:TimeSpan ;
+    sh:closed            true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property          :skosPrefLabelProperty ;
+    sh:property          :skosAltLabelProperty ;
+    sh:property          :skosNoteProperty ;
+    sh:property          :dctermsHasPartProperty ;
+    sh:property          :dctermsIsPartOfProperty ;
+    sh:property          :edmBeginProperty ;
+    sh:property          :edmEndProperty ;
+    sh:property          :edmIsNextInSequenceProperty ;
+    sh:property          :skosNotationProperty ;
+    sh:property          :owlSameAsProperty .
+
+:LicenseShape
+    a                    sh:NodeShape ;
+    sh:targetClass       cc:License ;
+    sh:closed            true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property          :odrlInheritFromProperty ;
+    sh:property          :ccDeprecatedOnProperty .
+
+
+##################################
+### Unsupported resource types ###
+##################################
+
+# No other resource types are supported.
+
+:TargetAllSubjects
+    a         sh:SPARQLTarget ;
+    sh:select """
+            PREFIX edm_ext_schema: <http://www.europeana.eu/metis/edm/ext/>
+            SELECT ?this
+            WHERE {
+                ?this ?pred ?object .
+                FILTER (!strStarts(str(?pred), str(edm_ext_schema:))) .
+            }
+        """ .
+
+#:UnksupportedNodeShape
+#    a           sh:NodeShape ;
+#    sh:target   :TargetAllSubjects ;
+#    sh:property [ sh:message  "This object is not one of the expected objects in EDM." ;
+#                  sh:path     ( [ sh:zeroOrOnePath rdf:type ]
+#                                [ sh:zeroOrMorePath rdfs:subClassOf ] ) ;
+#                  sh:hasValue :EdmClass ] .
+
+###############################
+### IRI target restrictions ###
+###############################
+
+# These shapes define the target type (range) of IRI references. These shapes verify that the
+# various properties reference the right type of classes. The typing conditions for contextual
+# class references are designed to avoid failing on literals, or on IRIs that are not resolvable
+# in the record.
 
 # TODO in the following checks, this schema follows the documentation. But we should verify and adjust.
 # TODO check: dc:coverage in the docs can also have timespan, but we enrich only for Place.
@@ -439,11 +670,8 @@
 # TODO check: The acceptable referenced classes/objects for each property. Where the documentation
 # TODO        it says 'resource' it is assumed to be a resource on the web somewhere.
 
-
-# These shapes verify that the various properties reference the right type of classes.
-# The typing conditions for contextual class references are designed to avoid failing on literals,
-# or on IRIs that are not resolvable in the record.
 # TODO Nuno is working on formalizing the range description of the various properties.
+
 :EdmClassWithCorrectReferencesShape
     a              sh:NodeShape ;
     sh:targetClass :EdmClass ;
@@ -582,9 +810,12 @@
                      sh:severity sh:Warning ;
                      sh:message  "This property in a TimeSpan should not reference an EDM class other than edm:TimeSpan." ] .
 
+#########################################
+### Property cardinality declarations ###
+#########################################
 
-
-### Shape declarations ###
+# This includes cardinalities for individual properties, but also for groups of properties (e.g.
+# at least one of the following three properties must be present).
 
 # Note: some properties are mandated to be non-empty in the definitions below. These properties are
 # involved in specific requirements for presence. If a property (or at least one of a group of
@@ -593,63 +824,6 @@
 # During normalisation emtpy properties may be removed and the record could become invalid as a result.
 # Note: this only applies when the property is allowed to be a literal.
 
-# ProvidedCHO: The closed list of permitted properties.
-:ProvidedCHOShape
-    a                    sh:NodeShape ;
-    sh:targetClass       edm:ProvidedCHO ;
-    sh:closed            true ;
-    sh:ignoredProperties ( rdf:type ) ;
-    sh:message           "This edm:ProvidedCho object contains unexpected properties." ;
-    sh:property          :dcContributorProperty ;
-    sh:property          :dcCoverageProperty ;
-    sh:property          :dcCreatorProperty ;
-    sh:property          :dcDateProperty ;
-    sh:property          :dcDescriptionProperty ;
-    sh:property          :dcFormatProperty ;
-    sh:property          :dcIdentifierProperty ;
-    sh:property          :dcLanguageProperty ;
-    sh:property          :dcPublisherProperty ;
-    sh:property          :dcRelationProperty ;
-    sh:property          :dcRightsProperty ;
-    sh:property          :dcSourceProperty ;
-    sh:property          :dcSubjectProperty ;
-    sh:property          :dcTitleProperty ;
-    sh:property          :dcTypeProperty ;
-    sh:property          :dctermsAlternativeProperty ;
-    sh:property          :dctermsConformsToProperty ;
-    sh:property          :dctermsCreatedProperty ;
-    sh:property          :dctermsExtentProperty ;
-    sh:property          :dctermsHasFormatProperty ;
-    sh:property          :dctermsHasPartProperty ;
-    sh:property          :dctermsHasVersionProperty ;
-    sh:property          :dctermsIsFormatOfProperty ;
-    sh:property          :dctermsIsPartOfProperty ;
-    sh:property          :dctermsIsReferencedByProperty ;
-    sh:property          :dctermsIsReplacedByProperty ;
-    sh:property          :dctermsIsRepuiredByProperty ;
-    sh:property          :dctermsIssuedProperty ;
-    sh:property          :dctermsIsVersionOfProperty ;
-    sh:property          :dctermsMediumProperty ;
-    sh:property          :dctermsProvenanceProperty ;
-    sh:property          :dctermsReferencesProperty ;
-    sh:property          :dctermsReplacesProperty ;
-    sh:property          :dctermsRequiresProperty ;
-    sh:property          :dctermsSpatialProperty ;
-    sh:property          :dctermsTableOfContentsProperty ;
-    sh:property          :dctermsTemporalProperty ;
-    sh:property          :edmCurrentLocationProperty ;
-    sh:property          :edmHasMetProperty ;
-    sh:property          :edmHasTypeProperty ;
-    sh:property          :edmIncorporatesProperty ;
-    sh:property          :edmIsDerivativeOfProperty ;
-    sh:property          :edmIsNextInSequenceProperty ;
-    sh:property          :edmIsRelatedToProperty ;
-    sh:property          :edmIsRepresentationOfProperty ;
-    sh:property          :edmIsSimilarToProperty ;
-    sh:property          :edmIsSuccessorOfProperty ;
-    sh:property          :edmRealizesProperty ;
-    sh:property          :edmTypeProperty ;
-    sh:property          :owlSameAsProperty .
 
 # ProvidedCHO: There needs to be at least a description or title, and the description should be a
 # literal. Also, there needs to be at least a dc:subject, dc:type, dcterms:spatial or dcterms:temporal.
@@ -694,25 +868,6 @@
                      [ sh:not [ sh:path    edm:type ;
                                 sh:pattern "^TEXT$" ] ] ) ;
     sh:message     "At least one non-whitespace occurrence of the property dc:language is required if edm:type='TEXT'." .
-
-# Aggregation: The closed list of permitted properties.
-:AggregationShape
-    a                    sh:NodeShape ;
-    sh:targetClass       ore:Aggregation ;
-    sh:closed            true ;
-    sh:ignoredProperties ( rdf:type ) ;
-    sh:message           "This ore:Aggregation object contains unexpected properties." ;
-    sh:property          :dcRightsProperty ;
-    sh:property          :edmAggregatedCHOProperty ;
-    sh:property          :edmDataProviderProperty ;
-    sh:property          :edmHasViewProperty ;
-    sh:property          :edmIntermediateProviderProperty ;
-    sh:property          :edmIsShownAtProperty ;
-    sh:property          :edmIsShownByProperty ;
-    sh:property          :edmObjectProperty ;
-    sh:property          :edmProviderProperty ;
-    sh:property          :edmRightsProperty ;
-    sh:property          :edmUgcProperty.
 
 # Aggregation: There needs to be at least a edm:isShownAt or edm:isShownBy.
 :AggregationCardinalitiesShape
@@ -760,31 +915,6 @@
     sh:severity    sh:Warning ;
     sh:message     "At least one of edm:isShownBy or edm:object is required for publication if edm:type='IMAGE'." .
 
-# WebResource: The closed list of permitted properties.
-:WebResourceShape
-    a                    sh:NodeShape ;
-    sh:targetClass       edm:WebResource ;
-    sh:closed            true ;
-    sh:ignoredProperties ( rdf:type ) ;
-    sh:message           "This edm:WebResource object contains unexpected properties." ;
-    sh:property          :dcCreatorProperty ;
-    sh:property          :dcDescriptionProperty ;
-    sh:property          :dcFormatProperty ;
-    sh:property          :dcRightsProperty ;
-    sh:property          :dcSourceProperty ;
-    sh:property          :dcTypeProperty ;
-    sh:property          :dctermsConformsToProperty ;
-    sh:property          :dctermsCreatedProperty ;
-    sh:property          :dctermsExtentProperty ;
-    sh:property          :dctermsHasPartProperty ;
-    sh:property          :dctermsIsFormatOfProperty ;
-    sh:property          :dctermsIsPartOfProperty ;
-    sh:property          :dctermsIsReferencedByProperty ;
-    sh:property          :dctermsIssuedProperty ;
-    sh:property          :edmIsNextInSequenceProperty ;
-    sh:property          :edmRightsProperty ;
-    sh:property          :owlSameAsProperty .
-
 :WebResourceCardinalitiesShape
     a              sh:NodeShape ;
     sh:targetClass edm:WebResource ;
@@ -805,35 +935,6 @@
                      sh:uniqueLang true ;
                      sh:severity   sh:Warning ;
                      sh:message    "There should be at most one skos:prefLabel value per language." ] .
-
-# Agent
-:AgentShape
-    a                    sh:NodeShape ;
-    sh:targetClass       edm:Agent ;
-    sh:closed            true ;
-    sh:ignoredProperties ( rdf:type ) ;
-    sh:property          :dcDateProperty ;
-    sh:property          :dcIdentifierProperty ;
-    sh:property          :dctermsHasPartProperty ;
-    sh:property          :dctermsIsPartOfProperty ;
-    sh:property          :edmBeginProperty ;
-    sh:property          :edmEndProperty ;
-    sh:property          :edmHasMetProperty ;
-    sh:property          :edmIsRelatedToProperty ;
-    sh:property          :foafNameProperty ;
-    sh:property          :owlSameAsProperty ;
-    sh:property          :rdaGr2BiographicalInformation ;
-    sh:property          :rdaGr2DateOfBirth ;
-    sh:property          :rdaGr2DateOfDeath ;
-    sh:property          :rdaGr2DateOfEstablishment ;
-    sh:property          :rdaGr2DateOfTermination ;
-    sh:property          :rdaGr2Gender ;
-    sh:property          :rdaGr2PlaceOfBirth ;
-    sh:property          :rdaGr2PlaceOfDeath ;
-    sh:property          :rdaGr2ProfessionOrOccupation ;
-    sh:property          :skosAltLabelProperty ;
-    sh:property          :skosNoteProperty ;
-    sh:property          :skosPrefLabelProperty .
 
 :AgentCardinalitiesShape
     a              sh:NodeShape ;
@@ -866,43 +967,6 @@
                      sh:maxCount 1 ;
                      sh:message  "rdaGr2:placeOfDeath can only occur once." ] .
 
-# Concept
-:ConceptShape
-    a                    sh:NodeShape ;
-    sh:targetClass       skos:Concept ;
-    sh:closed            true ;
-    sh:ignoredProperties ( rdf:type ) ;
-    sh:property          :skosPrefLabelProperty ;
-    sh:property          :skosAltLabelProperty ;
-    sh:property          :skosBroaderProperty ;
-    sh:property          :skosNarrowerProperty ;
-    sh:property          :skosRelatedProperty ;
-    sh:property          :skosBroadMatchProperty ;
-    sh:property          :skosNarrowMatchProperty ;
-    sh:property          :skosRelatedMatchProperty ;
-    sh:property          :skosExactMatchProperty ;
-    sh:property          :skosCloseMatchProperty ;
-    sh:property          :skosNoteProperty ;
-    sh:property          :skosNotationProperty ;
-    sh:property          :skosInSchemeProperty .
-
-# Place
-:PlaceShape
-    a                    sh:NodeShape ;
-    sh:targetClass       edm:Place ;
-    sh:closed            true ;
-    sh:ignoredProperties ( rdf:type ) ;
-    sh:property          :wgs84PosLatProperty ;
-    sh:property          :wgs84PosLongProperty ;
-    sh:property          :wgs84PosAltProperty ;
-    sh:property          :skosPrefLabelProperty ;
-    sh:property          :skosAltLabelProperty ;
-    sh:property          :skosNoteProperty ;
-    sh:property          :dctermsHasPartProperty ;
-    sh:property          :dctermsIsPartOfProperty ;
-    sh:property          :edmIsNextInSequenceProperty ;
-    sh:property          :owlSameAsProperty .
-
 :PlaceCardinalitiesShape
     a              sh:NodeShape ;
     sh:targetClass edm:Place ;
@@ -916,23 +980,6 @@
                      sh:maxCount 1 ;
                      sh:message  "wgs84_pos:alt can only occur once." ] .
 
-# TimeSpan
-:TimeSpanShape
-    a                    sh:NodeShape ;
-    sh:targetClass       edm:TimeSpan ;
-    sh:closed            true ;
-    sh:ignoredProperties ( rdf:type ) ;
-    sh:property          :skosPrefLabelProperty ;
-    sh:property          :skosAltLabelProperty ;
-    sh:property          :skosNoteProperty ;
-    sh:property          :dctermsHasPartProperty ;
-    sh:property          :dctermsIsPartOfProperty ;
-    sh:property          :edmBeginProperty ;
-    sh:property          :edmEndProperty ;
-    sh:property          :edmIsNextInSequenceProperty ;
-    sh:property          :skosNotationProperty ;
-    sh:property          :owlSameAsProperty .
-
 :TimeSpanCardinalitiesShape
     a              sh:NodeShape ;
     sh:targetClass edm:TimeSpan ;
@@ -945,15 +992,6 @@
     sh:property    [ sh:path     skos:notation ;
                      sh:maxCount 1 ;
                      sh:message  "skos:notation can only occur once." ] .
-
-# License
-:LicenseShape
-    a                    sh:NodeShape ;
-    sh:targetClass       cc:License ;
-    sh:closed            true ;
-    sh:ignoredProperties ( rdf:type ) ;
-    sh:property          :odrlInheritFromProperty ;
-    sh:property          :ccDeprecatedOnProperty .
 
 :LicenseCardinalitiesShape
     a              sh:NodeShape ;
