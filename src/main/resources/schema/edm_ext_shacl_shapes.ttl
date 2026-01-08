@@ -23,7 +23,7 @@
 # These shapes define the properties including their value type and any literal value restrictions.
 # Note: by themselves these don't do anything. They need to be used in node shapes for resources.
 
-# Set the message and conditions for a string literal or IRI property instance.
+# Set the message and conditions for a string literal or IRI property definition.
 :StringLiteralOrIRIProperty
     rdfs:subClassOf [ a              owl:Restriction ;
                       owl:onProperty sh:message ;
@@ -34,7 +34,7 @@
                                                [ sh:datatype rdf:langString ]
                                                [ sh:nodeKind sh:IRI ] ) ] ] .
 
-# Set the message and conditions for a string literal property instance.
+# Set the message and conditions for a string literal property definition.
 :StringLiteralProperty
     rdfs:subClassOf [ a              owl:Restriction ;
                       owl:onProperty sh:message ;
@@ -44,7 +44,7 @@
                       owl:hasValue   [ sh:or ( [ sh:datatype xsd:string ]
                                                [ sh:datatype rdf:langString ] ) ] ] .
 
-# Set the message and conditions for an IRI property instance.
+# Set the message and conditions for an IRI property definition.
 :IRIProperty
     rdfs:subClassOf [ a              owl:Restriction ;
                       owl:onProperty sh:message ;
@@ -53,7 +53,7 @@
                       owl:onProperty sh:node ;
                       owl:hasValue   [ sh:nodeKind sh:IRI ] ] .
 
-# Set the message and conditions for a string literal or decimal property instance.
+# Set the message and conditions for a string literal or decimal property definition.
 # TODO These properties should be encouraged to be decimal - but does our pipeline support it?
 :StringOrDecimalLiteralProperty
     rdfs:subClassOf [ a              owl:Restriction ;
@@ -641,149 +641,312 @@
 # TODO check: dcterms:medium and dc:format is enriched as if it always has a Concept, but this is
 # TODO        not clear from the docs. However, it is kind of implied in the EDM definition.
 # TODO check: Organization objects (and references to them) are not expected in EDM external?
+# TODO check: dc:description can be a reference. To what?
 
 # TODO check: The acceptable referenced classes/objects for each property. Where the documentation
-# TODO        it says 'resource' it is assumed to be a resource on the web somewhere.
+# TODO        it says '(related) resource' it is assumed to be a resource on the web somewhere.
+# TODO        So we need to check at least all references that are marked as non-EDM or
+# TODO        ProvidedCHO references.
 
 # TODO Nuno is working on formalizing the range description of the various properties.
 
+# Conditions with a lesser severity level.
+:ConditionWithLesserSeverity
+    rdfs:subClassOf [ a              owl:Restriction ;
+                      owl:onProperty sh:severity ;
+                      owl:hasValue   sh:Warning ] .
+
+# Set the message and conditions for an Agent reference definition.
+:AgentReference
+    rdfs:subClassOf :ConditionWithLesserSeverity ;
+    rdfs:subClassOf [ owl:onProperty sh:message ;
+                      owl:hasValue   "This property should not reference an EDM class other than edm:Agent." ] ;
+    rdfs:subClassOf [ a              owl:Restriction ;
+                      owl:onProperty sh:node ;
+                      owl:hasValue   [ sh:or ( [ sh:class edm:Agent ]
+                                               [ sh:not [ sh:class :EdmClass ] ] ) ] ] .
+
+# Set the message and conditions for a Concept reference definition.
+:ConceptReference
+    rdfs:subClassOf :ConditionWithLesserSeverity ;
+    rdfs:subClassOf [ owl:onProperty sh:message ;
+                      owl:hasValue   "This property should not reference an EDM class other than skos:Concept." ] ;
+    rdfs:subClassOf [ a              owl:Restriction ;
+                      owl:onProperty sh:node ;
+                      owl:hasValue   [ sh:or ( [ sh:class skos:Concept ]
+                                               [ sh:not [ sh:class :EdmClass ] ] ) ] ] .
+
+# Set the message and conditions for a non-EDM reference definition.
+:NonEdmReference
+    rdfs:subClassOf :ConditionWithLesserSeverity ;
+    rdfs:subClassOf [ owl:onProperty sh:message ;
+                      owl:hasValue   "This property should not reference an EDM class." ] ;
+    rdfs:subClassOf [ a              owl:Restriction ;
+                      owl:onProperty sh:node ;
+                      owl:hasValue   [ sh:not [ sh:class :EdmClass ] ] ] .
+
+# Set the message and conditions for an Organisation reference definition.
+:OrganisationReference
+    rdfs:subClassOf :ConditionWithLesserSeverity ;
+    rdfs:subClassOf [ owl:onProperty sh:message ;
+                      owl:hasValue   "This property relates to Organizations and should not reference an EDM-external class." ] ;
+    rdfs:subClassOf [ a              owl:Restriction ;
+                      owl:onProperty sh:node ;
+                      owl:hasValue   [ sh:not [ sh:class :EdmClass ] ] ] .
+
+# Set the message and conditions for a Place reference definition.
+:PlaceReference
+    rdfs:subClassOf :ConditionWithLesserSeverity ;
+    rdfs:subClassOf [ owl:onProperty sh:message ;
+                      owl:hasValue   "This property should not reference an EDM class other than edm:Place." ] ;
+    rdfs:subClassOf [ a              owl:Restriction ;
+                      owl:onProperty sh:node ;
+                      owl:hasValue   [ sh:or ( [ sh:class edm:Place ]
+                                               [ sh:not [ sh:class :EdmClass ] ] ) ] ] .
+
+# Set the message and conditions for a 'related resource' reference definition.
+:ProvidedCHOReference
+    rdfs:subClassOf :ConditionWithLesserSeverity ;
+    rdfs:subClassOf [ owl:onProperty sh:message ;
+                      owl:hasValue   "This property should not reference an EDM class other than edm:ProvidedCHO." ] ;
+    rdfs:subClassOf [ a              owl:Restriction ;
+                      owl:onProperty sh:node ;
+                      owl:hasValue   [ sh:or ( [ sh:class edm:ProvidedCHO ]
+                                               [ sh:not [ sh:class :EdmClass ] ] ) ] ] .
+# Set the message and conditions for a TimeSpan reference definition.
+:TimeSpanReference
+    rdfs:subClassOf :ConditionWithLesserSeverity ;
+    rdfs:subClassOf [ owl:onProperty sh:message ;
+                      owl:hasValue   "This property should not reference an EDM class other than edm:TimeSpan." ] ;
+    rdfs:subClassOf [ a              owl:Restriction ;
+                      owl:onProperty sh:node ;
+                      owl:hasValue   [ sh:or ( [ sh:class edm:TimeSpan ]
+                                               [ sh:not [ sh:class :EdmClass ] ] ) ] ] .
+
+# Set the message and conditions for a Web Resource reference definition.
+:WebResourceReference
+    rdfs:subClassOf :ConditionWithLesserSeverity ;
+    rdfs:subClassOf [ owl:onProperty sh:message ;
+                      owl:hasValue   "This property should not reference an EDM class other than edm:WebResource." ] ;
+    rdfs:subClassOf [ a              owl:Restriction ;
+                      owl:onProperty sh:node ;
+                      owl:hasValue   [ sh:or ( [ sh:class edm:WebResource ]
+                                               [ sh:not [ sh:class :EdmClass ] ] ) ] ] .
+
+# Properties for which the references are always the same type, regardless of the subject type.
 :EdmClassWithCorrectReferencesShape
     a              sh:NodeShape ;
     sh:targetClass :EdmClass ;
-    sh:property    [ sh:path    edm:aggregatedCHO ;
-                     sh:class   edm:ProvidedCHO ;
-                     sh:message "edm:aggregatedCHO must reference an edm:ProvidedCHO." ] ;
-    sh:property    [ sh:path     [ sh:alternativePath ( dc:relation dc:source dcterms:hasVersion
-                                                        dcterms:isReferencedBy dcterms:isReplacedBy
-                                                        dcterms:isRequiredBy dcterms:isVersionOf dcterms:references
-                                                        dcterms:replaces dcterms:requires edm:incorporates
-                                                        edm:isDerivativeOf edm:isRepresentationOf
-                                                        edm:isSimilarTo edm:isSuccessorOf edm:realizes ) ] ;
-                     sh:or       ( [ sh:class edm:ProvidedCHO ]
-                                   [ sh:not [ sh:class :EdmClass ] ] ) ;
-                     sh:severity sh:Warning ;
-                     sh:message  "This property should not reference an EDM class other than edm:ProvidedCHO." ] ;
-    sh:property    [ sh:path     [ sh:alternativePath ( dcterms:hasFormat dcterms:isFormatOf ) ] ;
-                     sh:or       ( [ sh:class edm:ProvidedCHO ]
-                                   [ sh:class edm:WebResource ]
-                                   [ sh:not [ sh:class :EdmClass ] ] ) ;
-                     sh:severity sh:Warning ;
-                     sh:message  "This property should not reference an EDM class other than edm:ProvidedCHO or edm:WebResource." ] ;
-    sh:property    [ sh:path     [ sh:alternativePath ( edm:hasView edm:isShownAt edm:isShownBy edm:object ) ] ;
-                     sh:or       ( [ sh:class edm:WebResource ]
-                                   [ sh:not [ sh:class :EdmClass ] ] ) ;
-                     sh:severity sh:Warning ;
-                     sh:message  "This property should not reference an EDM class other than edm:WebResource." ] ;
-    sh:property    [ sh:path     [ sh:alternativePath ( dc:contributor dc:creator dc:publisher ) ] ;
-                     sh:or       ( [ sh:class edm:Agent ]
-                                   [ sh:not [ sh:class :EdmClass ] ] ) ;
-                     sh:severity sh:Warning ;
-                     sh:message  "This property should not reference an EDM class other than edm:Agent." ] ;
-    sh:property    [ sh:path     [ sh:alternativePath ( dc:subject dc:type edm:hasType rdaGr2:professionOrOccupation
-                                                        skos:broader skos:narrower skos:related
-                                                        skos:broadMatch skos:narrowMatch skos:relatedMatch
-                                                        skos:closeMatch skos:exactMatch ) ] ;
-                     sh:or       ( [ sh:class skos:Concept ]
-                                   [ sh:not [ sh:class :EdmClass ] ] ) ;
-                     sh:severity sh:Warning ;
-                     sh:message  "This property should not reference an EDM class other than skos:Concept." ] ;
-    sh:property    [ sh:path     [ sh:alternativePath ( dcterms:spatial edm:currentLocation
-                                                        rdaGr2:placeOfBirth rdaGr2:placeOfDeath ) ] ;
-                     sh:or       ( [ sh:class edm:Place ]
-                                   [ sh:not [ sh:class :EdmClass ] ] ) ;
-                     sh:severity sh:Warning ;
-                     sh:message  "This property should not reference an EDM class other than edm:Place." ] ;
-    sh:property    [ sh:path     [ sh:alternativePath ( dc:date dcterms:created dcterms:issued dcterms:temporal ) ] ;
-                     sh:or       ( [ sh:class edm:TimeSpan ]
-                                   [ sh:not [ sh:class :EdmClass ] ] ) ;
-                     sh:severity sh:Warning ;
-                     sh:message  "This property should not reference an EDM class other than edm:TimeSpan." ] ;
+    sh:property    [ sh:path dc:contributor ;
+                     a       :AgentReference ] ;
     sh:property    [ sh:path     dc:coverage ;
                      sh:or       ( [ sh:class edm:Place ]
                                    [ sh:class edm:TimeSpan ]
                                    [ sh:not [ sh:class :EdmClass ] ] ) ;
                      sh:severity sh:Warning ;
                      sh:message  "This property should not reference an EDM class other than edm:Place or edm:TimeSpan." ] ;
-    sh:property    [ sh:path     edm:rights ;
-                     sh:or       ( [ sh:class cc:License ]
-                                   [ sh:not [ sh:class :EdmClass ] ] ) ;
-                     sh:severity sh:Warning ;
-                     sh:message  "This property should not reference an EDM class other than cc:License." ] ;
+    sh:property    [ sh:path dc:creator ;
+                     a       :AgentReference ] ;
+    sh:property    [ sh:path dc:date ;
+                     a       :TimeSpanReference ] ;
+    sh:property    [ sh:path dc:description ;
+                     a       :NonEdmReference ] ;
+    sh:property    [ sh:path dc:format ;
+                     a       :ConceptReference ] ;
+    sh:property    [ sh:path dc:publisher ;
+                     a       :AgentReference ] ;
+    sh:property    [ sh:path dc:relation ;
+                     a       :ProvidedCHOReference ] ;
+    sh:property    [ sh:path dc:rights ;
+                     a       :NonEdmReference ] ;
+    sh:property    [ sh:path dc:source ;
+                     a       :ProvidedCHOReference ] ;
+    sh:property    [ sh:path dc:subject ;
+                     a       :ConceptReference ] ;
+    sh:property    [ sh:path dc:type ;
+                     a       :ConceptReference ] ;
+    sh:property    [ sh:path dcterms:conformsTo ;
+                     a       :NonEdmReference ] ;
+    sh:property    [ sh:path dcterms:created ;
+                     a       :TimeSpanReference ] ;
+    sh:property    [ sh:path dcterms:extent ;
+                     a       :NonEdmReference ] ;
+    sh:property    [ sh:path dcterms:hasFormat ;
+                     a       :NonEdmReference ] ;
+    sh:property    [ sh:path dcterms:hasVersion ;
+                     a       :ProvidedCHOReference ] ;
+    sh:property    [ sh:path dcterms:issued ;
+                     a       :TimeSpanReference ] ;
+    sh:property    [ sh:path dcterms:isReferencedBy ;
+                     a       :ProvidedCHOReference ] ;
+    sh:property    [ sh:path dcterms:isReplacedBy ;
+                     a       :ProvidedCHOReference ] ;
+    sh:property    [ sh:path dcterms:isRequiredBy ;
+                     a       :ProvidedCHOReference ] ;
+    sh:property    [ sh:path dcterms:isVersionOf ;
+                     a       :ProvidedCHOReference ] ;
+    sh:property    [ sh:path dcterms:medium ;
+                     a       :ConceptReference ] ;
+    sh:property    [ sh:path dcterms:provenance ;
+                     a       :NonEdmReference ] ;
+    sh:property    [ sh:path dcterms:references ;
+                     a       :ProvidedCHOReference ] ;
+    sh:property    [ sh:path dcterms:replaces ;
+                     a       :ProvidedCHOReference ] ;
+    sh:property    [ sh:path dcterms:requires ;
+                     a       :ProvidedCHOReference ] ;
+    sh:property    [ sh:path dcterms:spatial ;
+                     a       :PlaceReference ] ;
+    sh:property    [ sh:path dcterms:temporal ;
+                     a       :TimeSpanReference ] ;
+    sh:property    [ sh:path    edm:aggregatedCHO ;
+                     sh:class   edm:ProvidedCHO ;
+                     sh:message "edm:aggregatedCHO must reference an edm:ProvidedCHO." ] ;
+    sh:property    [ sh:path edm:currentLocation ;
+                     a       :PlaceReference ] ;
+    sh:property    [ sh:path edm:dataProvider ;
+                     a       :OrganisationReference ] ;
     sh:property    [ sh:path     edm:hasMet ;
                      sh:or       ( [ sh:class :ContextualClass ]
                                    [ sh:not [ sh:class :EdmClass ] ] ) ;
                      sh:severity sh:Warning ;
                      sh:message  "This property should not reference an EDM class other than a contextual entity." ] ;
-    sh:property    [ sh:path     [ sh:alternativePath ( dc:description dc:format dc:rights dcterms:conformsTo
-                                                        dcterms:extent dcterms:medium dcterms:provenance
-                                                        odrl:inheritFrom skos:inScheme ) ] ;
-                     sh:not      [ sh:class :EdmClass ] ;
+    sh:property    [ sh:path edm:hasView ;
+                     a       :WebResourceReference ] ;
+    sh:property    [ sh:path edm:hasType ;
+                     a       :ConceptReference ] ;
+    sh:property    [ sh:path edm:incorporates ;
+                     a       :ProvidedCHOReference ] ;
+    sh:property    [ sh:path edm:intermediateProvider ;
+                     a       :OrganisationReference ] ;
+    sh:property    [ sh:path edm:isDerivativeOf ;
+                     a       :ProvidedCHOReference ] ;
+    sh:property    [ sh:path edm:isRepresentationOf ;
+                     a       :ProvidedCHOReference ] ;
+    sh:property    [ sh:path edm:isShownAt ;
+                     a       :WebResourceReference ] ;
+    sh:property    [ sh:path edm:isShownBy ;
+                     a       :WebResourceReference ] ;
+    sh:property    [ sh:path edm:isSimilarTo ;
+                     a       :ProvidedCHOReference ] ;
+    sh:property    [ sh:path edm:isSuccessorOf ;
+                     a       :ProvidedCHOReference ] ;
+    sh:property    [ sh:path edm:object ;
+                     a       :WebResourceReference ] ;
+    sh:property    [ sh:path edm:provider ;
+                     a       :OrganisationReference ] ;
+    sh:property    [ sh:path edm:realizes ;
+                     a       :ProvidedCHOReference ] ;
+    sh:property    [ sh:path     edm:rights ;
+                     sh:or       ( [ sh:class cc:License ]
+                                   [ sh:not [ sh:class :EdmClass ] ] ) ;
                      sh:severity sh:Warning ;
-                     sh:message  "This property should not reference an EDM class." ] ;
-    sh:property    [ sh:path     [ sh:alternativePath ( edm:dataProvider edm:intermediateProvider edm:provider ) ] ;
-                     sh:not      [ sh:class :EdmClass ] ;
-                     sh:severity sh:Warning ;
-                     sh:message  "This property relates to Organizations and should not reference an EDM external class." ] .
+                     sh:message  "This property should not reference an EDM class other than cc:License." ] ;
+    sh:property    [ sh:path odrl:inheritFrom ;
+                     a       :NonEdmReference ] ;
+    sh:property    [ sh:path rdaGr2:placeOfBirth ;
+                     a       :PlaceReference ] ;
+    sh:property    [ sh:path rdaGr2:placeOfDeath ;
+                     a       :PlaceReference ] ;
+    sh:property    [ sh:path rdaGr2:professionOrOccupation ;
+                     a       :ConceptReference ] ;
+    sh:property    [ sh:path skos:broader ;
+                     a       :ConceptReference ] ;
+    sh:property    [ sh:path skos:broadMatch ;
+                     a       :ConceptReference ] ;
+    sh:property    [ sh:path skos:closeMatch ;
+                     a       :ConceptReference ] ;
+    sh:property    [ sh:path skos:exactMatch ;
+                     a       :ConceptReference ] ;
+    sh:property    [ sh:path skos:inScheme ;
+                     a       :NonEdmReference ] ;
+    sh:property    [ sh:path skos:narrower ;
+                     a       :ConceptReference ] ;
+    sh:property    [ sh:path skos:narrowMatch ;
+                     a       :ConceptReference ] ;
+    sh:property    [ sh:path skos:related ;
+                     a       :ConceptReference ] ;
+    sh:property    [ sh:path skos:relatedMatch ;
+                     a       :ConceptReference ] .
 
+# Provided CHO properties for which the references are dependent on the subject type.
 :ProvidedCHOWithCorrectReferencesShape
     a              sh:NodeShape ;
     sh:targetClass edm:ProvidedCHO ;
-    sh:property    [ sh:path     [ sh:alternativePath ( dcterms:hasPart dcterms:isPartOf
-                                                        edm:isNextInSequence owl:sameAs ) ] ;
-                     sh:or       ( [ sh:class edm:ProvidedCHO ]
-                                   [ sh:not [ sh:class :EdmClass ] ] ) ;
-                     sh:severity sh:Warning ;
-                     sh:message  "This property in a ProvidedCHO should not reference an EDM class other than edm:ProvidedCHO." ] ;
+    sh:property    [ sh:path dcterms:hasPart ;
+                     a       :ProvidedCHOReference ] ;
+    sh:property    [ sh:path dcterms:isFormatOf ;
+                     a       :NonEdmReference ] ;
+    sh:property    [ sh:path dcterms:isPartOf ;
+                     a       :NonEdmReference ] ;
+    sh:property    [ sh:path edm:isNextInSequence ;
+                     a       :NonEdmReference ] ;
+    sh:property    [ sh:path owl:sameAs ;
+                     a       :NonEdmReference ] ;
     sh:property    [ sh:path     edm:isRelatedTo ;
                      sh:or       ( [ sh:class edm:ProvidedCHO ]
                                    [ sh:class skos:Concept ]
                                    [ sh:not [ sh:class :EdmClass ] ] ) ;
                      sh:severity sh:Warning ;
-                     sh:message  "This property in a ProvidedCHO should not reference an EDM class other than edm:ProvidedCHO or skos:Concept." ] .
+                     sh:message  "This property should not reference an EDM class other than edm:ProvidedCHO or skos:Concept." ] .
 
+# Web Resource properties for which the references are dependent on the subject type.
 :WebResourceWithCorrectReferencesShape
     a              sh:NodeShape ;
     sh:targetClass edm:WebResource ;
-    sh:property    [ sh:path      [ sh:alternativePath ( dcterms:hasPart dcterms:isPartOf
-                                                         edm:isNextInSequence owl:sameAs ) ] ;
-                     sh:or       ( [ sh:class edm:WebResource ]
-                                   [ sh:not [ sh:class :EdmClass ] ] ) ;
-                     sh:severity sh:Warning ;
-                     sh:message  "This property in a WebResource should not reference an EDM class other than edm:WebResource." ] .
+    sh:property    [ sh:path dcterms:hasPart ;
+                     a       :WebResourceReference ] ;
+    sh:property    [ sh:path dcterms:isFormatOf ;
+                     a       :WebResourceReference ] ;
+    sh:property    [ sh:path dcterms:isPartOf ;
+                     a       :WebResourceReference ] ;
+    sh:property    [ sh:path edm:isNextInSequence ;
+                     a       :WebResourceReference ] ;
+    sh:property    [ sh:path owl:sameAs ;
+                     a       :WebResourceReference ] .
 
+# Agent properties for which the references are dependent on the subject type.
 :AgentWithCorrectReferencesShape
     a              sh:NodeShape ;
     sh:targetClass edm:Agent ;
-    sh:property    [ sh:path     [ sh:alternativePath ( dcterms:hasPart dcterms:isPartOf owl:sameAs ) ] ;
-                     sh:or       ( [ sh:class edm:Agent ]
-                                   [ sh:not [ sh:class :EdmClass ] ] ) ;
-                     sh:severity sh:Warning ;
-                     sh:message  "This property in an Agent should not reference an EDM class other than edm:Agent." ] ;
+    sh:property    [ sh:path dcterms:hasPart ;
+                     a       :AgentReference ] ;
+    sh:property    [ sh:path dcterms:isPartOf ;
+                     a       :AgentReference ] ;
     sh:property    [ sh:path     edm:isRelatedTo ;
                      sh:or       ( [ sh:class :ContextualClass ]
                                    [ sh:not [ sh:class :EdmClass ] ] ) ;
                      sh:severity sh:Warning ;
-                     sh:message  "This property in an Agent should not reference an EDM class other than a contextual entity." ] .
+                     sh:message  "This property should not reference an EDM class other than a contextual entity." ] ;
+    sh:property    [ sh:path owl:sameAs ;
+                     a       :AgentReference ] .
 
+# Place properties for which the references are dependent on the subject type.
 :PlaceWithCorrectReferencesShape
     a              sh:NodeShape ;
     sh:targetClass edm:Place ;
-    sh:property    [ sh:path      [ sh:alternativePath ( dcterms:hasPart dcterms:isPartOf
-                                                         edm:isNextInSequence owl:sameAs ) ] ;
-                     sh:or       ( [ sh:class edm:Place ]
-                                   [ sh:not [ sh:class :EdmClass ] ] ) ;
-                     sh:severity sh:Warning ;
-                     sh:message  "This property in a Place should not reference an EDM class other than edm:Place." ] .
+    sh:property    [ sh:path dcterms:hasPart ;
+                     a       :PlaceReference ] ;
+    sh:property    [ sh:path dcterms:isPartOf ;
+                     a       :PlaceReference ] ;
+    sh:property    [ sh:path edm:isNextInSequence ;
+                     a       :PlaceReference ] ;
+    sh:property    [ sh:path owl:sameAs ;
+                     a       :PlaceReference ] .
 
+# Timespan properties for which the references are dependent on the subject type.
 :TimeSpanWithCorrectReferencesShape
     a              sh:NodeShape ;
     sh:targetClass edm:TimeSpan ;
-    sh:property    [ sh:path      [ sh:alternativePath ( dcterms:hasPart dcterms:isPartOf
-                                                         edm:isNextInSequence owl:sameAs ) ] ;
-                     sh:or       ( [ sh:class edm:TimeSpan ]
-                                   [ sh:not [ sh:class :EdmClass ] ] ) ;
-                     sh:severity sh:Warning ;
-                     sh:message  "This property in a TimeSpan should not reference an EDM class other than edm:TimeSpan." ] .
+    sh:property    [ sh:path dcterms:hasPart ;
+                     a       :TimeSpanReference ] ;
+    sh:property    [ sh:path dcterms:isPartOf ;
+                     a       :TimeSpanReference ] ;
+    sh:property    [ sh:path edm:isNextInSequence ;
+                     a       :TimeSpanReference ] ;
+    sh:property    [ sh:path owl:sameAs ;
+                     a       :TimeSpanReference ] .
+
 
 #########################################
 ### Property cardinality declarations ###
@@ -901,11 +1064,11 @@
 :ContextualClassCardinalitiesShape
     a              sh:NodeShape ;
     sh:targetClass :ContextualClass ;
-    sh:property    [ sh:path       skos:prefLabel ;
-                     sh:minCount   1 ;
-                     sh:pattern    "\\S" ;
-                     sh:severity   sh:Warning ;
-                     sh:message    "There should be at least one non-empty skos:prefLabel." ] ;
+    sh:property    [ sh:path                skos:prefLabel ;
+                     sh:qualifiedValueShape [ sh:pattern "\\S" ] ;
+                     sh:qualifiedMinCount   1 ;
+                     sh:severity            sh:Warning ;
+                     sh:message             "There should be at least one non-empty skos:prefLabel." ] ;
     sh:property    [ sh:path       skos:prefLabel ;
                      sh:uniqueLang true ;
                      sh:severity   sh:Warning ;

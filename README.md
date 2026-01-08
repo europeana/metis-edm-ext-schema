@@ -49,7 +49,9 @@ Still lacking support:
 * Detecting orphaned entities (probably requiring SPARQL)
 * TODOs in schema: To be investigated.
 * We could look into separating the shapes into a file that can be used without importing the hierarchy, 
-and can be used easily by externals, and then a bit for which the hierarchy is necessary. 
+  and can be used easily by externals, and then a bit for which the hierarchy is necessary.
+* In the report we get the property and the object, but not the subject. Any chance we can include 
+  that? Otherwise users may not be able to locate the offending property. 
 
 Further additions needed (these may also require inclusion in the EDM documentation below):
 
