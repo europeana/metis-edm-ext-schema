@@ -52,16 +52,33 @@ Still lacking support:
 and can be used easily by externals, and then a bit for which the hierarchy is necessary. 
 
 Further additions needed (these may also require inclusion in the EDM documentation below):
-* The various record API V3 requirements (as warnings) 
+
+* The various record API V3 requirements (as warnings)
 * 3D profile (see https://europeana.atlassian.net/browse/MET-6731)
 * IIIF profile
 * OEmbed profile
 * PID profile
 * Technical metadata fields (profile)
 * Others? Also see https://pro.europeana.eu/page/edm-profiles.
-* Others? Also see (subpages of) https://europeana.atlassian.net/wiki/spaces/EF/pages/1141932262/Classes+from+EDM+Profiles
+* Others? Also see (subpages
+  of) https://europeana.atlassian.net/wiki/spaces/EF/pages/1141932262/Classes+from+EDM+Profiles
 * Any additional features in the existing schema?
 * We could show info-level warnings for the absence of recommended properties.
+* Note: the new schema opens up the possibility to accept construction like this:
+  ```
+  <dc:creator>
+    <edm:Agent rdf:about="http://www.example.com/XXXXXX">
+      <skos:prefLabel>TEST</skos:prefLabel>
+    </edm:Agent>
+  </dc:creator>
+  ```
+  This will work because the inner object is not anonymous, but has an ID. But how will
+  transformation support this? We need class `EdmExternalNormalizer` which performs normalisation
+  before transformation, consisting of the following:
+    * Converting any model to RDF/XML
+    * Ensuring that all nested objects end up in the root node
+    * Converting relative URIs to absolute ones (using the `base` parameter in the
+      `Model.read(...)` methods).
 
 This project should replace the schema links on the EDM page of Europeana Pro 
 (https://pro.europeana.eu/page/edm-documentation)

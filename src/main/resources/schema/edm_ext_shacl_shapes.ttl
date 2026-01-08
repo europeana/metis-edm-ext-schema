@@ -625,31 +625,6 @@
     sh:property          :ccDeprecatedOnProperty .
 
 
-##################################
-### Unsupported resource types ###
-##################################
-
-# No other resource types are supported.
-
-:TargetAllSubjects
-    a         sh:SPARQLTarget ;
-    sh:select """
-            PREFIX edm_ext_schema: <http://www.europeana.eu/metis/edm/ext/>
-            SELECT ?this
-            WHERE {
-                ?this ?pred ?object .
-                FILTER (!strStarts(str(?pred), str(edm_ext_schema:))) .
-            }
-        """ .
-
-#:UnksupportedNodeShape
-#    a           sh:NodeShape ;
-#    sh:target   :TargetAllSubjects ;
-#    sh:property [ sh:message  "This object is not one of the expected objects in EDM." ;
-#                  sh:path     ( [ sh:zeroOrOnePath rdf:type ]
-#                                [ sh:zeroOrMorePath rdfs:subClassOf ] ) ;
-#                  sh:hasValue :EdmClass ] .
-
 ###############################
 ### IRI target restrictions ###
 ###############################
