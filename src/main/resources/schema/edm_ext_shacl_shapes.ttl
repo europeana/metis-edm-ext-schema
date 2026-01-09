@@ -299,6 +299,11 @@
     sh:path edm:object ;
     a       :IRIProperty .
 
+:edmPidProperty
+    sh:path     edm:pid ;
+    sh:datatype xsd:string ;
+    sh:message  "This property must be a string literal without language qualifier." .
+
 :edmProviderProperty
     sh:path edm:provider ;
     a       :StringLiteralOrIRIProperty .
@@ -505,6 +510,7 @@
     sh:property          :edmIsRepresentationOfProperty ;
     sh:property          :edmIsSimilarToProperty ;
     sh:property          :edmIsSuccessorOfProperty ;
+    sh:property          :edmPidProperty ;
     sh:property          :edmRealizesProperty ;
     sh:property          :edmTypeProperty ;
     sh:property          :owlSameAsProperty .
@@ -548,6 +554,7 @@
     sh:property          :dctermsIsReferencedByProperty ;
     sh:property          :dctermsIssuedProperty ;
     sh:property          :edmIsNextInSequenceProperty ;
+    sh:property          :edmPidProperty ;
     sh:property          :edmRightsProperty ;
     sh:property          :owlSameAsProperty ;
     sh:property          :svcsHasServiceProperty .
