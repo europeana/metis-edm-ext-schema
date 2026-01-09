@@ -372,6 +372,10 @@
     sh:path rdaGr2:professionOrOccupation ;
     a       :StringLiteralOrIRIProperty .
 
+:rdfsLabelProperty
+    sh:path rdfs:label ;
+    a       :StringLiteralProperty .
+
 :skosAltLabelProperty
     sh:path skos:altLabel ;
     a       :StringLiteralProperty .
@@ -641,7 +645,8 @@
     sh:closed            true ;
     sh:ignoredProperties ( rdf:type ) ;
     sh:property          :dctermsConformsToProperty ;
-    sh:property          :doapImplementsProperty .
+    sh:property          :doapImplementsProperty ;
+    sh:property          :rdfsLabelProperty .
 
 ###############################
 ### IRI target restrictions ###
@@ -963,7 +968,7 @@
     sh:targetClass svcs:Service ;
     sh:property    [ sh:path     dcterms:conformsTo ;
                      sh:nodeKind sh:IRI ;
-                     sh:hasValue <http://iiif.io/api/image> ;
+                     sh:in       ( <http://iiif.io/api/image> <https://oembed.com/> );
                      sh:severity sh:Warning ;
                      sh:message  "This Service conforms to an unrecognised standard." ] .
 
@@ -1185,3 +1190,13 @@
                      sh:maxCount 1 ;
                      sh:message  "doap:implements can only occur once." ] .
 
+:ServiceWithLabelShape
+    a              sh:NodeShape ;
+    sh:targetClass svcs:Service ;
+    sh:or          ( [ sh:path     rdfs:label ;
+                       sh:qualifiedValueShape [ sh:pattern "\\S" ] ;
+                       sh:qualifiedMinCount   1 ]
+                     [ sh:not      [ sh:path    ( dcterms:conformsTo ) ;
+                                     sh:hasValue <https://oembed.com/> ] ] ) ;
+    sh:severity    sh:Warning ;
+    sh:message     "An oEmbed-compliant service should have a non-empty rdfs:label value." .

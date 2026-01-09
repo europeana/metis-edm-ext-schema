@@ -56,14 +56,12 @@ Further additions needed (these may also require inclusion in the EDM documentat
 
 * The various record API V3 requirements (as warnings)
 * 3D profile (see https://europeana.atlassian.net/browse/MET-6731)
-* IIIF profile
-* OEmbed profile
 * PID profile
-* Technical metadata fields (profile)
+* Technical metadata fields (profile)?
 * Others? Also see https://pro.europeana.eu/page/edm-profiles.
 * Others? Also see (subpages
   of) https://europeana.atlassian.net/wiki/spaces/EF/pages/1141932262/Classes+from+EDM+Profiles
-* Any additional features in the existing schema?
+* Any additional features in the existing (jibx) schema?
 * We could show info-level warnings for the absence of recommended properties.
 * Note: the new schema opens up the possibility to accept construction like this:
   ```
