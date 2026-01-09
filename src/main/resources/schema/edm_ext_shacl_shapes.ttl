@@ -2,6 +2,7 @@
 @prefix cc:        <http://creativecommons.org/ns#> .
 @prefix dc:        <http://purl.org/dc/elements/1.1/> .
 @prefix dcterms:   <http://purl.org/dc/terms/> .
+@prefix doap:      <http://usefulinc.com/ns/doap#> .
 @prefix edm:       <http://www.europeana.eu/schemas/edm/> .
 @prefix foaf:      <http://xmlns.com/foaf/0.1/> .
 @prefix odrl:      <http://www.w3.org/ns/odrl/2/> .
@@ -12,6 +13,7 @@
 @prefix rdfs:      <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sh:        <http://www.w3.org/ns/shacl#> .
 @prefix skos:      <http://www.w3.org/2004/02/skos/core#> .
+@prefix svcs:      <http://rdfs.org/sioc/services#> .
 @prefix xsd:       <http://www.w3.org/2001/XMLSchema#> .
 @prefix wgs84_pos: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
 
@@ -217,6 +219,10 @@
     sh:path dcterms:temporal ;
     a       :StringLiteralOrIRIProperty .
 
+:doapImplementsProperty
+    sh:path doap:implements ;
+    a       :IRIProperty .
+
 :edmAggregatedCHOProperty
     sh:path edm:aggregatedCHO ;
     a       :IRIProperty .
@@ -419,6 +425,10 @@
     sh:path skos:relatedMatch ;
     a       :IRIProperty .
 
+:svcsHasServiceProperty
+    sh:path svcs:has_service ;
+    a       :IRIProperty .
+
 :wgs84PosLatProperty
     sh:path wgs84_pos:lat ;
     a       :StringOrDecimalLiteralProperty .
@@ -535,7 +545,8 @@
     sh:property          :dctermsIssuedProperty ;
     sh:property          :edmIsNextInSequenceProperty ;
     sh:property          :edmRightsProperty ;
-    sh:property          :owlSameAsProperty .
+    sh:property          :owlSameAsProperty ;
+    sh:property          :svcsHasServiceProperty .
 
 :AgentShape
     a                    sh:NodeShape ;
@@ -624,6 +635,13 @@
     sh:property          :odrlInheritFromProperty ;
     sh:property          :ccDeprecatedOnProperty .
 
+:ServiceShape
+    a                    sh:NodeShape ;
+    sh:targetClass       svcs:Service ;
+    sh:closed            true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property          :dctermsConformsToProperty ;
+    sh:property          :doapImplementsProperty .
 
 ###############################
 ### IRI target restrictions ###
@@ -799,6 +817,8 @@
                      a       :PlaceReference ] ;
     sh:property    [ sh:path dcterms:temporal ;
                      a       :TimeSpanReference ] ;
+    sh:property    [ sh:path doap:implements ;
+                     a       :NonEdmReference ] ;
     sh:property    [ sh:path    edm:aggregatedCHO ;
                      sh:class   edm:ProvidedCHO ;
                      sh:message "edm:aggregatedCHO must reference an edm:ProvidedCHO." ] ;
@@ -867,7 +887,11 @@
     sh:property    [ sh:path skos:related ;
                      a       :ConceptReference ] ;
     sh:property    [ sh:path skos:relatedMatch ;
-                     a       :ConceptReference ] .
+                     a       :ConceptReference ] ;
+    sh:property    [ sh:path     svcs:has_service ;
+                     sh:class    svcs:Service ;
+                     sh:severity sh:Warning ;
+                     sh:message  "svcs:has_service must reference an svcs:Service." ] .
 
 # Provided CHO properties for which the references are dependent on the subject type.
 :ProvidedCHOWithCorrectReferencesShape
@@ -933,6 +957,15 @@
                      a       :PlaceReference ] ;
     sh:property    [ sh:path owl:sameAs ;
                      a       :PlaceReference ] .
+
+:ServiceWithCorrectReferencesShape
+    a              sh:NodeShape ;
+    sh:targetClass svcs:Service ;
+    sh:property    [ sh:path     dcterms:conformsTo ;
+                     sh:nodeKind sh:IRI ;
+                     sh:hasValue <http://iiif.io/api/image> ;
+                     sh:severity sh:Warning ;
+                     sh:message  "This Service conforms to an unrecognised standard." ] .
 
 # Timespan properties for which the references are dependent on the subject type.
 :TimeSpanWithCorrectReferencesShape
@@ -1141,3 +1174,14 @@
     sh:property    [ sh:path     cc:deprecatedOn ;
                      sh:maxCount 1 ;
                      sh:message  "cc:deprecatedOn can only occur once." ] .
+
+:ServiceCardinalitiesShape
+    a              sh:NodeShape ;
+    sh:targetClass svcs:Service ;
+    sh:property    [ sh:path     dcterms:conformsTo ;
+                     sh:minCount 1 ;
+                     sh:message  "dcterms:conformsTo must occur at least once." ] ;
+    sh:property    [ sh:path     doap:implements ;
+                     sh:maxCount 1 ;
+                     sh:message  "doap:implements can only occur once." ] .
+
