@@ -46,6 +46,7 @@ This is still a trial version with limited rules.
 
 Still lacking support:
 * Detecting orphaned entities (probably requiring SPARQL)
+* Verifying that there is only one object (providedCHO) being described.
 * TODOs in schema: To be investigated.
 * We could look into separating the shapes into a file that can be used without importing the hierarchy, 
   and can be used easily by externals, and then a bit for which the hierarchy is necessary.
@@ -55,7 +56,7 @@ Still lacking support:
 Further additions needed (these may also require inclusion in the EDM documentation below):
 
 * The various record API V3 requirements (as warnings)
-* 3D profile (see https://europeana.atlassian.net/browse/MET-6731)
+* Multiple provenances - Data added by intermediate provider/aggregator.
 * Technical metadata fields (profile)?
 * Others? Also see https://pro.europeana.eu/page/edm-profiles.
 * Others? Also see (subpages

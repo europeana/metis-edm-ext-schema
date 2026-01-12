@@ -4,13 +4,16 @@
 @prefix dcterms:   <http://purl.org/dc/terms/> .
 @prefix doap:      <http://usefulinc.com/ns/doap#> .
 @prefix edm:       <http://www.europeana.eu/schemas/edm/> .
+@prefix ef_usage:  <http://data.europeana.eu/vocabulary/usageArea/> .
 @prefix foaf:      <http://xmlns.com/foaf/0.1/> .
+@prefix iptc:      <https://cv.iptc.org/newscodes/digitalsourcetype/> .
 @prefix odrl:      <http://www.w3.org/ns/odrl/2/> .
 @prefix ore:       <http://www.openarchives.org/ore/terms/> .
 @prefix owl:       <http://www.w3.org/2002/07/owl#> .
 @prefix rdaGr2:    <http://rdvocab.info/ElementsGr2/> .
 @prefix rdf:       <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:      <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema:    <https://schema.org/> .
 @prefix sh:        <http://www.w3.org/ns/shacl#> .
 @prefix skos:      <http://www.w3.org/2004/02/skos/core#> .
 @prefix svcs:      <http://rdfs.org/sioc/services#> .
@@ -29,7 +32,7 @@
 :StringLiteralOrIRIProperty
     rdfs:subClassOf [ a              owl:Restriction ;
                       owl:onProperty sh:message ;
-                      owl:hasValue   "This property must be a string literal or a reference." ] ;
+                      owl:hasValue   "This property must be a string literal or a resource reference." ] ;
     rdfs:subClassOf [ a              owl:Restriction ;
                       owl:onProperty sh:node ;
                       owl:hasValue   [ sh:or ( [ sh:datatype xsd:string ]
@@ -50,7 +53,7 @@
 :IRIProperty
     rdfs:subClassOf [ a              owl:Restriction ;
                       owl:onProperty sh:message ;
-                      owl:hasValue   "This property must be a reference." ] ;
+                      owl:hasValue   "This property must be a resource reference." ] ;
     rdfs:subClassOf [ a              owl:Restriction ;
                       owl:onProperty sh:node ;
                       owl:hasValue   [ sh:nodeKind sh:IRI ] ] .
@@ -65,6 +68,17 @@
                       owl:onProperty sh:node ;
                       owl:hasValue   [ sh:or ( [ sh:datatype xsd:string ]
                                                [ sh:datatype xsd:decimal ] ) ] ] .
+
+# Set the message and conditions for a string literal or positive integer property definition.
+# TODO These properties should be encouraged to be integer - but does our pipeline support it?
+:StringOrPositiveIntegerLiteralProperty
+    rdfs:subClassOf [ a              owl:Restriction ;
+                      owl:onProperty sh:message ;
+                      owl:hasValue   "This property must be a positive integer." ] ;
+    rdfs:subClassOf [ a              owl:Restriction ;
+                      owl:onProperty sh:node ;
+                      owl:hasValue   [ sh:or ( [ sh:datatype xsd:string ]
+                                               [ sh:datatype xsd:positiveInteger ] ) ] ] .
 
 :ccDeprecatedOnProperty
     sh:path     cc:deprecatedOn ;
@@ -259,6 +273,15 @@
     sh:path edm:incorporates ;
     a       :IRIProperty .
 
+:edmIntededUsageProperty
+    sh:path     edm:intendedUsage ;
+    sh:nodeKind sh:IRI ;
+    sh:in       ( ef_usage:Knowledge ef_usage:Research ef_usage:Education ef_usage:Infotainment
+                  ef_usage:Tourism ef_usage:Gaming ef_usage:Exhibition ef_usage:Creativity
+                  ef_usage:Design ef_usage:Art ef_usage:Curation ef_usage:Maintenance
+                  ef_usage:Restoration ef_usage:Documentation ) ;
+    sh:message  "edm:intendedUsage must have one of the permitted resource references." .
+
 :edmIntermediateProviderProperty
     sh:path edm:intermediateProvider ;
     a       :StringLiteralOrIRIProperty .
@@ -308,6 +331,14 @@
     sh:path edm:provider ;
     a       :StringLiteralOrIRIProperty .
 
+:edmPointCountProperty
+    sh:path edm:pointCount ;
+    a       :StringOrPositiveIntegerLiteralProperty .
+
+:edmPolygonCountProperty
+    sh:path edm:polygonCount ;
+    a       :StringOrPositiveIntegerLiteralProperty .
+
 :edmRealizesProperty
     sh:path edm:realizes ;
     a       :IRIProperty .
@@ -327,6 +358,10 @@
     sh:datatype xsd:string ;
     sh:pattern  "^true$" ;
     sh:message  "edm:ugc must be a string literal with value 'true'." .
+
+:edmVertexCountProperty
+    sh:path edm:vertexCount ;
+    a       :StringOrPositiveIntegerLiteralProperty .
 
 :foafNameProperty
     sh:path foaf:name ;
@@ -380,6 +415,16 @@
 :rdfsLabelProperty
     sh:path rdfs:label ;
     a       :StringLiteralProperty .
+
+:rdfsSeeAlsoProperty
+    sh:path rdfs:seeAlso ;
+    a       :IRIProperty .
+
+:schemaDigitalSourceTypeProperty
+    sh:path     schema:digitalSourceType ;
+    sh:nodeKind sh:IRI ;
+    sh:in       ( iptc:digitalCapture iptc:dataDrivenMedia iptc:digitalCreation ) ;
+    sh:message  "schema:digitalSourceType must have one of the permitted resource references." .
 
 :skosAltLabelProperty
     sh:path skos:altLabel ;
@@ -455,14 +500,15 @@
 ### Resource definitions ###
 ############################
 
-# These are the closed lists of supported and permitted properties for each resource type.
+# These are the lists of supported and permitted properties for each resource type. They are
+# closed, meaning that no other properties are supported for the target class.
 
 :ProvidedCHOShape
     a                    sh:NodeShape ;
     sh:targetClass       edm:ProvidedCHO ;
     sh:closed            true ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:message           "This edm:ProvidedCho object contains unexpected properties." ;
+    sh:message           "This edm:ProvidedCho object contains an unexpected property." ;
     sh:property          :dcContributorProperty ;
     sh:property          :dcCoverageProperty ;
     sh:property          :dcCreatorProperty ;
@@ -520,7 +566,7 @@
     sh:targetClass       ore:Aggregation ;
     sh:closed            true ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:message           "This ore:Aggregation object contains unexpected properties." ;
+    sh:message           "This ore:Aggregation object contains an unexpected property." ;
     sh:property          :dcRightsProperty ;
     sh:property          :edmAggregatedCHOProperty ;
     sh:property          :edmDataProviderProperty ;
@@ -538,12 +584,14 @@
     sh:targetClass       edm:WebResource ;
     sh:closed            true ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:message           "This edm:WebResource object contains unexpected properties." ;
+    sh:message           "This edm:WebResource object contains an unexpected property." ;
     sh:property          :dcCreatorProperty ;
     sh:property          :dcDescriptionProperty ;
     sh:property          :dcFormatProperty ;
+    sh:property          :dcLanguageProperty ;
     sh:property          :dcRightsProperty ;
     sh:property          :dcSourceProperty ;
+    sh:property          :dcTitleProperty ;
     sh:property          :dcTypeProperty ;
     sh:property          :dctermsConformsToProperty ;
     sh:property          :dctermsCreatedProperty ;
@@ -553,10 +601,18 @@
     sh:property          :dctermsIsPartOfProperty ;
     sh:property          :dctermsIsReferencedByProperty ;
     sh:property          :dctermsIssuedProperty ;
+    sh:property          :dctermsTemporalProperty ;
+    sh:property          :edmIntededUsageProperty ;
     sh:property          :edmIsNextInSequenceProperty ;
     sh:property          :edmPidProperty ;
+    sh:property          :edmPointCountProperty ;
+    sh:property          :edmPolygonCountProperty ;
     sh:property          :edmRightsProperty ;
+    sh:property          :edmTypeProperty ;
+    sh:property          :edmVertexCountProperty ;
     sh:property          :owlSameAsProperty ;
+    sh:property          :rdfsSeeAlsoProperty ;
+    sh:property          :schemaDigitalSourceTypeProperty ;
     sh:property          :svcsHasServiceProperty .
 
 :AgentShape
@@ -564,6 +620,7 @@
     sh:targetClass       edm:Agent ;
     sh:closed            true ;
     sh:ignoredProperties ( rdf:type ) ;
+    sh:message           "This edm:Agent object contains an unexpected property." ;
     sh:property          :dcDateProperty ;
     sh:property          :dcIdentifierProperty ;
     sh:property          :dctermsHasPartProperty ;
@@ -592,6 +649,7 @@
     sh:targetClass       skos:Concept ;
     sh:closed            true ;
     sh:ignoredProperties ( rdf:type ) ;
+    sh:message           "This skos:Concept object contains an unexpected property." ;
     sh:property          :skosPrefLabelProperty ;
     sh:property          :skosAltLabelProperty ;
     sh:property          :skosBroaderProperty ;
@@ -611,6 +669,7 @@
     sh:targetClass       edm:Place ;
     sh:closed            true ;
     sh:ignoredProperties ( rdf:type ) ;
+    sh:message           "This edm:Place object contains an unexpected property." ;
     sh:property          :wgs84PosLatProperty ;
     sh:property          :wgs84PosLongProperty ;
     sh:property          :wgs84PosAltProperty ;
@@ -627,6 +686,7 @@
     sh:targetClass       edm:TimeSpan ;
     sh:closed            true ;
     sh:ignoredProperties ( rdf:type ) ;
+    sh:message           "This edm:TimeSpan object contains an unexpected property." ;
     sh:property          :skosPrefLabelProperty ;
     sh:property          :skosAltLabelProperty ;
     sh:property          :skosNoteProperty ;
@@ -643,6 +703,7 @@
     sh:targetClass       cc:License ;
     sh:closed            true ;
     sh:ignoredProperties ( rdf:type ) ;
+    sh:message           "This cc:License object contains an unexpected property." ;
     sh:property          :odrlInheritFromProperty ;
     sh:property          :ccDeprecatedOnProperty .
 
@@ -651,6 +712,7 @@
     sh:targetClass       svcs:Service ;
     sh:closed            true ;
     sh:ignoredProperties ( rdf:type ) ;
+    sh:message           "This svcs:Service object contains an unexpected property." ;
     sh:property          :dctermsConformsToProperty ;
     sh:property          :doapImplementsProperty ;
     sh:property          :rdfsLabelProperty .
@@ -851,6 +913,8 @@
                      a       :ProvidedCHOReference ] ;
     sh:property    [ sh:path edm:intermediateProvider ;
                      a       :OrganisationReference ] ;
+    sh:property    [ sh:path edm:intendedUsage ;
+                     a       :NonEdmReference ] ;
     sh:property    [ sh:path edm:isDerivativeOf ;
                      a       :ProvidedCHOReference ] ;
     sh:property    [ sh:path edm:isRepresentationOf ;
@@ -882,6 +946,8 @@
                      a       :PlaceReference ] ;
     sh:property    [ sh:path rdaGr2:professionOrOccupation ;
                      a       :ConceptReference ] ;
+    sh:property    [ sh:path schema:digitalSourceType ;
+                     a       :NonEdmReference ] ;
     sh:property    [ sh:path skos:broader ;
                      a       :ConceptReference ] ;
     sh:property    [ sh:path skos:broadMatch ;
@@ -939,7 +1005,10 @@
     sh:property    [ sh:path edm:isNextInSequence ;
                      a       :WebResourceReference ] ;
     sh:property    [ sh:path owl:sameAs ;
-                     a       :WebResourceReference ] .
+                     a       :WebResourceReference ] ;
+    sh:property    [ sh:path    rdfs:seeAlso ;
+                     sh:class   edm:WebResource ;
+                     sh:message "This property must reference an edm:WebResource." ] .
 
 # Agent properties for which the references are dependent on the subject type.
 :AgentWithCorrectReferencesShape
@@ -1103,7 +1172,28 @@
     sh:targetClass edm:WebResource ;
     sh:property    [ sh:path     edm:rights ;
                      sh:maxCount 1 ;
-                     sh:message  "edm:rights may only occur once." ] .
+                     sh:message  "edm:rights may only occur once." ] ;
+    sh:property    [ sh:path       dc:title ;
+                     sh:uniqueLang true ;
+                     sh:severity   sh:Warning ;
+                     sh:message    "There should be only one dc:title value per language. " ] ;
+    sh:property    [ sh:path     edm:pointCount ;
+                     sh:maxCount 1 ;
+                     sh:message  "edm:pointCount can only occur once." ] ;
+    sh:property    [ sh:path     edm:polygonCount ;
+                     sh:maxCount 1 ;
+                     sh:message  "edm:polygonCount can only occur once." ] ;
+    sh:property    [ sh:path     edm:vertexCount ;
+                     sh:maxCount 1 ;
+                     sh:message  "edm:vertexCount can only occur once." ] ;
+    sh:property    [ sh:path     rdfs:seeAlso ;
+                     sh:node     [ sh:property [ sh:path                dcterms:conformsTo ;
+                                                 sh:qualifiedValueShape [ sh:pattern "\\S" ] ;
+                                                 sh:qualifiedMinCount   1 ] ] ;
+                     sh:message  "The target of rdfs:seeAlso must have a non-empty value for dcterms:conformsTo." ] ;
+    sh:property    [ sh:path     schema:digitalSourceType ;
+                     sh:maxCount 1 ;
+                     sh:message  "schema:digitalSourceType may only occur once." ] .
 
 # Contextual classes
 :ContextualClassCardinalitiesShape
