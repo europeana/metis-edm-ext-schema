@@ -3,6 +3,7 @@ package eu.europeana.metis.edm.ext.schema;
 import java.io.StringReader;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import org.apache.jena.query.QueryExecution;
@@ -12,6 +13,7 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.reasoner.ReasonerRegistry;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
@@ -22,20 +24,23 @@ import org.apache.jena.shacl.lib.ShLib;
 
 public class EdmExternalValidator {
 
-  final Shapes shapes;
-  final Model modelHierarchy;
-  final Set<String> supportedResourceTypes;
+  // This URL is reserved and should never occur in the wild.
+  private static final String LOCAL_URL_BASE = "http://example.com/";
+
+  private final Shapes shapes;
+  private final Model modelHierarchy;
+  private final Set<String> supportedResourceTypes;
 
   public EdmExternalValidator() {
     final Model enhancedShapeModel = ModelFactory.createInfModel(ReasonerRegistry.getOWLReasoner(),
-        ModelFactory.createDefaultModel().read("schema/edm_ext_shacl_shapes.ttl"));
+        ModelFactory.createDefaultModel().read("schema/edm_ext_shacl_shapes.ttl", Lang.TTL.getLabel()));
 
     // Parse the shapes.
     this.shapes = Shapes.parse(enhancedShapeModel);
 
     // Parse the class definitions and type categorization.
     this.modelHierarchy = ModelFactory.createDefaultModel().read(
-        "schema/edm_ext_class_definitions.ttl");
+        "schema/edm_ext_class_definitions.ttl", Lang.TTL.getLabel());
 
     // From the type categorization, extract the types that are supported: all subtypes of EdmClass.
     final String supportedTypesQuery = """
@@ -50,18 +55,23 @@ public class EdmExternalValidator {
     try (QueryExecution supportedTypesQueryExecution = QueryExecutionFactory
         .create(QueryFactory.create(supportedTypesQuery), this.modelHierarchy)) {
       final Set<String> results = new HashSet<>();
-      supportedTypesQueryExecution.execSelect()
-          .forEachRemaining(result -> results.add(result.get("type").toString()));
+      supportedTypesQueryExecution.execSelect().forEachRemaining(result ->
+          results.add(Objects.requireNonNull(result.get("type").asResource().getURI())));
       this.supportedResourceTypes = Collections.unmodifiableSet(results);
     }
   }
 
-  public void validate(String rdfXmlInput) {
+  private static String normalizeUri(String uri) {
+    return (uri != null && uri.startsWith(LOCAL_URL_BASE)) ?
+        uri.substring(LOCAL_URL_BASE.length()) : uri;
+  }
+
+  public void validateSingleRecord(String rdfXmlInput) {
 
     // Parse the model
     final Model model = ModelFactory.createDefaultModel();
     try {
-      model.read(new StringReader(rdfXmlInput), "", Lang.RDFXML.getLabel());
+      model.read(new StringReader(rdfXmlInput), LOCAL_URL_BASE, Lang.RDFXML.getLabel());
     } catch (RuntimeException e) {
       System.out.println("Could not parse input: " + e.getMessage());
       e.printStackTrace();
@@ -69,6 +79,7 @@ public class EdmExternalValidator {
     }
 
     // Global analysis: parse and analyze the model as a whole.
+    final String id = checkForUniqueProvidedCHOId(model);
     checkForUnsupportedTypes(model);
     checkForOrphanedResources(model);
 
@@ -79,7 +90,22 @@ public class EdmExternalValidator {
     System.out.println();
     RDFDataMgr.write(System.out, report.getModel(), Lang.TTL);
 
-    // TODO compile and return report.
+    // TODO compile and return report. Note: remove the LOCAL_URL_BASE from all values!
+    System.out.println();
+    System.out.println("Successfully validated record " + id);
+  }
+
+  private String checkForUniqueProvidedCHOId(Model model) {
+    final Set<String> ids = EdmExternalRecordIdExtractor.extractRecordIds(model);
+    if (ids.isEmpty()) {
+      System.out.println("No unique provided CHO ID found.");
+      return null;
+    }
+    if (ids.size() > 1) {
+      System.out.println("Multiple unique provided CHO ID found.");
+      return null;
+    }
+    return normalizeUri(ids.iterator().next());
   }
 
   private void checkForUnsupportedTypes(Model model) {
@@ -99,9 +125,9 @@ public class EdmExternalValidator {
       results.forEachRemaining(result -> {
         final boolean isBlankResource = !result.get("resource").isURIResource();
         final String resource =
-            isBlankResource ? "[BLANK RESOURCE]" : result.get("resource").toString();
-        final String type = Optional.ofNullable(result.get("type")).map(RDFNode::toString)
-            .orElse(null);
+            isBlankResource ? "[BLANK RESOURCE]" : result.get("resource").asResource().getURI();
+        final String type = Optional.ofNullable(result.get("type")).filter(RDFNode::isResource)
+            .map(RDFNode::asResource).map(Resource::getURI).orElse(null);
         if (type == null) {
           System.out.println("Resource " + resource + " has no type.");
           System.out.println();

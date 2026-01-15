@@ -46,7 +46,6 @@ This is still a trial version with limited rules.
 
 Still lacking support:
 * Detecting orphaned entities (probably requiring SPARQL)
-* Verifying that there is only one object (providedCHO) being described.
 * TODOs in schema: To be investigated.
 * We could look into separating the shapes into a file that can be used without importing the hierarchy, 
   and can be used easily by externals, and then a bit for which the hierarchy is necessary.
