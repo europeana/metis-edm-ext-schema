@@ -1,11 +1,16 @@
 package eu.europeana.metis.edm.ext.schema;
 
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.jena.graph.Node;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
@@ -16,17 +21,18 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.reasoner.ReasonerRegistry;
 import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.shacl.ShaclValidator;
 import org.apache.jena.shacl.Shapes;
-import org.apache.jena.shacl.ValidationReport;
-import org.apache.jena.shacl.lib.ShLib;
+import org.apache.jena.sparql.path.P_Link;
+import org.apache.jena.sparql.path.Path;
+import org.apache.jena.sparql.path.PathVisitorBase;
 
 public class EdmExternalValidator {
 
   // This URL is reserved and should never occur in the wild.
   private static final String LOCAL_URL_BASE = "http://example.com/";
 
+  // TODO these can be static and initialized once for the VM.
   private final Shapes shapes;
   private final Model modelHierarchy;
   private final Set<String> supportedResourceTypes;
@@ -66,49 +72,83 @@ public class EdmExternalValidator {
         uri.substring(LOCAL_URL_BASE.length()) : uri;
   }
 
-  public void validateSingleRecord(String rdfXmlInput) {
+  private static String toString(Node node) {
+    if (node == null || node.isBlank()) {
+      return null;
+    }
+    if (node.isLiteral()) {
+      return node.getLiteral().toString();
+    }
+    if (node.isURI()) {
+      return normalizeUri(node.getURI());
+    }
+    return null;
+  }
+
+  private static String toString(Path path) {
+    if (path == null) {
+      return null;
+    }
+    final Set<String> foundPaths = new HashSet<>();
+    path.visit(new PathVisitorBase() {
+      @Override
+      public void visit(P_Link pathNode) {
+        foundPaths.add(EdmExternalValidator.toString(pathNode.getNode()));
+      }
+    });
+    return foundPaths.size() == 1 ? foundPaths.iterator().next() : null;
+  }
+
+  public ValidationReport validateSingleRecord(String rdfXmlInput) {
 
     // Parse the model
     final Model model = ModelFactory.createDefaultModel();
     try {
       model.read(new StringReader(rdfXmlInput), LOCAL_URL_BASE, Lang.RDFXML.getLabel());
     } catch (RuntimeException e) {
-      System.out.println("Could not parse input: " + e.getMessage());
-      e.printStackTrace();
-      return;
+      return new ValidationReport(null, ValidationIssueSeverity.ERROR,
+          List.of(new ValidationReportItem(null, null, null,
+              "Could not parse input: " + e.getMessage(), ValidationIssueSeverity.ERROR)));
     }
 
     // Global analysis: parse and analyze the model as a whole.
-    final String id = checkForUniqueProvidedCHOId(model);
-    checkForUnsupportedTypes(model);
-    checkForOrphanedResources(model);
+    final Pair<String, ValidationReportItem> idCheck = checkForUniqueProvidedCHOId(model);
+    final List<ValidationReportItem> unsupportedTypeCheck = checkForUnsupportedTypes(model);
+    final ValidationReportItem orphanedResourcesCheck = checkForOrphanedResources(model);
 
     // Local analysis: validate the provided shapes. First, add the resource hierarchy.
     model.add(this.modelHierarchy);
-    final ValidationReport report = ShaclValidator.get().validate(shapes, model.getGraph());
-    ShLib.printReport(report);
-    System.out.println();
-    RDFDataMgr.write(System.out, report.getModel(), Lang.TTL);
+    final List<ValidationReportItem> localReportItems = new ArrayList<>();
+    ShaclValidator.get().validate(shapes, model.getGraph()).getEntries().forEach(entry ->
+        localReportItems.add(new ValidationReportItem(toString(entry.focusNode()),
+            toString(entry.resultPath()), toString(entry.value()), entry.message(),
+            ValidationIssueSeverity.forSeverity(entry.severity()))));
 
-    // TODO compile and return report. Note: remove the LOCAL_URL_BASE from all values!
-    System.out.println();
-    System.out.println("Successfully validated record " + id);
+    // Compile and run report.
+    final List<ValidationReportItem> allReportItems = new ArrayList<>();
+    Optional.ofNullable(idCheck.getRight()).ifPresent(allReportItems::add);
+    allReportItems.addAll(unsupportedTypeCheck);
+    Optional.ofNullable(orphanedResourcesCheck).ifPresent(allReportItems::add);
+    allReportItems.addAll(localReportItems);
+    return new ValidationReport(idCheck.getLeft(),
+        allReportItems.stream().map(ValidationReportItem::severity)
+            .max(ValidationIssueSeverity.comparator()).orElse(null), allReportItems);
   }
 
-  private String checkForUniqueProvidedCHOId(Model model) {
+  private Pair<String, ValidationReportItem> checkForUniqueProvidedCHOId(Model model) {
     final Set<String> ids = EdmExternalRecordIdExtractor.extractRecordIds(model);
     if (ids.isEmpty()) {
-      System.out.println("No unique provided CHO ID found.");
-      return null;
+      return new ImmutablePair<>(null, new ValidationReportItem(null, null, null,
+          "No unique provided CHO ID found.", ValidationIssueSeverity.ERROR));
     }
     if (ids.size() > 1) {
-      System.out.println("Multiple unique provided CHO ID found.");
-      return null;
+      return new ImmutablePair<>(null, new ValidationReportItem(null, null, null,
+          "Multiple unique provided CHO ID found.", ValidationIssueSeverity.ERROR));
     }
-    return normalizeUri(ids.iterator().next());
+    return new ImmutablePair<>(normalizeUri(ids.iterator().next()), null);
   }
 
-  private void checkForUnsupportedTypes(Model model) {
+  private List<ValidationReportItem> checkForUnsupportedTypes(Model model) {
 
     // Check whether the type is known and supported. We query for a mapping from all known
     // resources to their type. We then cross-check with the supported types.
@@ -122,29 +162,34 @@ public class EdmExternalValidator {
     try (QueryExecution typeMapQueryExecution = QueryExecutionFactory
         .create(QueryFactory.create(typeMapQuery), model)) {
       final ResultSet results = typeMapQueryExecution.execSelect();
+      final List<ValidationReportItem> validationItems = new ArrayList<>();
       results.forEachRemaining(result -> {
-        final boolean isBlankResource = !result.get("resource").isURIResource();
-        final String resource =
-            isBlankResource ? "[BLANK RESOURCE]" : result.get("resource").asResource().getURI();
+        final Node resourceNode = result.get("resource").asNode();
         final String type = Optional.ofNullable(result.get("type")).filter(RDFNode::isResource)
             .map(RDFNode::asResource).map(Resource::getURI).orElse(null);
+        final String resourceString =
+            resourceNode.isBlank() ? "[BLANK RESOURCE]" : toString(resourceNode);
         if (type == null) {
-          System.out.println("Resource " + resource + " has no type.");
-          System.out.println();
+          validationItems.add(new ValidationReportItem(toString(resourceNode), null, null,
+              "Resource " + resourceString + " has no declared rdf:type.",
+              ValidationIssueSeverity.ERROR));
         } else if (!this.supportedResourceTypes.contains(type)) {
-          System.out.println("Resource " + resource + " has unsupported type " + type + ".");
-          System.out.println();
+          validationItems.add(new ValidationReportItem(toString(resourceNode), null, null,
+              "Resource " + resourceString + " has unsupported rdf:type " + type + ".",
+              ValidationIssueSeverity.ERROR));
         }
       });
+      return validationItems;
     }
   }
 
-  private void checkForOrphanedResources(Model model) {
+  private ValidationReportItem checkForOrphanedResources(Model model) {
 
     // Check that there are no orphans: check that all resources are reachable from an aggregation.
     // This can be done by creating a simplified graph of which resource has a reference to which
     // other resource. Then check whether there are resources that can't be reached from an aggregation.
 
     // TODO return report
+    return null;
   }
 }
