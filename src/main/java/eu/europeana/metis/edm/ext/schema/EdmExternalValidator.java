@@ -29,8 +29,8 @@ import org.apache.jena.sparql.path.PathVisitorBase;
 
 public class EdmExternalValidator {
 
-  // This URL is reserved and should never occur in the wild.
-  private static final String LOCAL_URL_BASE = "http://example.com/";
+  // This URL is reserved and with the unique ID should never occur in the wild.
+  private static final String LOCAL_URL_BASE = "http://example.com/3a051336-f671-4e94-90db-45d3432181fb/";
 
   // TODO these can be static and initialized once for the VM.
   private final Shapes shapes;
@@ -99,12 +99,24 @@ public class EdmExternalValidator {
     return foundPaths.size() == 1 ? foundPaths.iterator().next() : null;
   }
 
-  public ValidationReport validateSingleRecord(String rdfXmlInput) {
+  public ValidationReport validateSingleRecordTtl(String rdfTtlInput) {
+    return validateSingleRecord(rdfTtlInput, Lang.TTL);
+  }
+
+  public ValidationReport validateSingleRecordXml(String rdfXmlInput) {
+    final List<ValidationReportItem> preValidationItems = new ArrayList<>();
+    final String normalizedXmlInput = RdfXmlPreValidationUtils.normalizeAndPreValidateXmlRecord(
+        rdfXmlInput, preValidationItems::add);
+    final ValidationReport report = validateSingleRecord(normalizedXmlInput, Lang.RDFXML);
+    return ValidationReport.merge(report, preValidationItems);
+  }
+
+  private ValidationReport validateSingleRecord(String record, Lang inputLanguage) {
 
     // Parse the model
     final Model model = ModelFactory.createDefaultModel();
     try {
-      model.read(new StringReader(rdfXmlInput), LOCAL_URL_BASE, Lang.RDFXML.getLabel());
+      model.read(new StringReader(record), LOCAL_URL_BASE, inputLanguage.getLabel());
     } catch (RuntimeException e) {
       return new ValidationReport(null, ValidationIssueSeverity.ERROR,
           List.of(new ValidationReportItem(null, null, null,
@@ -130,9 +142,7 @@ public class EdmExternalValidator {
     allReportItems.addAll(unsupportedTypeCheck);
     Optional.ofNullable(orphanedResourcesCheck).ifPresent(allReportItems::add);
     allReportItems.addAll(localReportItems);
-    return new ValidationReport(idCheck.getLeft(),
-        allReportItems.stream().map(ValidationReportItem::severity)
-            .max(ValidationIssueSeverity.comparator()).orElse(null), allReportItems);
+    return ValidationReport.of(idCheck.getLeft(), allReportItems);
   }
 
   private Pair<String, ValidationReportItem> checkForUniqueProvidedCHOId(Model model) {
