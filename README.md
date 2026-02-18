@@ -91,15 +91,9 @@ This is still a trial version with limited rules.
 
 Still lacking support:
 
-* Detecting orphaned entities (probably requiring SPARQL)
-* TODOs in schema: To be investigated.
-* According to OEmbed profile:
-  > "The edm:WebResource may have the ebucore:hasMimeType property with one of two
-  > values: `application/json+oembed` or `application/xml+oembed`."
-
-  In general we should (probably) allow all technical metadata fields in `edm:WebResource`?
+* TODOs in SHACL file: To be investigated.
+* In general we should (probably) allow all technical metadata fields in `edm:WebResource`?
   The idea being that all fields that are served by our own APIs should be allowed as input?
-
 
 Further additions needed (these may also require inclusion in the EDM documentation below):
 

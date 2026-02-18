@@ -126,7 +126,7 @@ public class EdmExternalValidator {
     // Global analysis: parse and analyze the model as a whole.
     final Pair<String, ValidationReportItem> idCheck = checkForUniqueProvidedCHOId(model);
     final List<ValidationReportItem> unsupportedTypeCheck = checkForUnsupportedTypes(model);
-    final ValidationReportItem orphanedResourcesCheck = checkForOrphanedResources(model);
+    final List<ValidationReportItem> orphanedResourcesCheck = checkForOrphanedResources(model);
 
     // Local analysis: validate the provided shapes. First, add the resource hierarchy.
     model.add(this.modelHierarchy);
@@ -140,7 +140,7 @@ public class EdmExternalValidator {
     final List<ValidationReportItem> allReportItems = new ArrayList<>();
     Optional.ofNullable(idCheck.getRight()).ifPresent(allReportItems::add);
     allReportItems.addAll(unsupportedTypeCheck);
-    Optional.ofNullable(orphanedResourcesCheck).ifPresent(allReportItems::add);
+    allReportItems.addAll(orphanedResourcesCheck);
     allReportItems.addAll(localReportItems);
     return ValidationReport.of(idCheck.getLeft(), allReportItems);
   }
@@ -160,8 +160,11 @@ public class EdmExternalValidator {
 
   private List<ValidationReportItem> checkForUnsupportedTypes(Model model) {
 
-    // Check whether the type is known and supported. We query for a mapping from all known
-    // resources to their type. We then cross-check with the supported types.
+    // Check whether the type is declared and supported. We query for a mapping from all
+    // resources to their type (or absence thereof). We then cross-check with the supported types.
+    // Note that we limit this to resources that the model makes any statements about, not resources
+    // that are just external references (and may be dereferenced at a later point). We also
+    // consider blank nodes (anonymous resources).
     final String typeMapQuery = """
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         SELECT DISTINCT ?resource ?type
@@ -177,15 +180,14 @@ public class EdmExternalValidator {
         final Node resourceNode = result.get("resource").asNode();
         final String type = Optional.ofNullable(result.get("type")).filter(RDFNode::isResource)
             .map(RDFNode::asResource).map(Resource::getURI).orElse(null);
-        final String resourceString =
-            resourceNode.isBlank() ? "[BLANK RESOURCE]" : toString(resourceNode);
+        final String resourceString = resourceNode.isBlank() ? "Blank resource" : "Resource";
         if (type == null) {
           validationItems.add(new ValidationReportItem(toString(resourceNode), null, null,
-              "Resource " + resourceString + " has no declared rdf:type.",
+              resourceString + " has no declared rdf:type.",
               ValidationIssueSeverity.ERROR));
         } else if (!this.supportedResourceTypes.contains(type)) {
           validationItems.add(new ValidationReportItem(toString(resourceNode), null, null,
-              "Resource " + resourceString + " has unsupported rdf:type " + type + ".",
+              resourceString + " has unsupported rdf:type " + type + ".",
               ValidationIssueSeverity.ERROR));
         }
       });
@@ -193,13 +195,37 @@ public class EdmExternalValidator {
     }
   }
 
-  private ValidationReportItem checkForOrphanedResources(Model model) {
+  private List<ValidationReportItem> checkForOrphanedResources(Model model) {
 
-    // Check that there are no orphans: check that all resources are reachable from an aggregation.
-    // This can be done by creating a simplified graph of which resource has a reference to which
-    // other resource. Then check whether there are resources that can't be reached from an aggregation.
-
-    // TODO return report
-    return null;
+    // Check that there are no orphans: check that all resources are reachable from an aggregation
+    // by any path of properties. The (<>|!<>) construction is a common shorthand for 'any property'.
+    // Note that we limit this to resources that the model makes any statements about, not resources
+    // that are just external references (and may be dereferenced at a later point). We also
+    // consider blank nodes (anonymous resources) even though in the known representations it is
+    // not possible to have a blank node that is not referenced.
+    final String typeMapQuery = """
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX ore: <http://www.openarchives.org/ore/terms/>
+        SELECT DISTINCT ?orphan
+        WHERE {
+            ?orphan ?pred ?object .
+            FILTER NOT EXISTS {
+                ?source (<>|!<>)* ?orphan .
+                ?source rdf:type ore:Aggregation .
+            } .
+        }""";
+    try (QueryExecution typeMapQueryExecution = QueryExecutionFactory
+        .create(QueryFactory.create(typeMapQuery), model)) {
+      final ResultSet results = typeMapQueryExecution.execSelect();
+      final List<ValidationReportItem> validationItems = new ArrayList<>();
+      results.forEachRemaining(result -> {
+        final Node orphanNode = result.get("orphan").asNode();
+        final String resourceString = orphanNode.isBlank() ? "Blank resource" : "Resource";
+        validationItems.add(new ValidationReportItem(toString(orphanNode), null, null,
+            resourceString + " is orphaned: it is not linked from elsewhere in the data.",
+            ValidationIssueSeverity.WARNING));
+      });
+      return validationItems;
+    }
   }
 }

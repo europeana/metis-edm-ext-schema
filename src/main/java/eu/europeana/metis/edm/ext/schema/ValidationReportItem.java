@@ -28,7 +28,8 @@ package eu.europeana.metis.edm.ext.schema;
  * @param object    The object of the triple (a resource IRI or literal value) that caused the
  *                  issue, if applicable. Otherwise <code>null</code> (e.g., in case the issue does
  *                  not pertain to a specific triple, or the object is a blank node).
- * @param message   The message explaining the issue.
+ * @param message   The message explaining the issue. The message should not have
+ *                  occurrence-specific information in it, so that errors may be grouped.
  * @param severity  The severity of the issue.
  */
 public record ValidationReportItem(String subject, String predicate, String object,
