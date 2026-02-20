@@ -446,6 +446,10 @@
     sh:path skos:exactMatch ;
     a       :IRIProperty .
 
+:skosHiddenLabelProperty
+    sh:path skos:hiddenLabel ;
+    a       :StringLiteralProperty .
+
 :skosInSchemeProperty
     sh:path skos:inScheme ;
     a       :IRIProperty .
@@ -604,6 +608,7 @@
     sh:property          :dctermsTemporalProperty ;
     sh:property          :edmIntededUsageProperty ;
     sh:property          :edmIsNextInSequenceProperty ;
+    sh:property          :edmIsRepresentationOfProperty ;
     sh:property          :edmPidProperty ;
     sh:property          :edmPointCountProperty ;
     sh:property          :edmPolygonCountProperty ;
@@ -641,6 +646,7 @@
     sh:property          :rdaGr2PlaceOfDeath ;
     sh:property          :rdaGr2ProfessionOrOccupation ;
     sh:property          :skosAltLabelProperty ;
+    sh:property          :skosHiddenLabelProperty ;
     sh:property          :skosNoteProperty ;
     sh:property          :skosPrefLabelProperty .
 
@@ -652,6 +658,7 @@
     sh:message           "This skos:Concept object contains an unexpected property." ;
     sh:property          :skosPrefLabelProperty ;
     sh:property          :skosAltLabelProperty ;
+    sh:property          :skosHiddenLabelProperty ;
     sh:property          :skosBroaderProperty ;
     sh:property          :skosNarrowerProperty ;
     sh:property          :skosRelatedProperty ;
@@ -675,6 +682,7 @@
     sh:property          :wgs84PosAltProperty ;
     sh:property          :skosPrefLabelProperty ;
     sh:property          :skosAltLabelProperty ;
+    sh:property          :skosHiddenLabelProperty ;
     sh:property          :skosNoteProperty ;
     sh:property          :dctermsHasPartProperty ;
     sh:property          :dctermsIsPartOfProperty ;
@@ -689,6 +697,7 @@
     sh:message           "This edm:TimeSpan object contains an unexpected property." ;
     sh:property          :skosPrefLabelProperty ;
     sh:property          :skosAltLabelProperty ;
+    sh:property          :skosHiddenLabelProperty ;
     sh:property          :skosNoteProperty ;
     sh:property          :dctermsHasPartProperty ;
     sh:property          :dctermsIsPartOfProperty ;
@@ -1003,6 +1012,8 @@
     sh:property    [ sh:path dcterms:isPartOf ;
                      a       :WebResourceReference ] ;
     sh:property    [ sh:path edm:isNextInSequence ;
+                     a       :WebResourceReference ] ;
+    sh:property    [ sh:path edm:isRepresentationOf ;
                      a       :WebResourceReference ] ;
     sh:property    [ sh:path owl:sameAs ;
                      a       :WebResourceReference ] ;

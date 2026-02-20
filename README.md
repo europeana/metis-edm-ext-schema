@@ -97,9 +97,7 @@ Still lacking support:
 
 Further additions needed (these may also require inclusion in the EDM documentation below):
 
-* https://europeana.atlassian.net/browse/MET-6997
 * The various record API V3 requirements (as warnings)
-* Multiple provenances - Data added by intermediate provider/aggregator.
 * Technical metadata fields (profile)?
 * Others? Also see https://pro.europeana.eu/page/edm-profiles.
 * Others? Also see (subpages
