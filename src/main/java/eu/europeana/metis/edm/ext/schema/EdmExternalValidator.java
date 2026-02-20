@@ -1,6 +1,8 @@
 package eu.europeana.metis.edm.ext.schema;
 
-import java.io.StringReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -27,16 +29,19 @@ import org.apache.jena.sparql.path.P_Link;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathVisitorBase;
 
-public class EdmExternalValidator {
-
-  // This URL is reserved and with the unique ID should never occur in the wild.
-  private static final String LOCAL_URL_BASE = "http://example.com/3a051336-f671-4e94-90db-45d3432181fb/";
+/**
+ * This class provides EDM external validation.
+ */
+public class EdmExternalValidator extends DataWithDefaultBaseUrlHandler {
 
   // TODO these can be static and initialized once for the VM.
   private final Shapes shapes;
   private final Model modelHierarchy;
   private final Set<String> supportedResourceTypes;
 
+  /**
+   * Constructor.
+   */
   public EdmExternalValidator() {
     final Model enhancedShapeModel = ModelFactory.createInfModel(ReasonerRegistry.getOWLReasoner(),
         ModelFactory.createDefaultModel().read("schema/edm_ext_shacl_shapes.ttl", Lang.TTL.getLabel()));
@@ -67,11 +72,6 @@ public class EdmExternalValidator {
     }
   }
 
-  private static String normalizeUri(String uri) {
-    return (uri != null && uri.startsWith(LOCAL_URL_BASE)) ?
-        uri.substring(LOCAL_URL_BASE.length()) : uri;
-  }
-
   private static String toString(Node node) {
     if (node == null || node.isBlank()) {
       return null;
@@ -99,24 +99,52 @@ public class EdmExternalValidator {
     return foundPaths.size() == 1 ? foundPaths.iterator().next() : null;
   }
 
-  public ValidationReport validateSingleRecordTtl(String rdfTtlInput) {
-    return validateSingleRecord(rdfTtlInput, Lang.TTL);
+  /**
+   * Validates a single record.
+   *
+   * @param record         The record to validate.
+   * @param representation The representation of the record.
+   * @return A report with found validation issues.
+   */
+  public ValidationReport validateSingleRecord(String record, Representation representation) {
+    return validateSingleRecord(new ByteArrayInputStream(record.getBytes()), representation);
   }
 
-  public ValidationReport validateSingleRecordXml(String rdfXmlInput) {
-    final List<ValidationReportItem> preValidationItems = new ArrayList<>();
-    final String normalizedXmlInput = RdfXmlPreValidationUtils.normalizeAndPreValidateXmlRecord(
-        rdfXmlInput, preValidationItems::add);
-    final ValidationReport report = validateSingleRecord(normalizedXmlInput, Lang.RDFXML);
-    return ValidationReport.merge(report, preValidationItems);
+  /**
+   * Validates a single record.
+   *
+   * @param record         The record to validate.
+   * @param representation The representation of the record.
+   * @return A report with found validation issues.
+   */
+  public ValidationReport validateSingleRecord(InputStream record, Representation representation) {
+    if (representation == Representation.XML) {
+
+      // If we have an XML record, we need to normalize and pre-validate first.
+      final List<ValidationReportItem> preValidationItems = new ArrayList<>();
+      try (InputStream normalizedRecord = RdfXmlPreValidationUtils.normalizeAndPreValidateXmlData(
+          record, preValidationItems::add, true)) {
+        final ValidationReport report = validateSingleNormalizedRecord(normalizedRecord,
+            representation.getLang());
+        return ValidationReport.merge(report, preValidationItems);
+      } catch (IOException e) {
+        preValidationItems.add(new ValidationReportItem(null, null, null,
+            "Could not parse XML input: " + e.getMessage(), ValidationIssueSeverity.ERROR));
+        return new ValidationReport(null, ValidationIssueSeverity.ERROR, preValidationItems);
+      }
+    } else {
+
+      // No normalization needed: proceed as per usual.
+      return validateSingleNormalizedRecord(record, representation.getLang());
+    }
   }
 
-  private ValidationReport validateSingleRecord(String record, Lang inputLanguage) {
+  private ValidationReport validateSingleNormalizedRecord(InputStream record, Lang lang) {
 
     // Parse the model
     final Model model = ModelFactory.createDefaultModel();
     try {
-      model.read(new StringReader(record), LOCAL_URL_BASE, inputLanguage.getLabel());
+      model.read(record, DEFAULT_BASE_URL, lang.getLabel());
     } catch (RuntimeException e) {
       return new ValidationReport(null, ValidationIssueSeverity.ERROR,
           List.of(new ValidationReportItem(null, null, null,

@@ -1,11 +1,15 @@
 package eu.europeana.metis.edm.ext.schema;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.StreamSupport;
@@ -22,13 +26,13 @@ import javax.xml.stream.events.XMLEvent;
 
 /**
  * This class contains additional pre-validation for RDF data in XML. This is currently necessary
- * for two reasons:
+ * for two reasons (both of which are meant to be resolved in the short-to-medium term):
  *
  * <ol>
  *   <li>
  *     The XML schema for EDM internal contains two non-RDF-compliant fields related to provenance
  *     <code>edm:wasGeneratedBy</code> and <code>edm:confidenceLevel</code>. They need to be
- *     stripped from the record before it can be validated in the generic way.
+ *     stripped from the data before it can be validated in the generic way.
  *   </li>
  *   <li>
  *     The XSLT transformation (to EDM internal) cannot handle nested objects, even though from an
@@ -40,11 +44,11 @@ import javax.xml.stream.events.XMLEvent;
  *         <skos:prefLabel>TEST</skos:prefLabel>
  *       </edm:Agent>
  *     </dc:creator>
- *}
+ *     }
  *   </li>
  * </ol>
  * <p>
- * Note that the aim is for both of those issues to be resolved in the short-to-medium term.
+ * This class implements a streamed parsing, and thus supports large data volumes.
  */
 public class RdfXmlPreValidationUtils {
 
@@ -65,47 +69,55 @@ public class RdfXmlPreValidationUtils {
   }
 
   /**
-   * <p>Analyzes an XML file ahead of RDF validation. It validates the XML record against the
-   * XML-specific rules.
+   * <p>
+   * Analyzes an XML file ahead of RDF validation. It validates the XML data against the
+   * XML-specific rules. This code uses XML-specific parsing, as RDF parsing would break on the
+   * non-RDF-compliant fields.
    * </p>
    * <p>
-   * Note on implementation: this method returns a <code>String</code> so that it can be read by the
-   * next step. It is conceivable to make this fully streamed (e.g., with a threaded approach using
-   * a <code>PipedInputStream</code> - <code>PipedOutputStream</code> pair). This option was
-   * rejected as we are specifically only handling one record (very little memory usage) and this
-   * functionality should be temporary.
+   * Note: the reading is executed asynchronously and the method does not block. Any reading errors
+   * will be submitted to the <code>reportItemConsumer</code>, and processing will stop. Similarly,
+   * if the caller wishes to stop reading, they can close the returned <code>InputStream</code>,
+   * this will be noticed by the writing process which will then also stop (and a report item will
+   * be submitted to the <code>reportItemConsumer</code>).
    * </p>
    *
-   * @param xmlRecord          The XML to validate
-   * @param reportItemConsumer A consumer for validation report items in case issues were found.
-   * @return A normalized version of the XML file that is ready for RDF validation, or null if there
-   * were issues parsing the XML (in which case a report item to that effect will have been sent to
-   * <code>reportItemConsumer</code>).
+   * @param xmlData              The XML to validate.
+   * @param reportItemConsumer   A consumer for validation report items in case issues were found.
+   * @param reportNestedElements Whether nested elements should be reported (i.e., submitted to
+   *                             <code>reportItemConsumer</code>).
+   * @return An input stream containing the normalized version of the XML file that is ready for RDF
+   * validation. The caller is responsible for closing this input stream.
    */
-  protected static String normalizeAndPreValidateXmlRecord(String xmlRecord,
-      Consumer<ValidationReportItem> reportItemConsumer) {
-    try {
-      return normalizeAndPreValidateXmlRecordPrivate(xmlRecord, reportItemConsumer);
-    } catch (XMLStreamException e) {
-      reportItemConsumer.accept(new ValidationReportItem(null, null, null,
-          "Could not parse the XML content: " + e.getMessage(), ValidationIssueSeverity.ERROR));
+  protected static InputStream normalizeAndPreValidateXmlData(InputStream xmlData,
+      Consumer<ValidationReportItem> reportItemConsumer, boolean reportNestedElements) {
+    final PipedInputStream result = new PipedInputStream();
+    CompletableFuture.supplyAsync(() -> {
+      try (final PipedOutputStream normalizedRecord = new PipedOutputStream(result)) {
+        normalizeAndPreValidateXmlDataPrivate(xmlData, reportItemConsumer, normalizedRecord,
+            reportNestedElements);
+      } catch (IOException | XMLStreamException | RuntimeException e) {
+        reportItemConsumer.accept(new ValidationReportItem(null, null, null,
+            "Could not read the XML content: " + e.getMessage(), ValidationIssueSeverity.ERROR));
+      }
       return null;
-    }
+    });
+    return result;
   }
 
-  private static String normalizeAndPreValidateXmlRecordPrivate(String xmlRecord,
-      Consumer<ValidationReportItem> reportItemConsumer) throws XMLStreamException {
+  private static void normalizeAndPreValidateXmlDataPrivate(InputStream xmlData,
+      Consumer<ValidationReportItem> reportItemConsumer, OutputStream output,
+      boolean reportNestedElements) throws XMLStreamException {
 
-    // Set up the input with the XML record as provided.
+    // Set up the input with the XML data as provided.
     final XMLEventFactory eventFactory = XMLEventFactory.newInstance();
-    final XMLEventReader reader = XMLInputFactory.newInstance()
-        .createXMLEventReader(new ByteArrayInputStream(xmlRecord.getBytes()));
+    final XMLEventReader reader = XMLInputFactory.newInstance().createXMLEventReader(xmlData);
 
-    // Set up the output for the normalized XML record.
-    final ByteArrayOutputStream output = new ByteArrayOutputStream();
+    // Set up the output for the normalized XML data.
     final XMLEventWriter writer = XMLOutputFactory.newInstance().createXMLEventWriter(output);
 
-    // Go by the events. Keep track of the element's level (depth).
+    // Go by the events. Keep track of the element's level (depth). Note: if writing to the output
+    // fails, the loop is interrupted and an exception is returned.
     final AtomicInteger currentDepth = new AtomicInteger(0);
     while (reader.hasNext()) {
 
@@ -115,7 +127,7 @@ public class RdfXmlPreValidationUtils {
 
         // Check whether we support this element at this depth.
         final StartElement element = nextEvent.asStartElement();
-        if (currentDepth.get() > 1) {
+        if (currentDepth.get() > 1 && reportNestedElements) {
           verifyNestedElement(element, reportItemConsumer);
         }
 
@@ -139,9 +151,6 @@ public class RdfXmlPreValidationUtils {
         writer.add(nextEvent);
       }
     }
-
-    // Done
-    return output.toString();
   }
 
   private static Iterator<Attribute> stripProvenanceAttributes(Iterator<Attribute> attributes) {
