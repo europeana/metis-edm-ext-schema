@@ -4,10 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -34,42 +32,18 @@ import org.apache.jena.sparql.path.PathVisitorBase;
  */
 public class EdmExternalValidator extends DataWithDefaultBaseUrlHandler {
 
-  // TODO these can be static and initialized once for the VM.
-  private final Shapes shapes;
-  private final Model modelHierarchy;
-  private final Set<String> supportedResourceTypes;
+  // Only access this through the synchronized getter.
+  private static Shapes shapes = null;
 
-  /**
-   * Constructor.
-   */
-  public EdmExternalValidator() {
-    final Model enhancedShapeModel = ModelFactory.createInfModel(ReasonerRegistry.getOWLReasoner(),
-        ModelFactory.createDefaultModel().read("schema/edm_ext_shacl_shapes.ttl", Lang.TTL.getLabel()));
-
-    // Parse the shapes.
-    this.shapes = Shapes.parse(enhancedShapeModel);
-
-    // Parse the class definitions and type categorization.
-    this.modelHierarchy = ModelFactory.createDefaultModel().read(
-        "schema/edm_ext_class_definitions.ttl", Lang.TTL.getLabel());
-
-    // From the type categorization, extract the types that are supported: all subtypes of EdmClass.
-    final String supportedTypesQuery = """
-        PREFIX edm_ext_schema: <http://www.europeana.eu/metis/edm/ext/>
-        PREFIX rdfs:           <http://www.w3.org/2000/01/rdf-schema#>
-        SELECT DISTINCT ?type
-        WHERE {
-          ?type rdfs:subClassOf* edm_ext_schema:EdmClass .
-          FILTER (!strStarts(str(?type), str(edm_ext_schema:))) .
-        }
-        """;
-    try (QueryExecution supportedTypesQueryExecution = QueryExecutionFactory
-        .create(QueryFactory.create(supportedTypesQuery), this.modelHierarchy)) {
-      final Set<String> results = new HashSet<>();
-      supportedTypesQueryExecution.execSelect().forEachRemaining(result ->
-          results.add(Objects.requireNonNull(result.get("type").asResource().getURI())));
-      this.supportedResourceTypes = Collections.unmodifiableSet(results);
+  private static synchronized Shapes getShapes() {
+    if (shapes == null) {
+      final Model shapesModel = ModelFactory.createDefaultModel()
+          .read("schema/edm_ext_shacl_shapes.ttl", Lang.TTL.getLabel());
+      final Model enhancedShapeModel = ModelFactory
+          .createInfModel(ReasonerRegistry.getOWLReasoner(), shapesModel);
+      shapes = Shapes.parse(enhancedShapeModel);
     }
+    return shapes;
   }
 
   private static String toString(Node node) {
@@ -157,9 +131,9 @@ public class EdmExternalValidator extends DataWithDefaultBaseUrlHandler {
     final List<ValidationReportItem> orphanedResourcesCheck = checkForOrphanedResources(model);
 
     // Local analysis: validate the provided shapes. First, add the resource hierarchy.
-    model.add(this.modelHierarchy);
+    SupportedResourceTypes.get().addTypeHierarchyToModel(model);
     final List<ValidationReportItem> localReportItems = new ArrayList<>();
-    ShaclValidator.get().validate(shapes, model.getGraph()).getEntries().forEach(entry ->
+    ShaclValidator.get().validate(getShapes(), model.getGraph()).getEntries().forEach(entry ->
         localReportItems.add(new ValidationReportItem(toString(entry.focusNode()),
             toString(entry.resultPath()), toString(entry.value()), entry.message(),
             ValidationIssueSeverity.forSeverity(entry.severity()))));
@@ -213,7 +187,7 @@ public class EdmExternalValidator extends DataWithDefaultBaseUrlHandler {
           validationItems.add(new ValidationReportItem(toString(resourceNode), null, null,
               resourceString + " has no declared rdf:type.",
               ValidationIssueSeverity.ERROR));
-        } else if (!this.supportedResourceTypes.contains(type)) {
+        } else if (!SupportedResourceTypes.get().getSupportedResourceTypes().contains(type)) {
           validationItems.add(new ValidationReportItem(toString(resourceNode), null, null,
               resourceString + " has unsupported rdf:type " + type + ".",
               ValidationIssueSeverity.ERROR));
