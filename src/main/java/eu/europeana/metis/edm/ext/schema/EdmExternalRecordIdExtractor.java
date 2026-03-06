@@ -1,5 +1,6 @@
 package eu.europeana.metis.edm.ext.schema;
 
+import eu.europeana.metis.common.rdf.RdfRepresentation;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,7 +38,7 @@ public class EdmExternalRecordIdExtractor extends DataWithDefaultBaseUrlHandler 
    * @return A set with all declared record IDs. Is not null, but could be empty.
    * @throws DataParseException When the data could not be parsed.
    */
-  public static Set<String> extractRecordIds(String data, Representation representation)
+  public static Set<String> extractRecordIds(String data, RdfRepresentation representation)
       throws DataParseException {
     return extractRecordIds(new ByteArrayInputStream(data.getBytes()), representation);
   }
@@ -49,9 +50,9 @@ public class EdmExternalRecordIdExtractor extends DataWithDefaultBaseUrlHandler 
    * @return A set with all declared record IDs. Is not null, but could be empty.
    * @throws DataParseException When the data could not be parsed.
    */
-  public static Set<String> extractRecordIds(InputStream data, Representation representation)
+  public static Set<String> extractRecordIds(InputStream data, RdfRepresentation representation)
       throws DataParseException {
-    if (representation == Representation.XML) {
+    if (representation == RdfRepresentation.XML) {
 
       // Read normalized XML data and extract IDs.
       final List<ValidationReportItem> preValidationItems = new ArrayList<>();
@@ -84,7 +85,7 @@ public class EdmExternalRecordIdExtractor extends DataWithDefaultBaseUrlHandler 
   }
 
   private static Set<String> extractRecordIdsFromNormalizedData(InputStream normalizedData,
-      Representation representation) {
+      RdfRepresentation representation) {
     final RDFParser parser = RDFParserBuilder.create().source(normalizedData)
         .lang(representation.getLang()).base(DEFAULT_BASE_URL).build();
     final Set<String> recordIds = new HashSet<>();

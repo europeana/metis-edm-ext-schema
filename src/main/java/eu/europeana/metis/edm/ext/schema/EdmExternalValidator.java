@@ -1,5 +1,6 @@
 package eu.europeana.metis.edm.ext.schema;
 
+import eu.europeana.metis.common.rdf.RdfRepresentation;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -80,7 +81,7 @@ public class EdmExternalValidator extends DataWithDefaultBaseUrlHandler {
    * @param representation The representation of the record.
    * @return A report with found validation issues.
    */
-  public ValidationReport validateSingleRecord(String record, Representation representation) {
+  public ValidationReport validateSingleRecord(String record, RdfRepresentation representation) {
     return validateSingleRecord(new ByteArrayInputStream(record.getBytes()), representation);
   }
 
@@ -91,8 +92,8 @@ public class EdmExternalValidator extends DataWithDefaultBaseUrlHandler {
    * @param representation The representation of the record.
    * @return A report with found validation issues.
    */
-  public ValidationReport validateSingleRecord(InputStream record, Representation representation) {
-    if (representation == Representation.XML) {
+  public ValidationReport validateSingleRecord(InputStream record, RdfRepresentation representation) {
+    if (representation == RdfRepresentation.XML) {
 
       // If we have an XML record, we need to normalize and pre-validate first.
       final List<ValidationReportItem> preValidationItems = new ArrayList<>();

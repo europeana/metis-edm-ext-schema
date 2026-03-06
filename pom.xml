@@ -25,8 +25,53 @@
     <dependency>
       <groupId>org.apache.jena</groupId>
       <artifactId>jena-shacl</artifactId>
-      <version>5.5.0</version>
+      <version>6.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>eu.europeana.metis</groupId>
+      <artifactId>metis-common-rdf</artifactId>
+      <version>19-SNAPSHOT</version>
     </dependency>
   </dependencies>
+
+  <repositories>
+    <!--Release repositories-->
+    <repository>
+      <id>libs-release</id>
+      <name>libs-release</name>
+      <url>https://artifactory-prod.eanadev.org/artifactory/libs-release</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <!--Snapshot repositories-->
+    <repository>
+      <id>libs-snapshot</id>
+      <name>libs-snapshots</name>
+      <url>https://artifactory-prod.eanadev.org/artifactory/libs-snapshot</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
+  <distributionManagement>
+    <repository>
+      <id>artifactory-prod.eanadev.org</id>
+      <name>artifactory-prod.eanadev.org-releases</name>
+      <url>https://artifactory-prod.eanadev.org/artifactory/libs-release-local</url>
+    </repository>
+    <snapshotRepository>
+      <id>artifactory-prod.eanadev.org</id>
+      <name>artifactory-prod.eanadev.org-snapshots</name>
+      <url>https://artifactory-prod.eanadev.org/artifactory/libs-snapshot-local</url>
+    </snapshotRepository>
+  </distributionManagement>
 
 </project>

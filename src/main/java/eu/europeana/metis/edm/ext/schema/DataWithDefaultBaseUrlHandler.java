@@ -8,8 +8,9 @@ package eu.europeana.metis.edm.ext.schema;
  */
 public abstract class DataWithDefaultBaseUrlHandler {
 
-  // This URL is reserved and with the unique ID should never occur in the wild.
-  static final String DEFAULT_BASE_URL = "http://example.com/3a051336-f671-4e94-90db-45d3432181fb/";
+  // This domain name is reserved and with the unique ID should never occur in the wild. Also,
+  // this will serve to detect relative URLs starting with / as well (i.e., relative to the domain).
+  static final String DEFAULT_BASE_URL = "http://3a051336-f671-4e94-90db-45d3432181fb.example.com/";
 
   static String normalizeUri(String uri) {
     return (uri != null && uri.startsWith(DEFAULT_BASE_URL)) ?
