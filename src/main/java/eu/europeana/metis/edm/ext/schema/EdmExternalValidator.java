@@ -206,7 +206,7 @@ public class EdmExternalValidator extends DataWithDefaultBaseUrlHandler {
     // that are just external references (and may be dereferenced at a later point). We also
     // consider blank nodes (anonymous resources) even though in the known representations it is
     // not possible to have a blank node that is not referenced.
-    final String typeMapQuery = """
+    final String orphanDetectQuery = """
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX ore: <http://www.openarchives.org/ore/terms/>
         SELECT DISTINCT ?orphan
@@ -217,9 +217,9 @@ public class EdmExternalValidator extends DataWithDefaultBaseUrlHandler {
                 ?source rdf:type ore:Aggregation .
             } .
         }""";
-    try (QueryExecution typeMapQueryExecution = QueryExecutionFactory
-        .create(QueryFactory.create(typeMapQuery), model)) {
-      final ResultSet results = typeMapQueryExecution.execSelect();
+    try (QueryExecution orphanDetectQueryExecution = QueryExecutionFactory
+        .create(QueryFactory.create(orphanDetectQuery), model)) {
+      final ResultSet results = orphanDetectQueryExecution.execSelect();
       final List<ValidationReportItem> validationItems = new ArrayList<>();
       results.forEachRemaining(result -> {
         final Node orphanNode = result.get("orphan").asNode();
