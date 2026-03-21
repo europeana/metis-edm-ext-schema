@@ -13,20 +13,27 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.vocabulary.RDF;
 
 /**
- * This class can segment larger amounts of data into individual EDM-external records. A user can
+ * <p>This class can segment larger amounts of data into individual EDM-external records. A user can
  * create an instance and add data to it. When ready, the user can segment the data into individual
  * records.
+ * </p>
+ * <p>Note: this class only supports 'true' RDF: so the two non-RDF-compliant fields related to
+ * provenance (<code>edm:wasGeneratedBy</code> and <code>edm:confidenceLevel</code>) are not
+ * supported.
+ * </p>
  */
 public class EdmExternalSegmenter implements AutoCloseable {
 
@@ -35,6 +42,11 @@ public class EdmExternalSegmenter implements AutoCloseable {
   public static final Resource EDM_PROVIDED_CHO = createResource(EDM_NAMESPACE + "ProvidedCHO");
   public static final Property EDM_AGGREGATED_CHO = createProperty(EDM_NAMESPACE, "aggregatedCHO");
 
+  private static final Set<String> LEGACY_PROPERTIES_WITH_DATA_TYPE = Set.of(
+      "http://www.w3.org/2004/02/skos/core#notation", "http://creativecommons.org/ns#deprecatedOn");
+  private static final String STRING_DATATYPE = "http://www.w3.org/2001/XMLSchema#string";
+
+  private final boolean legacyEdmXlmSchemaMode;
   private final Model datasetModel;
 
   /**
@@ -96,9 +108,15 @@ public class EdmExternalSegmenter implements AutoCloseable {
 
   /**
    * Constructor. Creates an empty dataset to which data can be added before segmentation.
+   *
+   * @param legacyEdmXlmSchemaMode Use this mode to indicate that the output should be acceptable
+   *                               for the legacy EDM XML schema (and transformation). This mode
+   *                               does not do the validation, but it will strip (most) data type
+   *                               declarations and base direction statements from literals.
    */
-  public EdmExternalSegmenter() {
+  public EdmExternalSegmenter(boolean legacyEdmXlmSchemaMode) {
     datasetModel = ModelFactory.createDefaultModel();
+    this.legacyEdmXlmSchemaMode = legacyEdmXlmSchemaMode;
   }
 
   /**
@@ -233,12 +251,52 @@ public class EdmExternalSegmenter implements AutoCloseable {
   private void copyResourceAndAddLinkedResourcesToQueue(Resource resource,
       Consumer<Resource> queueAppender, Model target) {
     consumeJenaIterator(resource.listProperties(), statement -> {
-      target.add(statement);
+
+      // Add any object resource to the queue to be included later.
       final RDFNode object = statement.getObject();
       if (object.isResource() && !object.asResource().hasProperty(RDF.type, EDM_PROVIDED_CHO)) {
         queueAppender.accept(object.asResource());
       }
+
+      // Add the statement to the target model. Create a legacy version of the statement if needed.
+      target.add(this.legacyEdmXlmSchemaMode ? asLegacyStatement(statement, target) : statement);
     });
+  }
+
+  /**
+   * Create a legacy version of this statement. If the statement object is not a literal, nothing
+   * will change. Otherwise, we strip the literal's base direction and in most cases also the data
+   * type, instead converting it to a string (potentially with language).
+   *
+   * @param statement The statement to convert.
+   * @param target    The target model where the statement is to be added.
+   * @return A legacy version of the statement.
+   */
+  private static Statement asLegacyStatement(Statement statement, Model target) {
+
+    // Only literals need to be adjusted. Otherwise, return the statement as-is.
+    if (!statement.getObject().isLiteral()) {
+      return statement;
+    }
+    final Literal literal = statement.getObject().asLiteral();
+
+    // Determine whether to retain the original data type. Except for a few fields, we don't,
+    // instead converting to String (potentially with language).
+    final String propertyName = statement.getPredicate().getURI();
+    boolean retainDataType = LEGACY_PROPERTIES_WITH_DATA_TYPE.contains(propertyName);
+
+    // Create the new literal. We strip the base direction, and we convert to string if needed.
+    // Note: the datatype and the language are never null.
+    final Literal legacyLiteral;
+    final String datatype = literal.getDatatype().getURI();
+    if (!retainDataType || STRING_DATATYPE.equals(datatype) || !literal.getLanguage().isBlank()) {
+      legacyLiteral = target.createLiteral(literal.getString(), literal.getLanguage());
+    } else {
+      legacyLiteral = target.createTypedLiteral(literal.getString(), datatype);
+    }
+
+    // Create the new statement with the adjusted literal.
+    return target.createStatement(statement.getSubject(), statement.getPredicate(), legacyLiteral);
   }
 
   /**
