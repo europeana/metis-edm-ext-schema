@@ -1,5 +1,6 @@
 package eu.europeana.metis.edm.ext.schema;
 
+import eu.europeana.metis.common.rdf.RdfBaseUrlUtils;
 import eu.europeana.metis.common.rdf.RdfRepresentation;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -31,7 +32,7 @@ import org.apache.jena.sparql.path.PathVisitorBase;
 /**
  * This class provides EDM external validation.
  */
-public class EdmExternalValidator extends DataWithDefaultBaseUrlHandler {
+public class EdmExternalValidator {
 
   // Only access this through the synchronized getter.
   private static Shapes shapes = null;
@@ -55,7 +56,7 @@ public class EdmExternalValidator extends DataWithDefaultBaseUrlHandler {
       return node.getLiteral().toString();
     }
     if (node.isURI()) {
-      return normalizeUri(node.getURI());
+      return RdfBaseUrlUtils.undoResolutionAgainstDefaultBaseUrl(node.getURI());
     }
     return null;
   }
@@ -119,7 +120,7 @@ public class EdmExternalValidator extends DataWithDefaultBaseUrlHandler {
     // Parse the model
     final Model model = ModelFactory.createDefaultModel();
     try {
-      model.read(record, DEFAULT_BASE_URL, lang.getLabel());
+      model.read(record, RdfBaseUrlUtils.DEFAULT_BASE_URL, lang.getLabel());
     } catch (RuntimeException e) {
       return new ValidationReport(null, ValidationIssueSeverity.ERROR,
           List.of(new ValidationReportItem(null, null, null,
@@ -158,7 +159,8 @@ public class EdmExternalValidator extends DataWithDefaultBaseUrlHandler {
       return new ImmutablePair<>(null, new ValidationReportItem(null, null, null,
           "Multiple unique provided CHO ID found.", ValidationIssueSeverity.ERROR));
     }
-    return new ImmutablePair<>(normalizeUri(ids.iterator().next()), null);
+    return new ImmutablePair<>(
+        RdfBaseUrlUtils.undoResolutionAgainstDefaultBaseUrl(ids.iterator().next()), null);
   }
 
   private List<ValidationReportItem> checkForUnsupportedTypes(Model model) {

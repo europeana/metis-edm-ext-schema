@@ -1,5 +1,6 @@
 package eu.europeana.metis.edm.ext.schema;
 
+import eu.europeana.metis.common.rdf.RdfBaseUrlUtils;
 import eu.europeana.metis.common.rdf.RdfRepresentation;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -26,7 +27,7 @@ import org.apache.jena.sparql.core.Quad;
  * it returns all IRIs of resources of type <code>edm:ProvidedCHO</code> that are found in the
  * input data. This class implements a streamed parsing, and thus supports large data volumes.
  */
-public class EdmExternalRecordIdExtractor extends DataWithDefaultBaseUrlHandler {
+public class EdmExternalRecordIdExtractor {
 
   private EdmExternalRecordIdExtractor() {
   }
@@ -87,7 +88,7 @@ public class EdmExternalRecordIdExtractor extends DataWithDefaultBaseUrlHandler 
   private static Set<String> extractRecordIdsFromNormalizedData(InputStream normalizedData,
       RdfRepresentation representation) {
     final RDFParser parser = RDFParserBuilder.create().source(normalizedData)
-        .lang(representation.getLang()).base(DEFAULT_BASE_URL).build();
+        .lang(representation.getLang()).base(RdfBaseUrlUtils.DEFAULT_BASE_URL).build();
     final Set<String> recordIds = new HashSet<>();
     parser.parse(new StreamRDFBase() {
 
@@ -99,7 +100,8 @@ public class EdmExternalRecordIdExtractor extends DataWithDefaultBaseUrlHandler 
             "http://www.europeana.eu/schemas/edm/ProvidedCHO".equals(obj) &&
             triple.getSubject().isURI()
         ) {
-          recordIds.add(normalizeUri(triple.getSubject().getURI()));
+          recordIds.add(
+              RdfBaseUrlUtils.undoResolutionAgainstDefaultBaseUrl(triple.getSubject().getURI()));
         }
       }
 
