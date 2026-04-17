@@ -257,6 +257,10 @@
     sh:path edm:end ;
     a       :StringLiteralProperty .
 
+:edmGaussianCountProperty
+    sh:path edm:gaussianCount ;
+    a       :StringOrPositiveIntegerLiteralProperty .
+
 :edmHasMetProperty
     sh:path edm:hasMet ;
     a       :IRIProperty .
@@ -606,6 +610,7 @@
     sh:property          :dctermsIsReferencedByProperty ;
     sh:property          :dctermsIssuedProperty ;
     sh:property          :dctermsTemporalProperty ;
+    sh:property          :edmGaussianCountProperty ;
     sh:property          :edmIntededUsageProperty ;
     sh:property          :edmIsNextInSequenceProperty ;
     sh:property          :edmIsRepresentationOfProperty ;
@@ -1188,6 +1193,9 @@
                      sh:uniqueLang true ;
                      sh:severity   sh:Warning ;
                      sh:message    "There should be only one dc:title value per language. " ] ;
+    sh:property    [ sh:path     edm:gaussianCount ;
+                     sh:maxCount 1 ;
+                     sh:message  "edm:gaussianCount can only occur once." ] ;
     sh:property    [ sh:path     edm:pointCount ;
                      sh:maxCount 1 ;
                      sh:message  "edm:pointCount can only occur once." ] ;
