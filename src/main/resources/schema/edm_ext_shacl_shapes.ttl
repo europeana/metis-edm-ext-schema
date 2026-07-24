@@ -190,7 +190,7 @@
     sh:path dcterms:isReplacedBy ;
     a       :StringLiteralOrIRIProperty .
 
-:dctermsIsRepuiredByProperty
+:dctermsIsRequiredByProperty
     sh:path dcterms:isRequiredBy ;
     a       :StringLiteralOrIRIProperty .
 
@@ -548,7 +548,7 @@
     sh:property          :dctermsIsPartOfProperty ;
     sh:property          :dctermsIsReferencedByProperty ;
     sh:property          :dctermsIsReplacedByProperty ;
-    sh:property          :dctermsIsRepuiredByProperty ;
+    sh:property          :dctermsIsRequiredByProperty ;
     sh:property          :dctermsIssuedProperty ;
     sh:property          :dctermsIsVersionOfProperty ;
     sh:property          :dctermsMediumProperty ;
