@@ -30,7 +30,7 @@
     <dependency>
       <groupId>eu.europeana.metis</groupId>
       <artifactId>metis-common-rdf</artifactId>
-      <version>19-SNAPSHOT</version>
+      <version>20-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
