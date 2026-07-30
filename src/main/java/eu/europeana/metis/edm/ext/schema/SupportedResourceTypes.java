@@ -53,7 +53,7 @@ public class SupportedResourceTypes {
    *
    * @return Instance of this class.
    */
-  public static synchronized SupportedResourceTypes get() {
+  protected static synchronized SupportedResourceTypes get() {
     if (instance == null) {
       instance = new SupportedResourceTypes();
     }
@@ -66,7 +66,7 @@ public class SupportedResourceTypes {
    *
    * @return The supported types in an unmodifiable set.
    */
-  public Set<String> getSupportedResourceTypes() {
+  protected Set<String> getSupportedResourceTypes() {
     return supportedResourceTypes;
   }
 
@@ -75,7 +75,7 @@ public class SupportedResourceTypes {
    *
    * @param model The model to which to add the type hierarchy.
    */
-  public void addTypeHierarchyToModel(Model model) {
+  protected void addTypeHierarchyToModel(Model model) {
     model.add(typeHierarchyModel);
   }
 }

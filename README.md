@@ -2,7 +2,18 @@
 
 This repository contains the functionality for validating EDM-external records. 
 This code supports validation of RDF data in any standard representation
-(Turtle, XML, etc.).
+(Turtle, XML, etc.). It also contains some supporting functionality for analyzing 
+EDM-external content (such as segmenting and extracting record IDs).
+
+## Usage information
+
+This module offers functionality in three main areas:
+* Validation of individual EDM-external records through the functionality in 
+  `EdmExternalValidator`.
+* Segmenting of data dumps into individual records through the functionality in 
+  `EdmExternalSegmenter`.
+* Extraction of record ID(s) through the functionality in `EdmExternalRecordIdExtractor`. This is 
+  a more specialized need that surfaces in the Metis pipeline.
 
 ## The schema definitions
 
@@ -82,19 +93,35 @@ Once these fields have been eliminated, we can do a normalization step instead.
 
 We can do this as follows. During the transformation phase (and just before applying the XSLT),  
 we convert any model to RDF/XML using Jena, ensuring that all nested objects end up in the root 
-node. Note: there is some code for this in the LOD project where we perform segmentation.
-We will have to take care that we handle relative URIs properly.
+node. Note: there is some code for this in the `metis-commons-rdf` module (currently used to
+normalize non-XML dereferenced entities).
 
-## Latest update
+### Improve schema and validation usability outside Java applications
 
-This is still a trial version with limited rules.
+The way the functionality is currently designed, it is by far the easiest to use it from Java 
+applications because that interface supports proper loading of the schema files (e.g., 
+triggering the OWL inference and including the class hierarchy). There is nothing preventing other
+applications from loading the schema files the same way. However, it is not as straightforward.
+This also goes for the 'stricter' validation checks done outside of the schema (such as checking for
+unsupported resource types) and other supporting functionality implemented in Java. 
+
+Europeana being a Java-centric organization, we will likely never support all functionality for 
+other environments. However, there is demand for supplying the schema files in a way that does not
+require complex initialization.
+
+Actions we could take include:
+* Provide the fully OWL-inferenced SHACL shapes as part of the repository, so it can be used
+  on its own without initialization.
+* Eliminate the requirement to add the hierarchy to the source data before validation. The
+  hierarchy could be built into the SHACL shapes in some way (possibly requiring OWL-inferencing).
+
+Note: OWL-inferencing during Maven building will not achieve this goal as it still requires
+building the project (the Java/Maven way).
+
+## Latest update and pending work
 
 Still lacking support:
 
-* GENERATE SHACL FILE DURING BUILDING? This would be to apply the OWL rules, but perhaps also
-  to appy the hierarchy!
-* Check Enno Meijers' comments: https://github.com/europeana/metis-edm-ext-schema/issues . 
-  Then report back to Enno.
 * TODOs in SHACL file: To be investigated.
 * In general we should (probably) allow all technical metadata fields in `edm:WebResource`?
   The idea being that all fields that are served by our own APIs should be allowed as input?
@@ -115,7 +142,3 @@ This project should replace the schema links on the EDM page of Europeana Pro
 (https://pro.europeana.eu/page/edm-documentation)
 
 Full EDM documentation: https://europeana.atlassian.net/wiki/spaces/EF/pages/987791389/EDM+-+Mapping+guidelines
-
-## Usage information
-
-To be added.
