@@ -117,7 +117,7 @@ public class EdmExternalValidator {
 
   private ValidationReport validateSingleNormalizedRecord(InputStream record, Lang lang) {
 
-    // Parse the model
+    // Parse the model. Use default base URL, it will be removed in report items.
     final Model model = ModelFactory.createDefaultModel();
     try {
       model.read(record, RdfBaseUrlUtils.DEFAULT_BASE_URL, lang.getLabel());

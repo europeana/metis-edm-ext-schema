@@ -2,17 +2,23 @@ package eu.europeana.metis.edm.ext.schema;
 
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
+import static org.apache.jena.rdf.model.ResourceFactory.createStatement;
 
+import eu.europeana.metis.common.rdf.RdfBaseUrlUtils;
 import eu.europeana.metis.common.rdf.RdfRepresentation;
 import eu.europeana.metis.edm.ext.schema.EdmExternalSegmenter.RecordConsumer.SegmentationResult;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayDeque;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -20,6 +26,7 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.util.iterator.ExtendedIterator;
@@ -126,10 +133,7 @@ public class EdmExternalSegmenter implements AutoCloseable {
    * @param representation The representation of the data.
    */
   public void addData(InputStream inputStream, RdfRepresentation representation) {
-    // TODO be smarter about the base? Plan: use the same code as in RdfConversion. If no
-    //  base is given, detect the default one in all statements we are copying. If there is an
-    //  issue, we throw an exception.
-    RDFDataMgr.read(datasetModel, inputStream, null, representation.getLang());
+    RDFDataMgr.read(datasetModel, inputStream, RdfBaseUrlUtils.DEFAULT_BASE_URL, representation.getLang());
   }
 
   @Override
@@ -152,21 +156,34 @@ public class EdmExternalSegmenter implements AutoCloseable {
   /**
    * Segment the dataset into individual records.
    *
-   * @param consumer             A consumer for the individual records.
-   * @param <E>                  The exception that may be thrown by the record consumer.
-   * @throws E When something went wrong while consuming a record.
+   * @param consumer A consumer for the individual records.
+   * @param <E>      The exception that may be thrown by the record consumer.
+   * @throws E                  When something went wrong while consuming a record.
+   * @throws DataParseException When there was a problem parsing the data.
    */
-  public <E extends Exception> void segment(RecordConsumer<E> consumer) throws E {
+  public <E extends Exception> void segment(RecordConsumer<E> consumer)
+      throws E, DataParseException {
 
     // Iterate over the ProvidedCHO resources to extract the records.
     final ResIterator iterator = datasetModel.listResourcesWithProperty(RDF.type, EDM_PROVIDED_CHO);
     try {
       while (iterator.hasNext()) {
-        final SegmentationResult writeResult = writeSingleRecord(iterator.next(), consumer);
+        final Resource providedCho = iterator.next();
+        final String recordId = providedCho.getURI();
+        if (StringUtils.isBlank(recordId)) {
+          throw new DataParseException("Provided CHO without resource identifier.");
+        }
+        if (RdfBaseUrlUtils.isRelativeToDefaultBaseUrl(recordId)) {
+          throw new DataParseException("Provided CHO with relative resource identifier: "
+              + RdfBaseUrlUtils.undoResolutionAgainstDefaultBaseUrl(recordId));
+        }
+        final SegmentationResult writeResult = writeSingleRecord(providedCho, consumer);
         if (writeResult == SegmentationResult.TERMINATE) {
           break;
         }
       }
+    } catch (URISyntaxException e) {
+      throw new DataParseException("Could not parse a record ID", e);
     } finally {
       iterator.close();
     }
@@ -182,9 +199,10 @@ public class EdmExternalSegmenter implements AutoCloseable {
    * @param <E>                  The exception that may be thrown by the record consumer.
    * @return The result of the consume action
    * @throws E When something went wrong while consuming the record.
+   * @throws URISyntaxException If there was a problem with the record ID.
    */
   private <E extends Exception> SegmentationResult writeSingleRecord(Resource providedCHO,
-      RecordConsumer<E> consumer) throws E {
+      RecordConsumer<E> consumer) throws E, URISyntaxException {
     final Model recordModel = extractRecordToNewModel(providedCHO);
     try {
       final Resource record = recordModel.getResource(providedCHO.getURI());
@@ -211,8 +229,9 @@ public class EdmExternalSegmenter implements AutoCloseable {
    *
    * @param providedCHO The record to extract.
    * @return The new model.
+   * @throws URISyntaxException If there was a problem with the record ID.
    */
-  private Model extractRecordToNewModel(Resource providedCHO) {
+  private Model extractRecordToNewModel(Resource providedCHO) throws URISyntaxException {
 
     // Create a model for the record.
     final Model recordModel = ModelFactory.createDefaultModel();
@@ -226,12 +245,13 @@ public class EdmExternalSegmenter implements AutoCloseable {
         queue::add);
 
     // Perform the copying.
+    final URI recordId = new URI(providedCHO.getURI());
     while (!queue.isEmpty()) {
       final Resource resource = queue.removeFirst();
       if (!handled.add(resource)) {
         continue;
       }
-      copyResourceAndAddLinkedResourcesToQueue(resource, queue::addLast, recordModel);
+      copyResourceAndAddLinkedResourcesToQueue(resource, queue::addLast, recordModel, recordId);
     }
 
     // Done.
@@ -247,9 +267,10 @@ public class EdmExternalSegmenter implements AutoCloseable {
    * @param resource      The resource to copy.
    * @param queueAppender The operation of adding any linked resources to the queue.
    * @param target        The model to which the resource is to be copied.
+   * @param recordId      The ID of the record we are writing.
    */
   private void copyResourceAndAddLinkedResourcesToQueue(Resource resource,
-      Consumer<Resource> queueAppender, Model target) {
+      Consumer<Resource> queueAppender, Model target, URI recordId) {
     consumeJenaIterator(resource.listProperties(), statement -> {
 
       // Add any object resource to the queue to be included later.
@@ -259,8 +280,19 @@ public class EdmExternalSegmenter implements AutoCloseable {
       }
 
       // Add the statement to the target model. Create a legacy version of the statement if needed.
-      target.add(this.legacyEdmXlmSchemaMode ? asLegacyStatement(statement, target) : statement);
+      final Statement result = asStatementRelativeToRecordId(statement, recordId);
+      target.add(this.legacyEdmXlmSchemaMode ? asLegacyStatement(result, target) : result);
     });
+  }
+
+  private Statement asStatementRelativeToRecordId(Statement statement, URI recordId) {
+    final Resource subject = Optional
+        .ofNullable(RdfBaseUrlUtils.replaceDefaultBaseUrl(statement.getSubject(), recordId))
+        .map(ResourceFactory::createResource).orElse(statement.getSubject());
+    final RDFNode object = Optional
+        .ofNullable(RdfBaseUrlUtils.replaceDefaultBaseUrl(statement.getObject(), recordId))
+        .<RDFNode>map(ResourceFactory::createResource).orElse(statement.getObject());
+    return createStatement(subject, statement.getPredicate(), object);
   }
 
   /**
@@ -268,7 +300,7 @@ public class EdmExternalSegmenter implements AutoCloseable {
    * will change. Otherwise, we strip the literal's base direction and in most cases also the data
    * type, instead converting it to a string (potentially with language).
    *
-   * @param statement The statement to convert.
+   * @param statement The statement to convert. May not be bound to a model.
    * @param target    The target model where the statement is to be added.
    * @return A legacy version of the statement.
    */
