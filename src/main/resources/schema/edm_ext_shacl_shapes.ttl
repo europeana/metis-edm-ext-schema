@@ -40,15 +40,10 @@
                                                [ sh:datatype rdf:langString ]
                                                [ sh:nodeKind sh:IRI ] ) ] ] .
 
-# Set the message and conditions for a string literal property definition.
-:StringLiteralProperty
-    rdfs:subClassOf [ a              owl:Restriction ;
-                      owl:onProperty sh:message ;
-                      owl:hasValue   "This property must be a string literal." ] ;
-    rdfs:subClassOf [ a              owl:Restriction ;
-                      owl:onProperty sh:node ;
-                      owl:hasValue   [ sh:or ( [ sh:datatype xsd:string ]
-                                               [ sh:datatype rdf:langString ] ) ] ] .
+# The conditions for a string literal property definition.
+:stringLiteralCondition
+    sh:or ( [ sh:datatype xsd:string ]
+            [ sh:datatype rdf:langString ] ) .
 
 # Set the message and conditions for an IRI property definition.
 :IRIProperty
@@ -111,12 +106,14 @@
     a       :StringLiteralOrIRIProperty .
 
 :dcIdentifierProperty
-    sh:path dc:identifier ;
-    a       :StringLiteralProperty .
+    sh:path    dc:identifier ;
+    sh:node    :stringLiteralCondition ;
+    sh:message "This property must be a string literal." .
 
 :dcLanguageProperty
-    sh:path dc:language ;
-    a       :StringLiteralProperty .
+    sh:path    dc:language ;
+    sh:node    :stringLiteralCondition ;
+    sh:message "This property must be a string literal." .
 
 :dcPublisherProperty
     sh:path dc:publisher ;
@@ -139,16 +136,18 @@
     a       :StringLiteralOrIRIProperty .
 
 :dcTitleProperty
-    sh:path dc:title ;
-    a       :StringLiteralProperty .
+    sh:path    dc:title ;
+    sh:node    :stringLiteralCondition ;
+    sh:message "This property must be a string literal." .
 
 :dcTypeProperty
     sh:path dc:type ;
     a       :StringLiteralOrIRIProperty .
 
 :dctermsAlternativeProperty
-    sh:path dcterms:alternative ;
-    a       :StringLiteralProperty .
+    sh:path    dcterms:alternative ;
+    sh:node    :stringLiteralCondition ;
+    sh:message "This property must be a string literal." .
 
 :dctermsConformsToProperty
     sh:path dcterms:conformsTo ;
@@ -227,8 +226,9 @@
     a       :StringLiteralOrIRIProperty .
 
 :dctermsTableOfContentsProperty
-    sh:path dcterms:tableOfContents ;
-    a       :StringLiteralProperty .
+    sh:path    dcterms:tableOfContents ;
+    sh:node    :stringLiteralCondition ;
+    sh:message "This property must be a string literal." .
 
 :dctermsTemporalProperty
     sh:path dcterms:temporal ;
@@ -251,12 +251,14 @@
     a       :StringLiteralOrIRIProperty .
 
 :edmBeginProperty
-    sh:path edm:begin ;
-    a       :StringLiteralProperty .
+    sh:path    edm:begin ;
+    sh:node    :stringLiteralCondition ;
+    sh:message "This property must be a string literal." .
 
 :edmEndProperty
-    sh:path edm:end ;
-    a       :StringLiteralProperty .
+    sh:path    edm:end ;
+    sh:node    :stringLiteralCondition ;
+    sh:message "This property must be a string literal." .
 
 :edmGaussianCountProperty
     sh:path edm:gaussianCount ;
@@ -369,8 +371,9 @@
     a       :StringOrPositiveIntegerLiteralProperty .
 
 :foafNameProperty
-    sh:path foaf:name ;
-    a       :StringLiteralProperty .
+    sh:path    foaf:name ;
+    sh:node    :stringLiteralCondition ;
+    sh:message "This property must be a string literal." .
 
 # TODO Europeana has a controlled list for permissible values.
 :odrlInheritFromProperty
@@ -386,28 +389,34 @@
     a       :IRIProperty .
 
 :rdaGr2BiographicalInformationProperty
-    sh:path rdaGr2:biographicalInformation ;
-    a       :StringLiteralProperty .
+    sh:path    rdaGr2:biographicalInformation ;
+    sh:node    :stringLiteralCondition ;
+    sh:message "This property must be a string literal." .
 
 :rdaGr2DateOfBirthProperty
-    sh:path rdaGr2:dateOfBirth ;
-    a       :StringLiteralProperty .
+    sh:path    rdaGr2:dateOfBirth ;
+    sh:node    :stringLiteralCondition ;
+    sh:message "This property must be a string literal." .
 
 :rdaGr2DateOfDeathProperty
-    sh:path rdaGr2:dateOfDeath ;
-    a       :StringLiteralProperty .
+    sh:path    rdaGr2:dateOfDeath ;
+    sh:node    :stringLiteralCondition ;
+    sh:message "This property must be a string literal." .
 
 :rdaGr2DateOfEstablishmentProperty
-    sh:path rdaGr2:dateOfEstablishment ;
-    a       :StringLiteralProperty .
+    sh:path    rdaGr2:dateOfEstablishment ;
+    sh:node    :stringLiteralCondition ;
+    sh:message "This property must be a string literal." .
 
 :rdaGr2DateOfTerminationProperty
-    sh:path rdaGr2:dateOfTermination ;
-    a       :StringLiteralProperty .
+    sh:path    rdaGr2:dateOfTermination ;
+    sh:node    :stringLiteralCondition ;
+    sh:message "This property must be a string literal." .
 
 :rdaGr2GenderProperty
-    sh:path rdaGr2:gender ;
-    a       :StringLiteralProperty .
+    sh:path    rdaGr2:gender ;
+    sh:node    :stringLiteralCondition ;
+    sh:message "This property must be a string literal." .
 
 :rdaGr2PlaceOfBirthProperty
     sh:path rdaGr2:placeOfBirth ;
@@ -422,8 +431,9 @@
     a       :StringLiteralOrIRIProperty .
 
 :rdfsLabelProperty
-    sh:path rdfs:label ;
-    a       :StringLiteralProperty .
+    sh:path    rdfs:label ;
+    sh:node    :stringLiteralCondition ;
+    sh:message "This property must be a string literal." .
 
 :rdfsSeeAlsoProperty
     sh:path rdfs:seeAlso ;
@@ -436,8 +446,9 @@
     sh:message  "schema:digitalSourceType must have one of the permitted resource references." .
 
 :skosAltLabelProperty
-    sh:path skos:altLabel ;
-    a       :StringLiteralProperty .
+    sh:path    skos:altLabel ;
+    sh:node    :stringLiteralCondition ;
+    sh:message "This property must be a string literal." .
 
 :skosBroaderProperty
     sh:path skos:broader ;
@@ -456,8 +467,9 @@
     a       :IRIProperty .
 
 :skosHiddenLabelProperty
-    sh:path skos:hiddenLabel ;
-    a       :StringLiteralProperty .
+    sh:path    skos:hiddenLabel ;
+    sh:node    :stringLiteralCondition ;
+    sh:message "This property must be a string literal." .
 
 :skosInSchemeProperty
     sh:path skos:inScheme ;
@@ -477,12 +489,14 @@
     sh:message  "skos:notation must be a literal of any type." .
 
 :skosNoteProperty
-    sh:path skos:note ;
-    a       :StringLiteralProperty .
+    sh:path    skos:note ;
+    sh:node    :stringLiteralCondition ;
+    sh:message "This property must be a string literal." .
 
 :skosPrefLabelProperty
-    sh:path skos:prefLabel ;
-    a       :StringLiteralProperty .
+    sh:path    skos:prefLabel ;
+    sh:node    :stringLiteralCondition ;
+    sh:message "This property must be a string literal." .
 
 :skosRelatedProperty
     sh:path skos:related ;
@@ -967,6 +981,7 @@
     sh:property    [ sh:path owl:sameAs ;
                      a       :PlaceReference ] .
 
+# Service properties for which the references are dependent on the subject type.
 :ServiceWithCorrectReferencesShape
     a              sh:NodeShape ;
     sh:targetClass svcs:Service ;
@@ -1009,7 +1024,6 @@
 
 # ProvidedCHO: There needs to be at least a description or title, and the description should be a
 # literal. Also, there needs to be at least a dc:subject, dc:type, dcterms:spatial or dcterms:temporal.
-# TODO hasView can only occur if isShownBy has already been used. According to Hugo:check with Nuno. Warning, not violation.
 :ProvidedCHOCardinalitiesShape
     a              sh:NodeShape ;
     sh:targetClass edm:ProvidedCHO ;

@@ -120,17 +120,8 @@ building the project (the Java/Maven way).
 
 ## Latest update and pending work
 
-Still lacking support:
-
-* TODOs in SHACL file: To be investigated.
-* In general we should (probably) allow all technical metadata fields in `edm:WebResource`?
-  The idea being that all fields that are served by our own APIs should be allowed as input?
-
 Further additions needed (these may also require inclusion in the EDM documentation below):
 
-* Note:
-  * https://europeana.atlassian.net/wiki/spaces/EF/pages/3297116185/EDM+namespace+classes+and+properties+definitions
-  * https://europeana.atlassian.net/wiki/spaces/EF/pages/3138879489/EDM+definitions
 * The various record API V3 requirements (as warnings)
 * Technical metadata fields (profile)?
 * Others? Also see https://pro.europeana.eu/page/edm-profiles.
