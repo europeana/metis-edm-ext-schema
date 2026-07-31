@@ -285,6 +285,15 @@ public class EdmExternalSegmenter implements AutoCloseable {
     });
   }
 
+  /**
+   * Convert the statement to a statement relative to the record ID. I.e., adjust all resource
+   * references that are relative to the default base URL to instead be relative to the record ID.
+   * If no such relative resources are present, the statement remains unchanged.
+   *
+   * @param statement The statement to adjust.
+   * @param recordId  The record ID.
+   * @return The adjusted statement.
+   */
   private Statement asStatementRelativeToRecordId(Statement statement, URI recordId) {
     final Resource subject = Optional
         .ofNullable(RdfBaseUrlUtils.replaceDefaultBaseUrl(statement.getSubject(), recordId))

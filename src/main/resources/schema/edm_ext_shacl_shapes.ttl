@@ -746,22 +746,6 @@
 # class references are designed to avoid failing on literals, or on IRIs that are not resolvable
 # in the record.
 
-# TODO in the following checks, this schema follows the documentation. But we should verify and adjust.
-# TODO check: dc:coverage in the docs can also have timespan, but we enrich only for Place.
-# TODO check: fields that are not enriched but could be according to the docs: dc:publisher, ...
-# TODO        edm:currentLocation, edm:hasType, edm:isRelatedTo?, dc:relation?
-# TODO check: dcterms:medium and dc:format is enriched as if it always has a Concept, but this is
-# TODO        not clear from the docs. However, it is kind of implied in the EDM definition.
-# TODO check: Organization objects (and references to them) are not expected in EDM external?
-# TODO check: dc:description can be a reference. To what?
-
-# TODO check: The acceptable referenced classes/objects for each property. Where the documentation
-# TODO        it says '(related) resource' it is assumed to be a resource on the web somewhere.
-# TODO        So we need to check at least all references that are marked as non-EDM or
-# TODO        ProvidedCHO references.
-
-# TODO Nuno is working on formalizing the range description of the various properties.
-
 # Conditions with a lesser severity level.
 :ConditionWithLesserSeverity
     rdfs:subClassOf [ a              owl:Restriction ;
@@ -861,58 +845,22 @@
                      a       :AgentReference ] ;
     sh:property    [ sh:path dc:date ;
                      a       :TimeSpanReference ] ;
-    sh:property    [ sh:path dc:description ;
-                     a       :NonEdmReference ] ;
-    sh:property    [ sh:path dc:format ;
-                     a       :ConceptReference ] ;
     sh:property    [ sh:path dc:publisher ;
                      a       :AgentReference ] ;
     sh:property    [ sh:path dc:relation ;
-                     a       :ProvidedCHOReference ] ;
-    sh:property    [ sh:path dc:rights ;
-                     a       :NonEdmReference ] ;
-    sh:property    [ sh:path dc:source ;
                      a       :ProvidedCHOReference ] ;
     sh:property    [ sh:path dc:subject ;
                      a       :ConceptReference ] ;
     sh:property    [ sh:path dc:type ;
                      a       :ConceptReference ] ;
-    sh:property    [ sh:path dcterms:conformsTo ;
-                     a       :NonEdmReference ] ;
     sh:property    [ sh:path dcterms:created ;
                      a       :TimeSpanReference ] ;
-    sh:property    [ sh:path dcterms:extent ;
-                     a       :NonEdmReference ] ;
-    sh:property    [ sh:path dcterms:hasFormat ;
-                     a       :NonEdmReference ] ;
-    sh:property    [ sh:path dcterms:hasVersion ;
-                     a       :ProvidedCHOReference ] ;
     sh:property    [ sh:path dcterms:issued ;
                      a       :TimeSpanReference ] ;
-    sh:property    [ sh:path dcterms:isReferencedBy ;
-                     a       :ProvidedCHOReference ] ;
-    sh:property    [ sh:path dcterms:isReplacedBy ;
-                     a       :ProvidedCHOReference ] ;
-    sh:property    [ sh:path dcterms:isRequiredBy ;
-                     a       :ProvidedCHOReference ] ;
-    sh:property    [ sh:path dcterms:isVersionOf ;
-                     a       :ProvidedCHOReference ] ;
-    sh:property    [ sh:path dcterms:medium ;
-                     a       :ConceptReference ] ;
-    sh:property    [ sh:path dcterms:provenance ;
-                     a       :NonEdmReference ] ;
-    sh:property    [ sh:path dcterms:references ;
-                     a       :ProvidedCHOReference ] ;
-    sh:property    [ sh:path dcterms:replaces ;
-                     a       :ProvidedCHOReference ] ;
-    sh:property    [ sh:path dcterms:requires ;
-                     a       :ProvidedCHOReference ] ;
     sh:property    [ sh:path dcterms:spatial ;
                      a       :PlaceReference ] ;
     sh:property    [ sh:path dcterms:temporal ;
                      a       :TimeSpanReference ] ;
-    sh:property    [ sh:path doap:implements ;
-                     a       :NonEdmReference ] ;
     sh:property    [ sh:path    edm:aggregatedCHO ;
                      sh:class   edm:ProvidedCHO ;
                      sh:message "edm:aggregatedCHO must reference an edm:ProvidedCHO." ] ;
@@ -920,44 +868,29 @@
                      a       :PlaceReference ] ;
     sh:property    [ sh:path edm:dataProvider ;
                      a       :OrganisationReference ] ;
-    sh:property    [ sh:path     edm:hasMet ;
-                     sh:or       ( [ sh:class :ContextualClass ]
-                                   [ sh:not [ sh:class :EdmClass ] ] ) ;
-                     sh:severity sh:Warning ;
-                     sh:message  "This property should not reference an EDM class other than a contextual entity." ] ;
-    sh:property    [ sh:path edm:hasView ;
-                     a       :WebResourceReference ] ;
     sh:property    [ sh:path edm:hasType ;
                      a       :ConceptReference ] ;
-    sh:property    [ sh:path edm:incorporates ;
-                     a       :ProvidedCHOReference ] ;
-    sh:property    [ sh:path edm:intermediateProvider ;
-                     a       :OrganisationReference ] ;
+    sh:property    [ sh:path edm:hasView ;
+                     a       :WebResourceReference ] ;
     sh:property    [ sh:path edm:intendedUsage ;
                      a       :NonEdmReference ] ;
-    sh:property    [ sh:path edm:isDerivativeOf ;
-                     a       :ProvidedCHOReference ] ;
-    sh:property    [ sh:path edm:isRepresentationOf ;
-                     a       :ProvidedCHOReference ] ;
+    sh:property    [ sh:path edm:intermediateProvider ;
+                     a       :OrganisationReference ] ;
     sh:property    [ sh:path edm:isShownAt ;
                      a       :WebResourceReference ] ;
     sh:property    [ sh:path edm:isShownBy ;
                      a       :WebResourceReference ] ;
-    sh:property    [ sh:path edm:isSimilarTo ;
-                     a       :ProvidedCHOReference ] ;
-    sh:property    [ sh:path edm:isSuccessorOf ;
-                     a       :ProvidedCHOReference ] ;
     sh:property    [ sh:path edm:object ;
                      a       :WebResourceReference ] ;
     sh:property    [ sh:path edm:provider ;
                      a       :OrganisationReference ] ;
-    sh:property    [ sh:path edm:realizes ;
-                     a       :ProvidedCHOReference ] ;
+    # TODO Either edm:rights is from the controlled list (NonEdmReference), or it references cc:License.
     sh:property    [ sh:path     edm:rights ;
                      sh:or       ( [ sh:class cc:License ]
                                    [ sh:not [ sh:class :EdmClass ] ] ) ;
                      sh:severity sh:Warning ;
                      sh:message  "This property should not reference an EDM class other than cc:License." ] ;
+    # TODO Is from the controlled list.
     sh:property    [ sh:path odrl:inheritFrom ;
                      a       :NonEdmReference ] ;
     sh:property    [ sh:path prov:wasGeneratedBy ;
@@ -966,8 +899,6 @@
                      a       :PlaceReference ] ;
     sh:property    [ sh:path rdaGr2:placeOfDeath ;
                      a       :PlaceReference ] ;
-    sh:property    [ sh:path rdaGr2:professionOrOccupation ;
-                     a       :ConceptReference ] ;
     sh:property    [ sh:path schema:digitalSourceType ;
                      a       :NonEdmReference ] ;
     sh:property    [ sh:path skos:broader ;
@@ -978,8 +909,6 @@
                      a       :ConceptReference ] ;
     sh:property    [ sh:path skos:exactMatch ;
                      a       :ConceptReference ] ;
-    sh:property    [ sh:path skos:inScheme ;
-                     a       :NonEdmReference ] ;
     sh:property    [ sh:path skos:narrower ;
                      a       :ConceptReference ] ;
     sh:property    [ sh:path skos:narrowMatch ;
@@ -997,35 +926,15 @@
 :ProvidedCHOWithCorrectReferencesShape
     a              sh:NodeShape ;
     sh:targetClass edm:ProvidedCHO ;
-    sh:property    [ sh:path dcterms:hasPart ;
+    sh:property    [ sh:path edm:isRepresentationOf ;
                      a       :ProvidedCHOReference ] ;
-    sh:property    [ sh:path dcterms:isFormatOf ;
-                     a       :NonEdmReference ] ;
-    sh:property    [ sh:path dcterms:isPartOf ;
-                     a       :NonEdmReference ] ;
-    sh:property    [ sh:path edm:isNextInSequence ;
-                     a       :NonEdmReference ] ;
     sh:property    [ sh:path owl:sameAs ;
-                     a       :NonEdmReference ] ;
-    sh:property    [ sh:path     edm:isRelatedTo ;
-                     sh:or       ( [ sh:class edm:ProvidedCHO ]
-                                   [ sh:class skos:Concept ]
-                                   [ sh:not [ sh:class :EdmClass ] ] ) ;
-                     sh:severity sh:Warning ;
-                     sh:message  "This property should not reference an EDM class other than edm:ProvidedCHO or skos:Concept." ] .
+                     a       :NonEdmReference ] .
 
 # Web Resource properties for which the references are dependent on the subject type.
 :WebResourceWithCorrectReferencesShape
     a              sh:NodeShape ;
     sh:targetClass edm:WebResource ;
-    sh:property    [ sh:path dcterms:hasPart ;
-                     a       :WebResourceReference ] ;
-    sh:property    [ sh:path dcterms:isFormatOf ;
-                     a       :WebResourceReference ] ;
-    sh:property    [ sh:path dcterms:isPartOf ;
-                     a       :WebResourceReference ] ;
-    sh:property    [ sh:path edm:isNextInSequence ;
-                     a       :WebResourceReference ] ;
     sh:property    [ sh:path edm:isRepresentationOf ;
                      a       :WebResourceReference ] ;
     sh:property    [ sh:path owl:sameAs ;
@@ -1042,11 +951,6 @@
                      a       :AgentReference ] ;
     sh:property    [ sh:path dcterms:isPartOf ;
                      a       :AgentReference ] ;
-    sh:property    [ sh:path     edm:isRelatedTo ;
-                     sh:or       ( [ sh:class :ContextualClass ]
-                                   [ sh:not [ sh:class :EdmClass ] ] ) ;
-                     sh:severity sh:Warning ;
-                     sh:message  "This property should not reference an EDM class other than a contextual entity." ] ;
     sh:property    [ sh:path owl:sameAs ;
                      a       :AgentReference ] .
 
@@ -1066,6 +970,8 @@
 :ServiceWithCorrectReferencesShape
     a              sh:NodeShape ;
     sh:targetClass svcs:Service ;
+    sh:property    [ sh:path dcterms:conformsTo ;
+                     a       :NonEdmReference ] ;
     sh:property    [ sh:path     dcterms:conformsTo ;
                      sh:nodeKind sh:IRI ;
                      sh:in       ( <http://iiif.io/api/image> <https://oembed.com/> );
