@@ -43,25 +43,15 @@
 
 # Set the message and conditions for a string literal or decimal property definition.
 # TODO These properties should be encouraged to be decimal - but does our pipeline support it?
-:StringOrDecimalLiteralProperty
-    rdfs:subClassOf [ a              owl:Restriction ;
-                      owl:onProperty sh:message ;
-                      owl:hasValue   "This property must be a floating point (decimal)." ] ;
-    rdfs:subClassOf [ a              owl:Restriction ;
-                      owl:onProperty sh:node ;
-                      owl:hasValue   [ sh:or ( [ sh:datatype xsd:string ]
-                                               [ sh:datatype xsd:decimal ] ) ] ] .
+:stringOrDecimalLiteralCondition
+    sh:or ( [ sh:datatype xsd:string ] [ sh:datatype xsd:decimal ] ) .
+
 
 # Set the message and conditions for a string literal or positive integer property definition.
 # TODO These properties should be encouraged to be integer - but does our pipeline support it?
-:StringOrPositiveIntegerLiteralProperty
-    rdfs:subClassOf [ a              owl:Restriction ;
-                      owl:onProperty sh:message ;
-                      owl:hasValue   "This property must be a positive integer." ] ;
-    rdfs:subClassOf [ a              owl:Restriction ;
-                      owl:onProperty sh:node ;
-                      owl:hasValue   [ sh:or ( [ sh:datatype xsd:string ]
-                                               [ sh:datatype xsd:positiveInteger ] ) ] ] .
+:stringOrPositiveIntegerLiteralCondition
+    sh:or ( [ sh:datatype xsd:string ] [ sh:datatype xsd:positiveInteger ] ) .
+
 
 :ccDeprecatedOnProperty
     sh:path     cc:deprecatedOn ;
@@ -284,8 +274,9 @@
     sh:message "This property must be a string literal." .
 
 :edmGaussianCountProperty
-    sh:path edm:gaussianCount ;
-    a       :StringOrPositiveIntegerLiteralProperty .
+    sh:path    edm:gaussianCount ;
+    sh:node    :stringOrPositiveIntegerLiteralCondition ;
+    sh:message "This property must be a positive integer." .
 
 :edmHasMetProperty
     sh:path    edm:hasMet ;
@@ -377,12 +368,14 @@
     sh:message "This property must be a string literal or a resource reference." .
 
 :edmPointCountProperty
-    sh:path edm:pointCount ;
-    a       :StringOrPositiveIntegerLiteralProperty .
+    sh:path    edm:pointCount ;
+    sh:node    :stringOrPositiveIntegerLiteralCondition ;
+    sh:message "This property must be a positive integer." .
 
 :edmPolygonCountProperty
-    sh:path edm:polygonCount ;
-    a       :StringOrPositiveIntegerLiteralProperty .
+    sh:path    edm:polygonCount ;
+    sh:node    :stringOrPositiveIntegerLiteralCondition ;
+    sh:message "This property must be a positive integer." .
 
 :edmRealizesProperty
     sh:path    edm:realizes ;
@@ -407,8 +400,9 @@
     sh:message  "edm:ugc must be a string literal with value 'true'." .
 
 :edmVertexCountProperty
-    sh:path edm:vertexCount ;
-    a       :StringOrPositiveIntegerLiteralProperty .
+    sh:path    edm:vertexCount ;
+    sh:node    :stringOrPositiveIntegerLiteralCondition ;
+    sh:message "This property must be a positive integer." .
 
 :foafNameProperty
     sh:path    foaf:name ;
@@ -568,16 +562,19 @@
     sh:message "This property must be a resource reference." .
 
 :wgs84PosLatProperty
-    sh:path wgs84_pos:lat ;
-    a       :StringOrDecimalLiteralProperty .
+    sh:path    wgs84_pos:lat ;
+    sh:node    :stringOrDecimalLiteralCondition ;
+    sh:message "This property must be a floating point (decimal)." .
 
 :wgs84PosLongProperty
-    sh:path wgs84_pos:long ;
-    a       :StringOrDecimalLiteralProperty .
+    sh:path    wgs84_pos:long ;
+    sh:node    :stringOrDecimalLiteralCondition ;
+    sh:message "This property must be a floating point (decimal)." .
 
 :wgs84PosAltProperty
-    sh:path wgs84_pos:alt ;
-    a       :StringOrDecimalLiteralProperty .
+    sh:path    wgs84_pos:alt ;
+    sh:node    :stringOrDecimalLiteralCondition ;
+    sh:message "This property must be a floating point (decimal)." .
 
 
 ############################
