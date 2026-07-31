@@ -21,7 +21,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.reasoner.ReasonerRegistry;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.shacl.ShaclValidator;
 import org.apache.jena.shacl.Shapes;
@@ -41,9 +40,7 @@ public class EdmExternalValidator {
     if (shapes == null) {
       final Model shapesModel = ModelFactory.createDefaultModel()
           .read("schema/edm_ext_shacl_shapes.ttl", Lang.TTL.getLabel());
-      final Model enhancedShapeModel = ModelFactory
-          .createInfModel(ReasonerRegistry.getOWLReasoner(), shapesModel);
-      shapes = Shapes.parse(enhancedShapeModel);
+      shapes = Shapes.parse(shapesModel);
     }
     return shapes;
   }

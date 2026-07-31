@@ -33,23 +33,8 @@ accordance with the following design principles:
 
 * **Maintainability**. The EDM standard is in active continuous development and
   developers need to be able to be able to adapt the schema easily and robustly to
-  any changes. To this end some compromises were made in the form of required
-  pre-processing before validation against the shapes can take place:
-    * Some `rdfs:subClassOf` definitions are added to the model before it
-      is validated. They form a convenient class hierarchy that is then used in
-      the shape definitions to make them more readable and understandable. The
-      SHACL engine then picks them up automatically.
-    * Within the shape definitions, common and recurring constructs are abstracted
-      and then extended or inherited from, reducing as much as possible repetition
-      among those many shape definitions. This hierarchy is implemented in accordance
-      to the OWL standard. This means that OWL inference reasoning is required on
-      the shape definitions before validating any data against them.
-
-  > [!CAUTION]
-  > Due to these maintainability compromises, the shape declarations should not be
-  > used outside the context of this code base as a self-contained definition of EDM-external.
-  > These pre-processing actions are required and form an integral part of the
-  > EDM-external validation process.
+  any changes. To avoid complex abstractions (e.g., requiring OWL reasoning),
+  there is some repetition, mainly in the form of messages.
 
 ## Future work
 
@@ -98,25 +83,20 @@ normalize non-XML dereferenced entities).
 
 ### Improve schema and validation usability outside Java applications
 
-The way the functionality is currently designed, it is by far the easiest to use it from Java 
-applications because that interface supports proper loading of the schema files (e.g., 
-triggering the OWL inference and including the class hierarchy). There is nothing preventing other
-applications from loading the schema files the same way. However, it is not as straightforward.
-This also goes for the 'stricter' validation checks done outside of the schema (such as checking for
-unsupported resource types) and other supporting functionality implemented in Java. 
+The way the functionality is currently designed, it is easiest to use it from Java 
+applications because that interface supports proper application of the schema files
+(like loading the class hierarchy into the data). There is nothing preventing other
+applications from applying the schema files the same way. There are also the 'stricter'
+validation checks done outside of the schema (such as checking for unsupported 
+resource types) and other supporting functionality implemented in Java. 
 
 Europeana being a Java-centric organization, we will likely never support all functionality for 
 other environments. However, there is demand for supplying the schema files in a way that does not
 require complex initialization.
 
-Actions we could take include:
-* Provide the fully OWL-inferenced SHACL shapes as part of the repository, so it can be used
-  on its own without initialization.
-* Eliminate the requirement to add the hierarchy to the source data before validation. The
-  hierarchy could be built into the SHACL shapes in some way (possibly requiring OWL-inferencing).
-
-Note: OWL-inferencing during Maven building will not achieve this goal as it still requires
-building the project (the Java/Maven way).
+Actions we could take include eliminating the requirement to add the hierarchy to the 
+source data before validation. It could be investigated whether the hierarchy could be
+built into the SHACL shapes in some way.
 
 ## Latest update and pending work
 
