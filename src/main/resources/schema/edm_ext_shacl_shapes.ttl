@@ -37,14 +37,9 @@
 :stringLiteralCondition
     sh:or ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ] ) .
 
-# Set the message and conditions for an IRI property definition.
-:IRIProperty
-    rdfs:subClassOf [ a              owl:Restriction ;
-                      owl:onProperty sh:message ;
-                      owl:hasValue   "This property must be a resource reference." ] ;
-    rdfs:subClassOf [ a              owl:Restriction ;
-                      owl:onProperty sh:node ;
-                      owl:hasValue   [ sh:nodeKind sh:IRI ] ] .
+# The condition for an IRI property definition.
+:iriCondition
+    sh:nodeKind sh:IRI .
 
 # Set the message and conditions for a string literal or decimal property definition.
 # TODO These properties should be encouraged to be decimal - but does our pipeline support it?
@@ -259,12 +254,14 @@
     sh:message "This property must be a string literal or a resource reference." .
 
 :doapImplementsProperty
-    sh:path doap:implements ;
-    a       :IRIProperty .
+    sh:path    doap:implements ;
+    sh:node    :iriCondition ;
+    sh:message "This property must be a resource reference." .
 
 :edmAggregatedCHOProperty
-    sh:path edm:aggregatedCHO ;
-    a       :IRIProperty .
+    sh:path    edm:aggregatedCHO ;
+    sh:node    :iriCondition ;
+    sh:message "This property must be a resource reference." .
 
 :edmCurrentLocationProperty
     sh:path    edm:currentLocation ;
@@ -291,8 +288,9 @@
     a       :StringOrPositiveIntegerLiteralProperty .
 
 :edmHasMetProperty
-    sh:path edm:hasMet ;
-    a       :IRIProperty .
+    sh:path    edm:hasMet ;
+    sh:node    :iriCondition ;
+    sh:message "This property must be a resource reference." .
 
 :edmHasTypeProperty
     sh:path    edm:hasType ;
@@ -300,12 +298,14 @@
     sh:message "This property must be a string literal or a resource reference." .
 
 :edmHasViewProperty
-    sh:path edm:hasView ;
-    a       :IRIProperty .
+    sh:path    edm:hasView ;
+    sh:node    :iriCondition ;
+    sh:message "This property must be a resource reference." .
 
 :edmIncorporatesProperty
-    sh:path edm:incorporates ;
-    a       :IRIProperty .
+    sh:path    edm:incorporates ;
+    sh:node    :iriCondition ;
+    sh:message "This property must be a resource reference." .
 
 :edmIntededUsageProperty
     sh:path     edm:intendedUsage ;
@@ -322,12 +322,14 @@
     sh:message "This property must be a string literal or a resource reference." .
 
 :edmIsDerivativeOfProperty
-    sh:path edm:isDerivativeOf ;
-    a       :IRIProperty .
+    sh:path    edm:isDerivativeOf ;
+    sh:node    :iriCondition ;
+    sh:message "This property must be a resource reference." .
 
 :edmIsNextInSequenceProperty
-    sh:path edm:isNextInSequence ;
-    a       :IRIProperty .
+    sh:path    edm:isNextInSequence ;
+    sh:node    :iriCondition ;
+    sh:message "This property must be a resource reference." .
 
 :edmIsRelatedToProperty
     sh:path    edm:isRelatedTo ;
@@ -335,28 +337,34 @@
     sh:message "This property must be a string literal or a resource reference." .
 
 :edmIsRepresentationOfProperty
-    sh:path edm:isRepresentationOf ;
-    a       :IRIProperty .
+    sh:path    edm:isRepresentationOf ;
+    sh:node    :iriCondition ;
+    sh:message "This property must be a resource reference." .
 
 :edmIsShownAtProperty
-    sh:path edm:isShownAt ;
-    a       :IRIProperty .
+    sh:path    edm:isShownAt ;
+    sh:node    :iriCondition ;
+    sh:message "This property must be a resource reference." .
 
 :edmIsShownByProperty
-    sh:path edm:isShownBy ;
-    a       :IRIProperty .
+    sh:path    edm:isShownBy ;
+    sh:node    :iriCondition ;
+    sh:message "This property must be a resource reference." .
 
 :edmIsSimilarToProperty
-    sh:path edm:isSimilarTo ;
-    a       :IRIProperty .
+    sh:path    edm:isSimilarTo ;
+    sh:node    :iriCondition ;
+    sh:message "This property must be a resource reference." .
 
 :edmIsSuccessorOfProperty
-    sh:path edm:isSuccessorOf ;
-    a       :IRIProperty .
+    sh:path    edm:isSuccessorOf ;
+    sh:node    :iriCondition ;
+    sh:message "This property must be a resource reference." .
 
 :edmObjectProperty
-    sh:path edm:object ;
-    a       :IRIProperty .
+    sh:path    edm:object ;
+    sh:node    :iriCondition ;
+    sh:message "This property must be a resource reference." .
 
 :edmPidProperty
     sh:path     edm:pid ;
@@ -377,12 +385,14 @@
     a       :StringOrPositiveIntegerLiteralProperty .
 
 :edmRealizesProperty
-    sh:path edm:realizes ;
-    a       :IRIProperty .
+    sh:path    edm:realizes ;
+    sh:node    :iriCondition ;
+    sh:message "This property must be a resource reference." .
 
 :edmRightsProperty
-    sh:path edm:rights ;
-    a       :IRIProperty .
+    sh:path    edm:rights ;
+    sh:node    :iriCondition ;
+    sh:message "This property must be a resource reference." .
 
 :edmTypeProperty
     sh:path     edm:type ;
@@ -407,16 +417,19 @@
 
 # TODO Europeana has a controlled list for permissible values.
 :odrlInheritFromProperty
-    sh:path odrl:inheritFrom ;
-    a       :IRIProperty .
+    sh:path    odrl:inheritFrom ;
+    sh:node    :iriCondition ;
+    sh:message "This property must be a resource reference." .
 
 :owlSameAsProperty
-    sh:path owl:sameAs ;
-    a       :IRIProperty .
+    sh:path    owl:sameAs ;
+    sh:node    :iriCondition ;
+    sh:message "This property must be a resource reference." .
 
 :provWasGeneratedByProperty
-    sh:path prov:wasGeneratedBy ;
-    a       :IRIProperty .
+    sh:path    prov:wasGeneratedBy ;
+    sh:node    :iriCondition ;
+    sh:message "This property must be a resource reference." .
 
 :rdaGr2BiographicalInformationProperty
     sh:path    rdaGr2:biographicalInformation ;
@@ -469,8 +482,9 @@
     sh:message "This property must be a string literal." .
 
 :rdfsSeeAlsoProperty
-    sh:path rdfs:seeAlso ;
-    a       :IRIProperty .
+    sh:path    rdfs:seeAlso ;
+    sh:node    :iriCondition ;
+    sh:message "This property must be a resource reference." .
 
 :schemaDigitalSourceTypeProperty
     sh:path     schema:digitalSourceType ;
@@ -484,20 +498,24 @@
     sh:message "This property must be a string literal." .
 
 :skosBroaderProperty
-    sh:path skos:broader ;
-    a       :IRIProperty .
+    sh:path    skos:broader ;
+    sh:node    :iriCondition ;
+    sh:message "This property must be a resource reference." .
 
 :skosBroadMatchProperty
-    sh:path skos:broadMatch ;
-    a       :IRIProperty .
+    sh:path    skos:broadMatch ;
+    sh:node    :iriCondition ;
+    sh:message "This property must be a resource reference." .
 
 :skosCloseMatchProperty
-    sh:path skos:closeMatch ;
-    a       :IRIProperty .
+    sh:path    skos:closeMatch ;
+    sh:node    :iriCondition ;
+    sh:message "This property must be a resource reference." .
 
 :skosExactMatchProperty
-    sh:path skos:exactMatch ;
-    a       :IRIProperty .
+    sh:path    skos:exactMatch ;
+    sh:node    :iriCondition ;
+    sh:message "This property must be a resource reference." .
 
 :skosHiddenLabelProperty
     sh:path    skos:hiddenLabel ;
@@ -505,16 +523,19 @@
     sh:message "This property must be a string literal." .
 
 :skosInSchemeProperty
-    sh:path skos:inScheme ;
-    a       :IRIProperty .
+    sh:path    skos:inScheme ;
+    sh:node    :iriCondition ;
+    sh:message "This property must be a resource reference." .
 
 :skosNarrowerProperty
-    sh:path skos:narrower ;
-    a       :IRIProperty .
+    sh:path    skos:narrower ;
+    sh:node    :iriCondition ;
+    sh:message "This property must be a resource reference." .
 
 :skosNarrowMatchProperty
-    sh:path skos:narrowMatch ;
-    a       :IRIProperty .
+    sh:path    skos:narrowMatch ;
+    sh:node    :iriCondition ;
+    sh:message "This property must be a resource reference." .
 
 :skosNotationProperty
     sh:path     skos:notation ;
@@ -532,16 +553,19 @@
     sh:message "This property must be a string literal." .
 
 :skosRelatedProperty
-    sh:path skos:related ;
-    a       :IRIProperty .
+    sh:path    skos:related ;
+    sh:node    :iriCondition ;
+    sh:message "This property must be a resource reference." .
 
 :skosRelatedMatchProperty
-    sh:path skos:relatedMatch ;
-    a       :IRIProperty .
+    sh:path    skos:relatedMatch ;
+    sh:node    :iriCondition ;
+    sh:message "This property must be a resource reference." .
 
 :svcsHasServiceProperty
-    sh:path svcs:has_service ;
-    a       :IRIProperty .
+    sh:path    svcs:has_service ;
+    sh:node    :iriCondition ;
+    sh:message "This property must be a resource reference." .
 
 :wgs84PosLatProperty
     sh:path wgs84_pos:lat ;
