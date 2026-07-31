@@ -821,24 +821,12 @@
                       owl:hasValue   sh:Warning ] .
 
 # Set the message and conditions for an Agent reference definition.
-:AgentReference
-    rdfs:subClassOf :ConditionWithLesserSeverity ;
-    rdfs:subClassOf [ owl:onProperty sh:message ;
-                      owl:hasValue   "This property should not reference an EDM class other than edm:Agent." ] ;
-    rdfs:subClassOf [ a              owl:Restriction ;
-                      owl:onProperty sh:node ;
-                      owl:hasValue   [ sh:or ( [ sh:class edm:Agent ]
-                                               [ sh:not [ sh:class :EdmClass ] ] ) ] ] .
+:agentReferenceCondition
+    sh:or ( [ sh:class edm:Agent ] [ sh:not [ sh:class :EdmClass ] ] ) .
 
 # Set the message and conditions for a Concept reference definition.
-:ConceptReference
-    rdfs:subClassOf :ConditionWithLesserSeverity ;
-    rdfs:subClassOf [ owl:onProperty sh:message ;
-                      owl:hasValue   "This property should not reference an EDM class other than skos:Concept." ] ;
-    rdfs:subClassOf [ a              owl:Restriction ;
-                      owl:onProperty sh:node ;
-                      owl:hasValue   [ sh:or ( [ sh:class skos:Concept ]
-                                               [ sh:not [ sh:class :EdmClass ] ] ) ] ] .
+:conceptReferenceCondition
+    sh:or ( [ sh:class skos:Concept ] [ sh:not [ sh:class :EdmClass ] ] ) .
 
 # Set the message and conditions for a non-EDM reference definition.
 :NonEdmReference
@@ -901,26 +889,36 @@
 :EdmClassWithCorrectReferencesShape
     a              sh:NodeShape ;
     sh:targetClass :EdmClass ;
-    sh:property    [ sh:path dc:contributor ;
-                     a       :AgentReference ] ;
+    sh:property    [ sh:path     dc:contributor ;
+                     sh:node     :agentReferenceCondition ;
+                     sh:severity sh:Warning ;
+                     sh:message  "This property should not reference an EDM class other than edm:Agent." ] ;
     sh:property    [ sh:path     dc:coverage ;
                      sh:or       ( [ sh:class edm:Place ]
                                    [ sh:class edm:TimeSpan ]
                                    [ sh:not [ sh:class :EdmClass ] ] ) ;
                      sh:severity sh:Warning ;
                      sh:message  "This property should not reference an EDM class other than edm:Place or edm:TimeSpan." ] ;
-    sh:property    [ sh:path dc:creator ;
-                     a       :AgentReference ] ;
+    sh:property    [ sh:path     dc:creator ;
+                     sh:node     :agentReferenceCondition ;
+                     sh:severity sh:Warning ;
+                     sh:message  "This property should not reference an EDM class other than edm:Agent."] ;
     sh:property    [ sh:path dc:date ;
                      a       :TimeSpanReference ] ;
-    sh:property    [ sh:path dc:publisher ;
-                     a       :AgentReference ] ;
+    sh:property    [ sh:path     dc:publisher ;
+                     sh:node     :agentReferenceCondition ;
+                     sh:severity sh:Warning ;
+                     sh:message  "This property should not reference an EDM class other than edm:Agent." ] ;
     sh:property    [ sh:path dc:relation ;
                      a       :ProvidedCHOReference ] ;
-    sh:property    [ sh:path dc:subject ;
-                     a       :ConceptReference ] ;
-    sh:property    [ sh:path dc:type ;
-                     a       :ConceptReference ] ;
+    sh:property    [ sh:path     dc:subject ;
+                     sh:node     :conceptReferenceCondition ;
+                     sh:severity sh:Warning ;
+                     sh:message  "This property should not reference an EDM class other than skos:Concept." ] ;
+    sh:property    [ sh:path     dc:type ;
+                     sh:node     :conceptReferenceCondition ;
+                     sh:severity sh:Warning ;
+                     sh:message  "This property should not reference an EDM class other than skos:Concept." ] ;
     sh:property    [ sh:path dcterms:created ;
                      a       :TimeSpanReference ] ;
     sh:property    [ sh:path dcterms:issued ;
@@ -936,8 +934,10 @@
                      a       :PlaceReference ] ;
     sh:property    [ sh:path edm:dataProvider ;
                      a       :OrganisationReference ] ;
-    sh:property    [ sh:path edm:hasType ;
-                     a       :ConceptReference ] ;
+    sh:property    [ sh:path     edm:hasType ;
+                     sh:node     :conceptReferenceCondition ;
+                     sh:severity sh:Warning ;
+                     sh:message  "This property should not reference an EDM class other than skos:Concept."] ;
     sh:property    [ sh:path edm:hasView ;
                      a       :WebResourceReference ] ;
     sh:property    [ sh:path edm:intendedUsage ;
@@ -969,22 +969,38 @@
                      a       :PlaceReference ] ;
     sh:property    [ sh:path schema:digitalSourceType ;
                      a       :NonEdmReference ] ;
-    sh:property    [ sh:path skos:broader ;
-                     a       :ConceptReference ] ;
-    sh:property    [ sh:path skos:broadMatch ;
-                     a       :ConceptReference ] ;
-    sh:property    [ sh:path skos:closeMatch ;
-                     a       :ConceptReference ] ;
-    sh:property    [ sh:path skos:exactMatch ;
-                     a       :ConceptReference ] ;
-    sh:property    [ sh:path skos:narrower ;
-                     a       :ConceptReference ] ;
-    sh:property    [ sh:path skos:narrowMatch ;
-                     a       :ConceptReference ] ;
-    sh:property    [ sh:path skos:related ;
-                     a       :ConceptReference ] ;
-    sh:property    [ sh:path skos:relatedMatch ;
-                     a       :ConceptReference ] ;
+    sh:property    [ sh:path     skos:broader ;
+                     sh:node     :conceptReferenceCondition ;
+                     sh:severity sh:Warning ;
+                     sh:message  "This property should not reference an EDM class other than skos:Concept." ] ;
+    sh:property    [ sh:path     skos:broadMatch ;
+                     sh:node     :conceptReferenceCondition ;
+                     sh:severity sh:Warning ;
+                     sh:message  "This property should not reference an EDM class other than skos:Concept." ] ;
+    sh:property    [ sh:path     skos:closeMatch ;
+                     sh:node     :conceptReferenceCondition ;
+                     sh:severity sh:Warning ;
+                     sh:message  "This property should not reference an EDM class other than skos:Concept." ] ;
+    sh:property    [ sh:path     skos:exactMatch ;
+                     sh:node     :conceptReferenceCondition ;
+                     sh:severity sh:Warning ;
+                     sh:message  "This property should not reference an EDM class other than skos:Concept." ] ;
+    sh:property    [ sh:path     skos:narrower ;
+                     sh:node     :conceptReferenceCondition ;
+                     sh:severity sh:Warning ;
+                     sh:message  "This property should not reference an EDM class other than skos:Concept." ] ;
+    sh:property    [ sh:path     skos:narrowMatch ;
+                     sh:node     :conceptReferenceCondition ;
+                     sh:severity sh:Warning ;
+                     sh:message  "This property should not reference an EDM class other than skos:Concept." ] ;
+    sh:property    [ sh:path     skos:related ;
+                     sh:node     :conceptReferenceCondition ;
+                     sh:severity sh:Warning ;
+                     sh:message  "This property should not reference an EDM class other than skos:Concept." ] ;
+    sh:property    [ sh:path     skos:relatedMatch ;
+                     sh:node     :conceptReferenceCondition ;
+                     sh:severity sh:Warning ;
+                     sh:message  "This property should not reference an EDM class other than skos:Concept." ] ;
     sh:property    [ sh:path     svcs:has_service ;
                      sh:class    svcs:Service ;
                      sh:severity sh:Warning ;
@@ -1015,12 +1031,18 @@
 :AgentWithCorrectReferencesShape
     a              sh:NodeShape ;
     sh:targetClass edm:Agent ;
-    sh:property    [ sh:path dcterms:hasPart ;
-                     a       :AgentReference ] ;
-    sh:property    [ sh:path dcterms:isPartOf ;
-                     a       :AgentReference ] ;
-    sh:property    [ sh:path owl:sameAs ;
-                     a       :AgentReference ] .
+    sh:property    [ sh:path     dcterms:hasPart ;
+                     sh:node     :agentReferenceCondition ;
+                     sh:severity sh:Warning ;
+                     sh:message  "This property should not reference an EDM class other than edm:Agent." ] ;
+    sh:property    [ sh:path     dcterms:isPartOf ;
+                     sh:node     :agentReferenceCondition ;
+                     sh:severity sh:Warning ;
+                     sh:message  "This property should not reference an EDM class other than edm:Agent."] ;
+    sh:property    [ sh:path     owl:sameAs ;
+                     sh:node     :agentReferenceCondition ;
+                     sh:severity sh:Warning ;
+                     sh:message  "This property should not reference an EDM class other than edm:Agent." ] .
 
 # Place properties for which the references are dependent on the subject type.
 :PlaceWithCorrectReferencesShape
