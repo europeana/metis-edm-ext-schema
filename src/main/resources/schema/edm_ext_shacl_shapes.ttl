@@ -22,6 +22,23 @@
 @prefix wgs84_pos: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
 
 
+#####################################
+### License statement definitions ###
+#####################################
+
+:licenseStatementCondition
+    sh:or (
+      [ sh:pattern "^http://creativecommons\\.org/licenses/(by|by-sa|by-nd|by-nc|by-nc-sa|by-nd-nc)/1\\.0/((fi|il|nl)/)?$" ]
+      [ sh:pattern "^http://creativecommons\\.org/licenses/(by|by-sa|by-nd|by-nc|by-nc-sa|by-nd-nc)/2\\.0/((au|at|be|br|ca|cl|hr|uk|fr|de|it|jp|nl|pl|kr|es|tw)/)?$" ]
+      [ sh:pattern "^http://creativecommons\\.org/licenses/(by|by-sa|by-nd|by-nc|by-nc-sa|by-nd-nc)/2\\.1/(au|es|jp)/$" ]
+      [ sh:pattern "^http://creativecommons\\.org/licenses/(by|by-sa|by-nd|by-nc|by-nc-sa|by-nd-nc)/2\\.5/((ar|au|br|bg|ca|cn|co|hr|dk|hu|in|il|it|mk|my|mt|mx|nl|pe|pl|pt|scotland|si|za|es|se|ch|tw)/)?$" ]
+      [ sh:pattern "^http://creativecommons\\.org/licenses/(by|by-sa|by-nd|by-nc|by-nc-sa|by-nd-nc)/3\\.0/((au|at|br|cl|cn|cr|hr|cz|ec|eg|ee|fr|de|gr|gt|hk|igo|ie|it|lu|nl|nz|no|ph|pl|pt|pr|ro|rs|sg|za|es|ch|tw|th|ug|us|ve|vn)/)?$" ]
+      [ sh:pattern "^http://creativecommons\\.org/licenses/(by|by-sa|by-nd|by-nc|by-nc-sa|by-nd-nc)/4\\.0/$" ]
+      [ sh:pattern "^http://rightsstatements\\.org/vocab/(NoC-NC|NoC-OKLR|InC|InC-EDU|InC-EU-OW|CNE)/1\\.0/$" ]
+      [ sh:pattern "^http://creativecommons\\.org/publicdomain/(zero|mark)/1\\.0/$" ]
+    ) .
+
+
 ############################
 ### Property definitions ###
 ############################
@@ -299,13 +316,13 @@
     sh:message "This property must be a resource reference." .
 
 :edmIntededUsageProperty
-    sh:path     edm:intendedUsage ;
-    sh:nodeKind sh:IRI ;
-    sh:in       ( ef_usage:Knowledge ef_usage:Research ef_usage:Education ef_usage:Infotainment
-                  ef_usage:Tourism ef_usage:Gaming ef_usage:Exhibition ef_usage:Creativity
-                  ef_usage:Design ef_usage:Art ef_usage:Curation ef_usage:Maintenance
-                  ef_usage:Restoration ef_usage:Documentation ) ;
-    sh:message  "edm:intendedUsage must have one of the permitted resource references." .
+    sh:path    edm:intendedUsage ;
+    sh:node    :iriCondition ;
+    sh:in      ( ef_usage:Knowledge ef_usage:Research ef_usage:Education ef_usage:Infotainment
+                 ef_usage:Tourism ef_usage:Gaming ef_usage:Exhibition ef_usage:Creativity
+                 ef_usage:Design ef_usage:Art ef_usage:Curation ef_usage:Maintenance
+                 ef_usage:Restoration ef_usage:Documentation ) ;
+    sh:message "edm:intendedUsage must have one of the permitted resource references." .
 
 :edmIntermediateProviderProperty
     sh:path    edm:intermediateProvider ;
@@ -409,11 +426,11 @@
     sh:node    :stringLiteralCondition ;
     sh:message "This property must be a string literal." .
 
-# TODO Europeana has a controlled list for permissible values.
 :odrlInheritFromProperty
     sh:path    odrl:inheritFrom ;
     sh:node    :iriCondition ;
-    sh:message "This property must be a resource reference." .
+    sh:node    :licenseStatementCondition ;
+    sh:message "odrl:inheritFrom must have one of the permitted resource references." .
 
 :owlSameAsProperty
     sh:path    owl:sameAs ;
@@ -481,10 +498,10 @@
     sh:message "This property must be a resource reference." .
 
 :schemaDigitalSourceTypeProperty
-    sh:path     schema:digitalSourceType ;
-    sh:nodeKind sh:IRI ;
-    sh:in       ( iptc:digitalCapture iptc:dataDrivenMedia iptc:digitalCreation ) ;
-    sh:message  "schema:digitalSourceType must have one of the permitted resource references." .
+    sh:path    schema:digitalSourceType ;
+    sh:node    :iriCondition ;
+    sh:in      ( iptc:digitalCapture iptc:dataDrivenMedia iptc:digitalCreation ) ;
+    sh:message "schema:digitalSourceType must have one of the permitted resource references." .
 
 :skosAltLabelProperty
     sh:path    skos:altLabel ;
@@ -943,13 +960,13 @@
                      sh:node     :organisationReferenceCondition ;
                      sh:severity sh:Warning ;
                      sh:message  "This property relates to Organizations and should not reference an EDM-external class." ] ;
-    # TODO Either edm:rights is from the controlled list (NonEdmReference), or it references cc:License.
-    sh:property    [ sh:path     edm:rights ;
-                     sh:or       ( [ sh:class cc:License ]
-                                   [ sh:not [ sh:class :EdmClass ] ] ) ;
+    sh:property [    sh:path edm:rights ;
+                     sh:or   ( [ sh:not   [ sh:node :licenseStatementCondition ] ;
+                                 sh:class cc:License ]
+                               [ sh:node  :licenseStatementCondition ;
+                                 sh:node  :nonEdmReferenceCondition ] ) ;
                      sh:severity sh:Warning ;
-                     sh:message  "This property should not reference an EDM class other than cc:License." ] ;
-    # TODO Is from the controlled list.
+                     sh:message  "This property must either have one of the permitted values or reference a cc:License." ] ;
     sh:property    [ sh:path     odrl:inheritFrom ;
                      sh:node     :nonEdmReferenceCondition ;
                      sh:severity sh:Warning ;
