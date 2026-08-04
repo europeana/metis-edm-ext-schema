@@ -237,7 +237,8 @@ public class EdmExternalSegmenter implements AutoCloseable {
     final Model recordModel = ModelFactory.createDefaultModel();
     recordModel.setNsPrefixes(datasetModel.getNsPrefixMap());
 
-    // Prepare copying: queue for processing and set of handled resources to avoid cycles.
+    // Prepare copying: queue for processing and set of handled resources to avoid cycles. Add
+    // the ProvidedCHO and the Aggregator as seed objects (Proxy does not exist in EDM external).
     final Set<Resource> handled = new HashSet<>();
     final ArrayDeque<Resource> queue = new ArrayDeque<>();
     queue.add(providedCHO);

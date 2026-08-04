@@ -7,22 +7,29 @@ EDM-external content (such as segmenting and extracting record IDs).
 
 ## Usage information
 
-This module offers functionality in three main areas:
+This repository offers functionality in three main areas through Java integration:
+
 * Validation of individual EDM-external records through the functionality in 
-  `EdmExternalValidator`.
+  [EdmExternalValidator.java](src/main/java/eu/europeana/metis/edm/ext/schema/EdmExternalValidator.java).
 * Segmenting of data dumps into individual records through the functionality in 
-  `EdmExternalSegmenter`.
-* Extraction of record ID(s) through the functionality in `EdmExternalRecordIdExtractor`. This is 
-  a more specialized need that surfaces in the Metis pipeline.
+  [EdmExternalSegmenter.java](src/main/java/eu/europeana/metis/edm/ext/schema/EdmExternalSegmenter.java).
+* Extraction of record ID(s) through the functionality in 
+  [EdmExternalRecordIdExtractor.java](src/main/java/eu/europeana/metis/edm/ext/schema/EdmExternalRecordIdExtractor.java). 
+  This is a specialized need that surfaces in the Metis pipeline.
+
+Additionally, the SHACL shapes are usable on their own in any SHACL validator. They fully
+conform to the SHACL standard. However, please note that they rely on the hierarchy in the
+class definitions (in
+[edm_ext_class_definitions.ttl](src/main/resources/schema/edm_ext_class_definitions.ttl))
+being added to the source data, so that the (limited) SHACL type inference can take pace.
 
 ## The schema definitions
 
-This repository contains SHACL shape definitions (represented in Turtle) that
-implements the EDM-external schema and against
-which any records can be validated for EDM compliance. They are written in
-accordance with the following design principles:
+This repository contains SHACL shape definitions (represented in the Turtle format) that
+implements the EDM-external schema and against which any records can be validated for EDM 
+compliance. They are written in accordance with the following design principles:
 
-* **Usability**. The purpose of this validation is to provide feedback on a user's
+* **User-friendliness**. The purpose of this validation is to provide feedback on a user's
   data's validity and correctness. The users' knowledge and experience with EDM, and
   RDF in general, can vary wildly. As such it is important to give clear feedback
   with appropriate and topical error and warning messages. To achieve this, the
@@ -34,7 +41,14 @@ accordance with the following design principles:
 * **Maintainability**. The EDM standard is in active continuous development and
   developers need to be able to be able to adapt the schema easily and robustly to
   any changes. To avoid complex abstractions (e.g., requiring OWL reasoning),
-  there is some repetition, mainly in the form of messages.
+  there is some repetition, mainly in the form of `sh:message` values. This could
+  not be avoided without violating the usability considerations (see below).
+
+* **Usability**. This repository offers easy-to-use access through the various entry
+  points mentioned above. Additionally, consideration has been given to usage of
+  the shapes in isolation (for instance outside the Java context). This is quite 
+  possible, even though the requirement of including the class definitions slightly 
+  complicates this use case.
 
 ## Future work
 
@@ -71,15 +85,14 @@ In RDF-based validation this will pass because the inner object is not anonymous
 We therefore added code that will specifically check whether the objects are all top-level (and 
 issue an error if they are not).
 
-The ideal solution is to be more permissive and normalize the XML before applying the 
-transformation (or, rework the transformation to operate on generic RDF and not just on XML).
-This cannot easily be done due to the presence of the provenance fields (mentioned above).
-Once these fields have been eliminated, we can do a normalization step instead.
+The ideal solution is to rework the transformation to operate on generic RDF and not 
+just on XML. This will be a major undertaking, further complicated by the presence of 
+the provenance fields (mentioned above). 
 
-We can do this as follows. During the transformation phase (and just before applying the XSLT),  
-we convert any model to RDF/XML using Jena, ensuring that all nested objects end up in the root 
-node. Note: there is some code for this in the `metis-commons-rdf` module (currently used to
-normalize non-XML dereferenced entities).
+A permissive solution that is easier to implement is to convert a non-XML representation
+to XML, then normalize this XML representation just before transformation. There is code
+for this normalization in the `metis-commons-rdf` library (in `RdfXmlHierarchyNormalization`) 
+that supports the provenance fields.
 
 ### Improve schema and validation usability outside Java applications
 
@@ -87,29 +100,32 @@ The way the functionality is currently designed, it is easiest to use it from Ja
 applications because that interface supports proper application of the schema files
 (like loading the class hierarchy into the data). There is nothing preventing other
 applications from applying the schema files the same way. There are also the 'stricter'
-validation checks done outside of the schema (such as checking for unsupported 
+validation checks done outside the schema (such as checking for unsupported 
 resource types) and other supporting functionality implemented in Java. 
 
 Europeana being a Java-centric organization, we will likely never support all functionality for 
 other environments. However, there is demand for supplying the schema files in a way that does not
 require complex initialization.
 
-Actions we could take include eliminating the requirement to add the hierarchy to the 
-source data before validation. It could be investigated whether the hierarchy could be
-built into the SHACL shapes in some way.
+The main action we could take is to include eliminating the requirement to add the hierarchy 
+to the source data before validation. It could be investigated whether the hierarchy could 
+be built into the SHACL shapes in some way.
+
+## References
+
+* The full EDM documentation can be found here:
+  https://europeana.atlassian.net/wiki/spaces/EF/pages/2916974597/Europeana+Data+Model
+  including the various child articles.
+* Additional information on the use of EDM (the 'Mapping Guidelines' can be found here:
+  https://europeana.atlassian.net/wiki/spaces/EF/pages/987791389/EDM+-+Mapping+guidelines
+  including the various child articles.
+* The official SHACL definition can be found here: https://www.w3.org/TR/shacl/.
+* The book _Validating RDF Data_, by Jose Emilio labra Gayo, Eric Prud’hommeaux, Iovka Boneva
+  and Dimitris Kontokostas has a useful introductory chapter on SHACL and is available 
+  online: https://book.validatingrdf.com/bookHtml011.html. 
 
 ## Latest update and pending work
 
-Further additions needed (these may also require inclusion in the EDM documentation below):
-
-* The various record API V3 requirements (as warnings)
-* Technical metadata fields (profile)?
-* Others? Also see https://pro.europeana.eu/page/edm-profiles.
-* Others? Also see (subpages
-  of) https://europeana.atlassian.net/wiki/spaces/EF/pages/1141932262/Classes+from+EDM+Profiles
 * Any additional features in the existing (jibx) schema?
-
-This project should replace the schema links on the EDM page of Europeana Pro 
+* This project should replace the schema links on the EDM page of Europeana Pro 
 (https://pro.europeana.eu/page/edm-documentation)
-
-Full EDM documentation: https://europeana.atlassian.net/wiki/spaces/EF/pages/987791389/EDM+-+Mapping+guidelines
